@@ -1,0 +1,38 @@
+{
+  "sources": {
+    "club": "D:\\Desktop\\嘉得路网球对战平台项目\\测试图\\切图-俱乐部元件.png",
+    "gallery": "C:/Users/17112/AppData/Local/Temp/codex-clipboard-b819f084-dd27-476b-84c8-39e3b9014ef9.png"
+  },
+  "results": [
+    {
+      "key": "club-flag",
+      "source": "club",
+      "left": 52,
+      "top": 70,
+      "width": 440,
+      "height": 368,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\club-gallery\\club-flag.png",
+      "removedPixels": 112025
+    },
+    {
+      "key": "gallery-camera",
+      "source": "gallery",
+      "left": 72,
+      "top": 82,
+      "width": 566,
+      "height": 370,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\club-gallery\\gallery-camera.png",
+      "removedPixels": 76725
+    },
+    {
+      "key": "gallery-polaroid",
+      "source": "gallery",
+      "left": 700,
+      "top": 164,
+      "width": 164,
+      "height": 205,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\club-gallery\\gallery-polaroid.png",
+      "removedPixels": 3717
+    }
+  ]
+}

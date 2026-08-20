@@ -1,0 +1,7 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Tournament Card / Time / Icon">
+<circle id="Clock ring" cx="12" cy="12" r="8.1" stroke="#7D8583" stroke-width="1.8"/>
+<rect id="Clock hand" x="11" y="5" width="1.8" height="8" rx="0.9" fill="#7D8583"/>
+<rect id="Clock hand horizontal" x="11" y="11" width="7" height="1.8" rx="0.9" fill="#7D8583"/>
+</g>
+</svg>

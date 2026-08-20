@@ -1,0 +1,62 @@
+/**
+ * 设计 token —— 全部取自 Figma 文件「网球赛事总结」(nzKWauHC37fyjpAtA3rjfd)。
+ *
+ * 画板宽 750px，与小程序 750rpx 基准一致，因此设计稿 1px 直接写作 1rpx。
+ * 画板高 1184px 短于真机可视高度，页面按「头部固定高度 + 内容流式」实现，
+ * 不要按画板总高等比缩放。
+ */
+page {
+  /* 头部渐变（node 1:208） */
+  --header-gradient: linear-gradient(90deg, #d4f34a 0%, #bfe63b 48%, #7ebb27 100%);
+
+  /* 品牌绿 */
+  --brand-lime: #83d414; /* Tab 选中底色，设计变量 tennis-color-brand-lime */
+  --brand-green-deep: #54b50a; /* 报名按钮 */
+  --brand-halo: #e6ffb0; /* 底栏选中光晕 */
+  --brand-green-text: #59850a; /* 底栏选中文字 */
+
+  /* 背景 */
+  --page-bg: #fbfff4; /* 波浪填充色，同时作为页面底色 */
+  --grid-gradient: linear-gradient(
+    179.4deg,
+    #f9ffeb 6.58%,
+    #ffffff 45.23%,
+    #f2ffd6 97.05%
+  );
+  --feed-gradient: linear-gradient(180deg, #f2ffd6 0%, #f5f8f5 100%);
+  --card-bg: #ffffff; /* 设计变量 tennis-color-surface-card */
+
+  /* 文字 */
+  --text-nav-title: #263312; /* 页面大标题 */
+  --text-banner-title: #14210a;
+  --text-banner-sub: #50662a;
+  --text-grid-label: #333b2e;
+  --text-tab-active: #10140e;
+  --text-muted: #7d8583; /* Tab 未选中、卡片副信息 */
+  --text-card-title: #1b201d;
+  --text-tabbar-idle: #6b7566;
+  --text-inverse: #ffffff;
+
+  /* 轮播指示点 */
+  --dot-active: #294308;
+  --dot-idle: rgba(83, 119, 36, 0.42);
+
+  /* 圆角 */
+  --radius-feed: 40rpx;
+  --radius-card: 28rpx;
+  --radius-photo: 22rpx;
+  --radius-tab: 23rpx;
+  --radius-button: 27rpx;
+
+  /* 阴影 */
+  --shadow-card: 0 10rpx 12rpx rgba(31, 46, 31, 0.12);
+
+  /* 关键高度 */
+  --header-height: 321rpx;
+  --grid-height: 350rpx;
+  --filter-height: 46rpx;
+  --tabbar-height: 153rpx;
+
+  /* 未选中的底栏图标在设计中带 52% 不透明度 */
+  --tabbar-icon-idle-opacity: 0.52;
+}

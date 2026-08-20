@@ -1,0 +1,10 @@
+{
+  "name": "ltjimmy-tennis-miniprogram",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LTJIMMY 网球赛事平台微信小程序",
+  "devDependencies": {
+    "miniprogram-api-typings": "^4.0.4",
+    "typescript": "^5.6.3"
+  }
+}

@@ -1,0 +1,69 @@
+@import './styles/tokens.wxss';
+
+page {
+  background: var(--page-bg);
+  color: var(--text-card-title);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue',
+    'Microsoft YaHei', sans-serif;
+  font-size: 28rpx;
+  -webkit-font-smoothing: antialiased;
+}
+
+view,
+text,
+image,
+swiper,
+swiper-item,
+scroll-view {
+  box-sizing: border-box;
+}
+
+image {
+  display: block;
+}
+
+/* 页面底部为自定义 tabBar 让出空间 */
+.tabbar-spacer {
+  height: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
+}
+
+/* 头部渐变通栏：内层 header__inner 承载按设计稿绝对定位的元素 */
+.header {
+  position: relative;
+  width: 100%;
+  background: var(--header-gradient);
+}
+
+.header__inner {
+  position: relative;
+  width: 100%;
+  height: var(--header-height);
+  overflow: hidden;
+}
+
+/* 头部下缘波浪，取自 Figma node 1:230 的矢量路径 */
+.header__wave {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='321' viewBox='0 0 750 321' preserveAspectRatio='none'%3E%3Cpath d='M0 260C92 219 166 291 263 273C343 258 373 230 448 258C546 293 628 238 750 202V321H0V260Z' fill='%23FBFFF4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+
+.header__title {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  font-weight: 600;
+  color: var(--text-nav-title);
+}

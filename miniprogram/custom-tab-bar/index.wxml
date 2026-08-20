@@ -1,0 +1,18 @@
+<view class="tabbar">
+  <view
+    class="tabbar__item"
+    wx:for="{{tabs}}"
+    wx:key="path"
+    data-index="{{index}}"
+    bindtap="onTap"
+  >
+    <view class="tabbar__halo" wx:if="{{selected === index}}"></view>
+    <image
+      class="tabbar__icon"
+      src="{{item.icon}}"
+      mode="aspectFit"
+      style="{{item.iconStyle}};opacity:{{selected === index ? 1 : idleOpacity}}"
+    />
+    <text class="tabbar__label {{selected === index ? 'is-active' : ''}}">{{item.text}}</text>
+  </view>
+</view>

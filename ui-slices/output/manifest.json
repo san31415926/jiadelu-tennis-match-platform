@@ -1,0 +1,27 @@
+{
+  "source": {
+    "home": "C:\\Users\\17112\\AppData\\Local\\Temp\\codex-clipboard-74c5da1c-bef5-4be3-a167-7e2e076841e8.png",
+    "bottomNav": "C:\\Users\\17112\\AppData\\Local\\Temp\\codex-clipboard-f4537147-4813-4dbe-a0d4-3f0aab6f7f36.png",
+    "method": "image-to-slice-tool / sharp coordinate slicing"
+  },
+  "canvas": {
+    "width": 700,
+    "note": "Reference screenshots include editor chrome; output crops isolate the mobile canvas."
+  },
+  "outputs": [
+    "home/home-reference.png",
+    "home/profile-hero.png",
+    "home/feature-grid.png",
+    "home/event-feed.png",
+    "bottom-nav/bottom-nav-reference.png",
+    "bottom-nav/bottom-nav-without-match.png",
+    "assets/icon-ranking.png",
+    "assets/icon-calendar.png",
+    "assets/icon-rewards.png",
+    "assets/icon-champions.png",
+    "assets/icon-photos.png",
+    "assets/icon-annual.png",
+    "assets/icon-registrations.png",
+    "assets/court-photo.png"
+  ]
+}

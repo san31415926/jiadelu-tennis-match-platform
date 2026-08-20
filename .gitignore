@@ -1,0 +1,18 @@
+# 依赖
+node_modules/
+
+# 外部克隆的第三方工具，自带独立 git 仓库，不纳入本仓库
+# 参见 README「本地环境准备」说明如何获取
+image-to-slice-tool/
+
+# 微信开发者工具的本地私有配置（含本机路径与个人编译设置）
+project.private.config.json
+miniprogram/miniprogram_npm/
+
+# 切图坐标探测的临时产物
+tools/.probe/
+
+# 系统与日志
+.DS_Store
+Thumbs.db
+*.log

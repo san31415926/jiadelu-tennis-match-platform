@@ -1,0 +1,11 @@
+{
+  "source": "D:\\Desktop\\嘉得路网球对战平台项目\\测试图\\定稿-超级杯.png",
+  "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\super-cup-hero\\super-cup-hero-court.png",
+  "crop": {
+    "left": 500,
+    "top": 90,
+    "width": 524,
+    "height": 298
+  },
+  "purpose": "Editable image layer for the right side of the Super Cup carousel."
+}

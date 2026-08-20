@@ -1,0 +1,221 @@
+{
+  "assets": [
+    {
+      "key": "player-card-base",
+      "source": "切图-球员卡元件.png",
+      "left": 60,
+      "top": 85,
+      "width": 675,
+      "height": 615,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\player-card-base.png"
+    },
+    {
+      "key": "rating-badge",
+      "source": "切图-球员卡元件.png",
+      "left": 790,
+      "top": 85,
+      "width": 245,
+      "height": 225,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\rating-badge.png"
+    },
+    {
+      "key": "level-mark",
+      "source": "切图-球员卡元件.png",
+      "left": 1055,
+      "top": 85,
+      "width": 390,
+      "height": 205,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\level-mark.png"
+    },
+    {
+      "key": "xp-bar",
+      "source": "切图-球员卡元件.png",
+      "left": 790,
+      "top": 335,
+      "width": 620,
+      "height": 135,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\xp-bar.png"
+    },
+    {
+      "key": "xp-ball",
+      "source": "切图-球员卡元件.png",
+      "left": 815,
+      "top": 500,
+      "width": 125,
+      "height": 110,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\xp-ball.png"
+    },
+    {
+      "key": "floating-balls",
+      "source": "切图-球员卡元件.png",
+      "left": 75,
+      "top": 700,
+      "width": 620,
+      "height": 290,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\floating-balls.png"
+    },
+    {
+      "key": "card-glow",
+      "source": "切图-球员卡元件.png",
+      "left": 770,
+      "top": 680,
+      "width": 700,
+      "height": 320,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\card-glow.png"
+    },
+    {
+      "key": "player-avatar",
+      "source": "C:/Users/17112/AppData/Local/Temp/codex-clipboard-c380261f-b992-4607-a6bc-ead4803f8f5a.png",
+      "left": 48,
+      "top": 44,
+      "width": 112,
+      "height": 108,
+      "keepBackground": true,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\player-avatar.png"
+    },
+    {
+      "key": "menu-profile",
+      "source": "切图-我的页菜单图标.png",
+      "left": 155,
+      "top": 100,
+      "width": 280,
+      "height": 250,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\menu-profile.png"
+    },
+    {
+      "key": "menu-records",
+      "source": "切图-我的页菜单图标.png",
+      "left": 510,
+      "top": 70,
+      "width": 250,
+      "height": 300,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\menu-records.png"
+    },
+    {
+      "key": "menu-club",
+      "source": "切图-我的页菜单图标.png",
+      "left": 825,
+      "top": 65,
+      "width": 330,
+      "height": 300,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\menu-club.png"
+    },
+    {
+      "key": "menu-about",
+      "source": "切图-我的页菜单图标.png",
+      "left": 1165,
+      "top": 100,
+      "width": 300,
+      "height": 275,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\menu-about.png"
+    },
+    {
+      "key": "menu-business",
+      "source": "切图-我的页菜单图标.png",
+      "left": 260,
+      "top": 485,
+      "width": 380,
+      "height": 285,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\menu-business.png"
+    },
+    {
+      "key": "menu-share",
+      "source": "切图-我的页菜单图标.png",
+      "left": 655,
+      "top": 490,
+      "width": 315,
+      "height": 270,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\menu-share.png"
+    },
+    {
+      "key": "menu-service",
+      "source": "切图-我的页菜单图标.png",
+      "left": 985,
+      "top": 470,
+      "width": 330,
+      "height": 315,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\menu-service.png"
+    },
+    {
+      "key": "menu-copy",
+      "source": "切图-我的页菜单图标.png",
+      "left": 615,
+      "top": 810,
+      "width": 215,
+      "height": 175,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\menu-copy.png"
+    },
+    {
+      "key": "menu-arrow",
+      "source": "切图-我的页菜单图标.png",
+      "left": 825,
+      "top": 805,
+      "width": 170,
+      "height": 180,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\menu-arrow.png"
+    },
+    {
+      "key": "trend-line",
+      "source": "切图-我的页控件底栏.png",
+      "left": 145,
+      "top": 85,
+      "width": 430,
+      "height": 220,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\trend-line.png"
+    },
+    {
+      "key": "trend-up",
+      "source": "切图-我的页控件底栏.png",
+      "left": 655,
+      "top": 105,
+      "width": 315,
+      "height": 175,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\trend-up.png"
+    },
+    {
+      "key": "win-loss",
+      "source": "切图-我的页控件底栏.png",
+      "left": 1050,
+      "top": 150,
+      "width": 350,
+      "height": 170,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\win-loss.png"
+    },
+    {
+      "key": "nav-event",
+      "source": "切图-我的页控件底栏.png",
+      "left": 205,
+      "top": 620,
+      "width": 280,
+      "height": 280,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\nav-event.png"
+    },
+    {
+      "key": "nav-super-cup",
+      "source": "切图-我的页控件底栏.png",
+      "left": 660,
+      "top": 620,
+      "width": 280,
+      "height": 280,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\nav-super-cup.png"
+    },
+    {
+      "key": "nav-my-selected",
+      "source": "切图-我的页控件底栏.png",
+      "left": 1015,
+      "top": 735,
+      "width": 365,
+      "height": 185,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\nav-my-selected.png"
+    },
+    {
+      "key": "nav-bar-reference",
+      "source": "切图-我的页控件底栏.png",
+      "left": 150,
+      "top": 725,
+      "width": 1240,
+      "height": 200,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\my-page-v1\\nav-bar-reference.png"
+    }
+  ]
+}

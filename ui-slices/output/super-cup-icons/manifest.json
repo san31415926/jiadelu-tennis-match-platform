@@ -1,0 +1,151 @@
+{
+  "source": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\input\\super-cup\\super-cup-grid-source.png",
+  "icons": [
+    {
+      "key": "super-cup-event",
+      "label": "超级杯赛事",
+      "left": 38,
+      "top": 4,
+      "width": 344,
+      "height": 440
+    },
+    {
+      "key": "rookie-cup-event",
+      "label": "新秀杯赛事",
+      "left": 410,
+      "top": 78,
+      "width": 358,
+      "height": 368
+    },
+    {
+      "key": "women-club-event",
+      "label": "女俱乐部赛",
+      "left": 798,
+      "top": 78,
+      "width": 356,
+      "height": 368
+    },
+    {
+      "key": "evergreen-cup-event",
+      "label": "常青杯赛事",
+      "left": 1160,
+      "top": 76,
+      "width": 360,
+      "height": 374
+    },
+    {
+      "key": "club-leaderboard",
+      "label": "俱乐部榜单",
+      "left": 38,
+      "top": 520,
+      "width": 362,
+      "height": 348
+    },
+    {
+      "key": "past-champions-laurel",
+      "label": "历届冠军",
+      "left": 416,
+      "top": 530,
+      "width": 362,
+      "height": 334
+    },
+    {
+      "key": "annual-best-medal",
+      "label": "年度最佳",
+      "left": 808,
+      "top": 522,
+      "width": 340,
+      "height": 346
+    },
+    {
+      "key": "club-badge",
+      "label": "俱乐部",
+      "left": 1158,
+      "top": 520,
+      "width": 360,
+      "height": 350
+    }
+  ],
+  "results": [
+    {
+      "key": "super-cup-event",
+      "label": "超级杯赛事",
+      "left": 38,
+      "top": 4,
+      "width": 344,
+      "height": 440,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\super-cup-icons\\super-cup-event.png",
+      "removedPixels": 95195
+    },
+    {
+      "key": "rookie-cup-event",
+      "label": "新秀杯赛事",
+      "left": 410,
+      "top": 78,
+      "width": 358,
+      "height": 368,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\super-cup-icons\\rookie-cup-event.png",
+      "removedPixels": 87704
+    },
+    {
+      "key": "women-club-event",
+      "label": "女俱乐部赛",
+      "left": 798,
+      "top": 78,
+      "width": 356,
+      "height": 368,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\super-cup-icons\\women-club-event.png",
+      "removedPixels": 89602
+    },
+    {
+      "key": "evergreen-cup-event",
+      "label": "常青杯赛事",
+      "left": 1160,
+      "top": 76,
+      "width": 360,
+      "height": 374,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\super-cup-icons\\evergreen-cup-event.png",
+      "removedPixels": 85838
+    },
+    {
+      "key": "club-leaderboard",
+      "label": "俱乐部榜单",
+      "left": 38,
+      "top": 520,
+      "width": 362,
+      "height": 348,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\super-cup-icons\\club-leaderboard.png",
+      "removedPixels": 79818
+    },
+    {
+      "key": "past-champions-laurel",
+      "label": "历届冠军",
+      "left": 416,
+      "top": 530,
+      "width": 362,
+      "height": 334,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\super-cup-icons\\past-champions-laurel.png",
+      "removedPixels": 75627
+    },
+    {
+      "key": "annual-best-medal",
+      "label": "年度最佳",
+      "left": 808,
+      "top": 522,
+      "width": 340,
+      "height": 346,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\super-cup-icons\\annual-best-medal.png",
+      "removedPixels": 79674
+    },
+    {
+      "key": "club-badge",
+      "label": "俱乐部",
+      "left": 1158,
+      "top": 520,
+      "width": 360,
+      "height": 350,
+      "output": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\output\\super-cup-icons\\club-badge.png",
+      "removedPixels": 70876
+    }
+  ]
+}

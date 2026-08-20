@@ -1,0 +1,42 @@
+{
+  "appid": "REPLACE_WITH_YOUR_APPID",
+  "projectname": "LTJIMMY网球赛事",
+  "description": "LTJIMMY 网球赛事平台小程序",
+  "miniprogramRoot": "./",
+  "compileType": "miniprogram",
+  "libVersion": "latest",
+  "srcMiniprogramRoot": "./",
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "folder",
+        "value": "typings"
+      }
+    ],
+    "include": []
+  },
+  "setting": {
+    "useCompilerPlugins": [
+      "typescript"
+    ],
+    "coverView": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "urlCheck": true,
+    "autoAudits": false,
+    "checkInvalidKey": true,
+    "uploadWithSourceMap": true,
+    "ignoreUploadUnusedFiles": true,
+    "compileHotReLoad": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "condition": {}
+}

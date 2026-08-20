@@ -1,0 +1,67 @@
+{
+  "source": "D:\\Desktop\\嘉得路网球对战平台项目\\ui-slices\\input\\user-home-icons-reference.png",
+  "crops": [
+    {
+      "key": "player-ranking",
+      "label": "球员排行",
+      "left": 72,
+      "top": 20,
+      "width": 250,
+      "height": 214
+    },
+    {
+      "key": "past-champions",
+      "label": "历届冠军",
+      "left": 1205,
+      "top": 16,
+      "width": 245,
+      "height": 218
+    },
+    {
+      "key": "event-photos",
+      "label": "赛事照片",
+      "left": 68,
+      "top": 374,
+      "width": 255,
+      "height": 192
+    },
+    {
+      "key": "annual-ceremony",
+      "label": "年会典礼",
+      "left": 441,
+      "top": 370,
+      "width": 285,
+      "height": 220
+    }
+  ],
+  "results": [
+    {
+      "key": "player-ranking",
+      "label": "球员排行",
+      "width": 250,
+      "height": 214,
+      "removedPixels": 29406
+    },
+    {
+      "key": "past-champions",
+      "label": "历届冠军",
+      "width": 245,
+      "height": 218,
+      "removedPixels": 34451
+    },
+    {
+      "key": "event-photos",
+      "label": "赛事照片",
+      "width": 255,
+      "height": 192,
+      "removedPixels": 25824
+    },
+    {
+      "key": "annual-ceremony",
+      "label": "年会典礼",
+      "width": 285,
+      "height": 220,
+      "removedPixels": 43471
+    }
+  ]
+}

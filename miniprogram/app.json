@@ -1,0 +1,52 @@
+{
+  "pages": [
+    "pages/events/index",
+    "pages/super-cup/index",
+    "pages/profile/index",
+    "pages/ranking/index",
+    "pages/calendar/index",
+    "pages/gallery/index",
+    "pages/champions/index",
+    "pages/ceremony/index",
+    "pages/rewards/index",
+    "pages/registrations/index",
+    "pages/event-detail/index",
+    "pages/clubs/index",
+    "pages/profile-edit/index",
+    "pages/records/index",
+    "pages/about/index",
+    "pages/business/index"
+  ],
+  "window": {
+    "navigationStyle": "custom",
+    "backgroundColor": "#FBFFF4",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#B5E51A",
+    "navigationBarTitleText": "LTJIMMY赛事",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#8A8F80",
+    "selectedColor": "#5FA80A",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/events/index",
+        "text": "赛事"
+      },
+      {
+        "pagePath": "pages/super-cup/index",
+        "text": "超级杯"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

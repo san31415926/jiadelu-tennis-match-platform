@@ -1,0 +1,24 @@
+/* 状态筛选，Figma node 1:261 / 1:367
+   四项各 174.5rpx，整体左对齐，右侧留白 52rpx（设计如此） */
+
+.filters {
+  display: flex;
+  height: 46rpx;
+  background: var(--card-bg);
+}
+
+.filters__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 174.5rpx;
+  height: 46rpx;
+  border-radius: var(--radius-tab);
+  font-size: 18rpx;
+  color: var(--text-muted);
+}
+
+.filters__item.is-active {
+  font-weight: 600;
+  color: var(--text-tab-active);
+}

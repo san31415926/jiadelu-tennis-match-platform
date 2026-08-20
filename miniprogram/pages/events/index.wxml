@@ -1,0 +1,45 @@
+<view class="home">
+  <hero-carousel
+    title="LTJIMMY赛事"
+    banners="{{banners}}"
+    status-bar-height="{{statusBarHeight}}"
+    bind:bannertap="onBannerTap"
+  />
+
+  <!-- 功能宫格，Figma node 1:239：绝对定位，七个图标尺寸各不相同 -->
+  <view class="feature-grid">
+    <view
+      class="feature"
+      wx:for="{{features}}"
+      wx:key="key"
+      data-path="{{item.path}}"
+      bindtap="onFeatureTap"
+      hover-class="feature--pressed"
+      hover-stay-time="60"
+    >
+      <image class="feature__icon" src="{{item.icon}}" mode="aspectFit" style="{{item.iconStyle}}" />
+      <view class="feature__label">{{item.label}}</view>
+    </view>
+  </view>
+
+  <filter-tabs
+    tabs="{{filters}}"
+    active="{{activeFilter}}"
+    active-color="#83d414"
+    bind:change="onFilterChange"
+  />
+
+  <view class="feed">
+    <event-card
+      class="feed__card"
+      wx:for="{{events}}"
+      wx:key="id"
+      event="{{item}}"
+      bind:cardtap="onEventTap"
+      bind:actiontap="onSignupTap"
+    />
+    <view class="feed__empty" wx:if="{{events.length === 0}}">该分类下暂无赛事</view>
+  </view>
+
+  <view class="tabbar-spacer"></view>
+</view>

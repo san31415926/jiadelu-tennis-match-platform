@@ -2,20 +2,7 @@
   "pages": [
     "pages/events/index",
     "pages/super-cup/index",
-    "pages/profile/index",
-    "pages/ranking/index",
-    "pages/calendar/index",
-    "pages/gallery/index",
-    "pages/champions/index",
-    "pages/ceremony/index",
-    "pages/rewards/index",
-    "pages/registrations/index",
-    "pages/event-detail/index",
-    "pages/clubs/index",
-    "pages/profile-edit/index",
-    "pages/records/index",
-    "pages/about/index",
-    "pages/business/index"
+    "pages/profile/index"
   ],
   "window": {
     "navigationStyle": "custom",
@@ -27,8 +14,8 @@
   },
   "tabBar": {
     "custom": true,
-    "color": "#8A8F80",
-    "selectedColor": "#5FA80A",
+    "color": "#6B7566",
+    "selectedColor": "#59850A",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [

@@ -1,0 +1,48 @@
+<view class="super-cup">
+  <hero-carousel
+    title="超级杯"
+    title-top="10"
+    banners="{{banners}}"
+    status-bar-height="{{statusBarHeight}}"
+    bind:bannertap="onBannerTap"
+  />
+
+  <!-- 功能宫格，Figma node 1:340：两行四列 Auto Layout，图标统一 110x105 -->
+  <view class="feature-grid">
+    <view class="feature-grid__row" wx:for="{{featureRows}}" wx:for-item="row" wx:key="index">
+      <view
+        class="feature"
+        wx:for="{{row}}"
+        wx:key="key"
+        data-path="{{item.path}}"
+        bindtap="onFeatureTap"
+        hover-class="feature--pressed"
+        hover-stay-time="60"
+      >
+        <image class="feature__icon" src="{{item.icon}}" mode="aspectFit" />
+        <view class="feature__label">{{item.label}}</view>
+      </view>
+    </view>
+  </view>
+
+  <filter-tabs
+    tabs="{{filters}}"
+    active="{{activeFilter}}"
+    active-color="#76d709"
+    bind:change="onFilterChange"
+  />
+
+  <view class="feed">
+    <event-card
+      class="feed__card"
+      wx:for="{{events}}"
+      wx:key="id"
+      event="{{item}}"
+      bind:cardtap="onEventTap"
+      bind:actiontap="onSignupTap"
+    />
+    <view class="feed__empty" wx:if="{{events.length === 0}}">该分类下暂无赛事</view>
+  </view>
+
+  <view class="tabbar-spacer"></view>
+</view>

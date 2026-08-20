@@ -28,6 +28,28 @@ const TASKS = [
   ['home-my-registrations.png', 'icons/home/my-registrations.png', 240, null],
   ['tab-super-cup.png', 'icons/tabbar/tab-super-cup.png', 176, null],
   ['tab-profile.png', 'icons/tabbar/tab-profile.png', 176, null],
+
+  // 超级杯宫格（node 1:340），设计中统一显示为 110x105
+  ['sc-super-cup-event.png', 'icons/super-cup/super-cup-event.png', 240, null],
+  ['sc-rookie-cup-event.png', 'icons/super-cup/rookie-cup-event.png', 240, null],
+  ['sc-women-club-event.png', 'icons/super-cup/women-club-event.png', 240, null],
+  ['sc-evergreen-cup-event.png', 'icons/super-cup/evergreen-cup-event.png', 240, null],
+  ['sc-club-leaderboard.png', 'icons/super-cup/club-leaderboard.png', 240, null],
+  ['sc-past-champions.png', 'icons/super-cup/past-champions.png', 240, null],
+  ['sc-annual-best.png', 'icons/super-cup/annual-best.png', 240, null],
+  ['sc-club-badge.png', 'icons/super-cup/club-badge.png', 240, null],
+
+  // 我的页菜单（node 10:234），设计中统一显示为 88x88
+  ['my-menu-profile.png', 'icons/profile/profile-info.png', 200, null],
+  ['my-menu-business.png', 'icons/profile/business-handshake.png', 200, null],
+  ['my-menu-about.png', 'icons/profile/about-us.png', 200, null],
+  ['my-menu-club.png', 'icons/profile/my-club-flag.png', 200, null],
+  ['my-menu-records.png', 'icons/profile/records-trophy.png', 200, null],
+  ['my-menu-service.png', 'icons/profile/customer-service.png', 200, null],
+
+  // 我的页头部装饰：金框头像 255x187、网球 133x116
+  ['my-gold-avatar-frame.png', 'images/gold-avatar-frame.png', 510, null],
+  ['my-tennis-ball.png', 'images/hero-tennis-ball.png', 266, null],
 ];
 
 /** 球场照片走 JPEG，圆角由 WXSS 负责；源图本身不大，不做放大 */

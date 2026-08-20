@@ -1,0 +1,12 @@
+<view class="filters">
+  <view
+    wx:for="{{tabs}}"
+    wx:key="*this"
+    class="filters__item {{active === item ? 'is-active' : ''}}"
+    style="{{active === item ? 'background:' + activeColor : ''}}"
+    data-tab="{{item}}"
+    bindtap="onTap"
+  >
+    {{item}}
+  </view>
+</view>

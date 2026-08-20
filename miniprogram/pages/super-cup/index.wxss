@@ -1,0 +1,67 @@
+/* 数值取自 Figma node 1:307 及其子节点 */
+
+/* 宫格容器渐变与首页不同：自上而下 #fcfff8 -> #f0ffd3 */
+.feature-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  height: var(--grid-height);
+  padding: 12rpx 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #fcfff8 0%, #f0ffd3 100%);
+}
+
+.feature-grid__row {
+  display: flex;
+  gap: 16rpx;
+  height: 158rpx;
+  padding: 0 32rpx 0 38rpx;
+  overflow: hidden;
+}
+
+.feature {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+  align-items: center;
+  justify-content: center;
+  width: 158rpx;
+  height: 154rpx;
+  overflow: hidden;
+}
+
+.feature--pressed {
+  opacity: 0.75;
+}
+
+.feature__icon {
+  flex-shrink: 0;
+  width: 110rpx;
+  height: 105rpx;
+}
+
+.feature__label {
+  font-size: 20rpx;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-grid-label);
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  padding: 16rpx 26rpx 24rpx;
+  border-radius: var(--radius-feed);
+  background: var(--feed-gradient);
+}
+
+.feed__card + .feed__card {
+  margin-top: 16rpx;
+}
+
+.feed__empty {
+  padding: 72rpx 0;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--text-muted);
+}

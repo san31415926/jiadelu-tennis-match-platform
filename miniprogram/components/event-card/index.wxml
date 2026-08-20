@@ -1,0 +1,23 @@
+<view class="event-card" bindtap="onCardTap">
+  <image class="event-card__photo" src="{{event.poster}}" mode="aspectFill" />
+  <view class="event-card__body">
+    <view class="event-card__title">{{event.title}}</view>
+
+    <view class="event-card__meta">
+      <view class="meta-icon meta-icon--location"></view>
+      <text class="event-card__meta-text">{{event.venue}}</text>
+    </view>
+    <view class="event-card__meta">
+      <view class="meta-icon meta-icon--time"></view>
+      <text class="event-card__meta-text">{{event.time}}</text>
+    </view>
+    <view class="event-card__meta">
+      <view class="meta-icon meta-icon--participants"></view>
+      <text class="event-card__meta-text">{{event.slots}}</text>
+    </view>
+
+    <view class="event-card__footer">
+      <view class="event-card__action" catchtap="onActionTap">{{event.actionText}}</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,242 @@
+/* 数值取自 Figma node 10:212 及其子节点 */
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  gap: 17rpx;
+  min-height: 100vh;
+  background: #f7faec;
+}
+
+/* ---------- 球员卡头部 ---------- */
+
+.hero {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(180deg, #abe514 0%, #c7f038 62%, #f0fab8 100%);
+  box-shadow: 0 12rpx 24rpx rgba(41, 56, 20, 0.16);
+}
+
+.hero__inner {
+  position: relative;
+  width: 100%;
+  height: 368rpx;
+  overflow: hidden;
+}
+
+/* 波浪路径取自 node 10:214，贴在头部下缘 */
+.hero__wave {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 105rpx;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105.289' viewBox='0 0 750 105.289' preserveAspectRatio='none'%3E%3Cpath d='M0 51.3173C92 15.0413 166 78.7455 263 62.8194C343 49.5477 373 24.7739 448 49.5477C546 80.515 628 31.8521 750 0V105.289H0V51.3173Z' fill='%23FBFFF4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* 标题在设计中的中心是 x=354，比屏幕正中略偏左 */
+.hero__title {
+  position: absolute;
+  left: 174rpx;
+  top: 28rpx;
+  width: 360rpx;
+  height: 28rpx;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 700;
+  line-height: 28rpx;
+  color: #1c1f21;
+}
+
+.hero__avatar {
+  position: absolute;
+  left: 32rpx;
+  top: 12rpx;
+  width: 255rpx;
+  height: 187rpx;
+}
+
+.hero__ball {
+  position: absolute;
+  left: 597rpx;
+  top: 28rpx;
+  width: 133rpx;
+  height: 116rpx;
+}
+
+.hero__nickname {
+  position: absolute;
+  left: 276rpx;
+  top: 138rpx;
+  width: 99rpx;
+  height: 42rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 42rpx;
+  color: #1f2414;
+}
+
+.hero__chip {
+  position: absolute;
+  top: 133rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 51rpx;
+  border-radius: 16rpx;
+  background: rgba(88, 153, 88, 0.6);
+  font-weight: 600;
+}
+
+.hero__chip--rating {
+  left: 377rpx;
+  width: 105rpx;
+  font-size: 24rpx;
+  color: #ffffff;
+}
+
+.hero__chip--level {
+  left: 508rpx;
+  width: 109rpx;
+  font-size: 32rpx;
+  color: #3d452d;
+}
+
+.hero__label {
+  position: absolute;
+  height: 24rpx;
+  font-size: 16rpx;
+  line-height: 24rpx;
+  color: #5c6e33;
+}
+
+.hero__label--value {
+  left: 33rpx;
+  top: 195rpx;
+}
+
+.hero__label--points {
+  left: 467rpx;
+  top: 200rpx;
+}
+
+.hero__number {
+  position: absolute;
+  top: 218rpx;
+  height: 48rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 48rpx;
+  color: #1f2414;
+}
+
+.hero__number--value {
+  left: 61rpx;
+}
+
+.hero__number--points {
+  left: 517rpx;
+}
+
+.hero__trend {
+  position: absolute;
+  left: 221rpx;
+  top: 228rpx;
+  height: 28rpx;
+  font-size: 18rpx;
+  font-weight: 600;
+  line-height: 28rpx;
+  color: #e4573a;
+}
+
+.hero__xp-hint {
+  position: absolute;
+  left: 32rpx;
+  top: 292rpx;
+  height: 24rpx;
+  font-size: 24rpx;
+  line-height: 24rpx;
+  color: #5c6e33;
+}
+
+.hero__xp-track,
+.hero__xp-fill {
+  position: absolute;
+  left: 32rpx;
+  top: 330rpx;
+  height: 8rpx;
+  border-radius: 4rpx;
+}
+
+.hero__xp-track {
+  width: 690rpx;
+  background: #e5ebbf;
+}
+
+.hero__xp-fill {
+  background: #80bf05;
+}
+
+/* node 10:229 是一个描白边的圆，用 CSS 绘制即可 */
+.hero__xp-ball {
+  position: absolute;
+  top: 317rpx;
+  width: 28rpx;
+  height: 28rpx;
+  box-sizing: border-box;
+  border: 2rpx solid #ffffff;
+  border-radius: 50%;
+  background: #d1f038;
+}
+
+/* ---------- 功能菜单 ---------- */
+
+.menu {
+  overflow: hidden;
+  border: 1rpx solid rgba(219, 229, 194, 0.75);
+  border-radius: 7rpx;
+  background: #fcfcfb;
+  box-shadow: 0 8rpx 10rpx rgba(38, 56, 20, 0.1);
+}
+
+.menu__item {
+  display: flex;
+  gap: 14rpx;
+  align-items: center;
+  height: 104rpx;
+  padding: 0 16rpx;
+  border-bottom: 1rpx solid rgba(229, 235, 219, 0.75);
+  background: var(--card-bg);
+}
+
+.menu__item--pressed {
+  background: #f6f9ee;
+}
+
+.menu__icon {
+  flex-shrink: 0;
+  width: 88rpx;
+  height: 88rpx;
+}
+
+.menu__icon--mirrored {
+  transform: scaleX(-1);
+}
+
+.menu__label {
+  flex: 1;
+  font-size: 36rpx;
+  font-weight: 500;
+  color: #57772f;
+}
+
+.menu__arrow {
+  flex-shrink: 0;
+  width: 30rpx;
+  text-align: center;
+  font-size: 34rpx;
+  line-height: 42rpx;
+  color: #668c14;
+}

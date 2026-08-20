@@ -1,0 +1,31 @@
+<view class="header" style="padding-top:{{statusBarHeight}}px">
+  <view class="header__inner">
+    <view class="header__wave"></view>
+    <view class="header__title" style="top:{{titleTop}}rpx">{{title}}</view>
+
+    <swiper
+      class="banner"
+      current="{{current}}"
+      bindchange="onChange"
+      circular
+      autoplay
+      interval="5000"
+      duration="400"
+    >
+      <swiper-item wx:for="{{banners}}" wx:key="id">
+        <view class="banner__slide" data-index="{{index}}" bindtap="onSlideTap">
+          <view class="banner__title">{{item.title}}</view>
+          <view class="banner__subtitle">{{item.subtitle}}</view>
+        </view>
+      </swiper-item>
+    </swiper>
+
+    <view class="banner__dots">
+      <view
+        wx:for="{{banners}}"
+        wx:key="id"
+        class="banner__dot banner__dot--{{index + 1}} {{current === index ? 'is-active' : ''}}"
+      ></view>
+    </view>
+  </view>
+</view>

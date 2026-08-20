@@ -1,0 +1,6 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "event-card": "../../components/event-card/index"
+  }
+}

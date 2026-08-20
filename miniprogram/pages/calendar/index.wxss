@@ -1,0 +1,231 @@
+/* 数值取自 Figma node 17:93 及其子节点 */
+
+.calendar {
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+  background: #f8faf2;
+}
+
+/* ---------- 头部 ---------- */
+
+.header {
+  position: relative;
+  background: linear-gradient(90deg, #a8e00a 6.82%, #ccf233 55.68%, #f0f7b8 106.82%);
+}
+
+.header__inner {
+  height: 345rpx;
+}
+
+/* node 17:95：930x170 的椭圆，两侧超出屏幕，形成宽缓的弧线下缘 */
+.header__ellipse {
+  position: absolute;
+  left: -90rpx;
+  top: 262rpx;
+  width: 930rpx;
+  height: 170rpx;
+  border-radius: 50%;
+  background: #f8faf2;
+}
+
+.cal-back {
+  position: absolute;
+  left: 28rpx;
+  top: 23rpx;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 56rpx;
+  font-size: 46rpx;
+  color: #141a12;
+}
+
+.header__title {
+  top: 28rpx;
+  height: 58rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #0d1208;
+}
+
+.month-controls {
+  position: absolute;
+  left: 30rpx;
+  top: 104rpx;
+  display: flex;
+  align-items: center;
+  width: 690rpx;
+  height: 64rpx;
+  color: #0f1408;
+}
+
+.month-controls__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54rpx;
+  height: 64rpx;
+  font-size: 42rpx;
+}
+
+.month-controls__label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 270rpx;
+  height: 64rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.today-btn {
+  position: absolute;
+  left: 481rpx;
+  top: 101rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 108rpx;
+  height: 50rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.9);
+  border-radius: 25rpx;
+  background: rgba(204, 240, 56, 0.55);
+  font-size: 22rpx;
+  color: #0f1408;
+}
+
+.header__ball {
+  position: absolute;
+  left: 548rpx;
+  top: 160rpx;
+  width: 120rpx;
+  height: 105rpx;
+}
+
+/* ---------- 月视图 ---------- */
+
+.grid {
+  padding: 17rpx 0;
+  background: #f8faf2;
+}
+
+.grid__inner {
+  width: 686rpx;
+  margin: 0 auto;
+  background: var(--card-bg);
+}
+
+.grid__weekdays {
+  display: flex;
+  height: 42rpx;
+  background: var(--card-bg);
+}
+
+.grid__weekday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 98rpx;
+  height: 42rpx;
+  font-size: 20rpx;
+  color: #73786e;
+}
+
+.grid__week {
+  display: flex;
+  height: 62rpx;
+  margin-top: 1rpx;
+}
+
+.cell {
+  position: relative;
+  width: 98rpx;
+  height: 62rpx;
+}
+
+/* node 17:176：52x52 的选中圆 */
+.cell__circle {
+  position: absolute;
+  left: 23rpx;
+  top: 1rpx;
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: #b2e01a;
+}
+
+.cell__day {
+  position: absolute;
+  left: 0;
+  top: 1rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 98rpx;
+  height: 52rpx;
+  font-size: 26rpx;
+  color: #1f2114;
+}
+
+/* 非本月日期的浅灰是按定稿图目视取的，Figma 未导出该状态 */
+.cell__day--muted {
+  color: #b3b8a8;
+}
+
+/* node 17:137：10x10 的赛事标记点 */
+.cell__dot {
+  position: absolute;
+  left: 44rpx;
+  top: 47rpx;
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #abd914;
+}
+
+/* ---------- 选中日期的赛事 ---------- */
+
+.day-heading {
+  display: flex;
+  align-items: center;
+  width: 680rpx;
+  height: 48rpx;
+  margin: 0 auto;
+  padding: 0 38rpx;
+  border-radius: 24rpx;
+  background: #eef8cb;
+}
+
+.day-heading__text {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  color: #1f2114;
+}
+
+.day-heading__divider {
+  flex: 1;
+  height: 1rpx;
+  margin-left: 20rpx;
+  background: #e5eec9;
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  padding: 16rpx 26rpx 24rpx;
+  border-radius: var(--radius-feed);
+  background: var(--feed-gradient);
+}
+
+.feed__card + .feed__card {
+  margin-top: 24rpx;
+}
+
+.feed__empty {
+  padding: 72rpx 0;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--text-muted);
+}

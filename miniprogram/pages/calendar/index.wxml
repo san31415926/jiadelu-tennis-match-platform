@@ -1,0 +1,65 @@
+<view class="calendar">
+  <!-- 头部，Figma node 17:94 -->
+  <view class="header" style="padding-top:{{statusBarHeight}}px">
+    <view class="header__inner">
+      <!-- 该页的下缘是一个超出屏宽的椭圆，而非波浪路径 -->
+      <view class="header__ellipse"></view>
+
+      <view class="cal-back" bindtap="onBack">‹</view>
+      <view class="header__title">赛事日历</view>
+
+      <view class="month-controls">
+        <view class="month-controls__arrow" bindtap="onPrevMonth">‹</view>
+        <view class="month-controls__label">{{monthLabel}}</view>
+        <view class="month-controls__arrow" bindtap="onNextMonth">›</view>
+      </view>
+
+      <view class="today-btn" bindtap="onToday">今日</view>
+
+      <image class="header__ball" src="/assets/images/hero-tennis-ball.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <!-- 月视图，Figma node 17:105 -->
+  <view class="grid">
+    <view class="grid__inner">
+      <view class="grid__weekdays">
+        <view class="grid__weekday" wx:for="{{weekdays}}" wx:key="*this">{{item}}</view>
+      </view>
+
+      <view class="grid__week" wx:for="{{weeks}}" wx:for-item="week" wx:key="index">
+        <view
+          class="cell"
+          wx:for="{{week}}"
+          wx:for-item="cell"
+          wx:key="key"
+          data-key="{{cell.key}}"
+          data-in-month="{{cell.inMonth}}"
+          bindtap="onSelectDay"
+        >
+          <view class="cell__circle" wx:if="{{cell.key === selectedKey}}"></view>
+          <view class="cell__day {{cell.inMonth ? '' : 'cell__day--muted'}}">{{cell.day}}</view>
+          <view class="cell__dot" wx:if="{{cell.hasEvent}}"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 选中日期的赛事，Figma node 17:217 -->
+  <view class="day-heading">
+    <text class="day-heading__text">{{dayHeading}}</text>
+    <view class="day-heading__divider"></view>
+  </view>
+
+  <view class="feed">
+    <event-card
+      class="feed__card"
+      wx:for="{{events}}"
+      wx:key="id"
+      event="{{item}}"
+      bind:cardtap="onEventTap"
+      bind:actiontap="onSignupTap"
+    />
+    <view class="feed__empty" wx:if="{{events.length === 0}}">这一天没有安排赛事</view>
+  </view>
+</view>

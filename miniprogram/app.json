@@ -3,7 +3,8 @@
     "pages/events/index",
     "pages/super-cup/index",
     "pages/profile/index",
-    "pages/ranking/index"
+    "pages/ranking/index",
+    "pages/calendar/index"
   ],
   "window": {
     "navigationStyle": "custom",

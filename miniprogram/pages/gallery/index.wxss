@@ -1,0 +1,208 @@
+/* 数值取自 Figma node 23:272 及其子节点 */
+
+.gallery {
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+  background: #fbfcf9;
+}
+
+/* ---------- 头部 ---------- */
+
+.header {
+  position: relative;
+  background: linear-gradient(90deg, #b2e514 4.55%, #d6f557 20.59%, #f5fac7 51.18%);
+}
+
+.header__inner {
+  height: 360rpx;
+}
+
+/* node 23:275：与俱乐部页同款的 900x190 椭圆下缘 */
+.header__ellipse {
+  position: absolute;
+  left: -75rpx;
+  top: 278rpx;
+  width: 900rpx;
+  height: 190rpx;
+  border-radius: 50%;
+  background: #fbfcf9;
+}
+
+.gallery-back {
+  position: absolute;
+  left: 24rpx;
+  top: 18rpx;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 58rpx;
+  font-size: 46rpx;
+  color: #0f1408;
+}
+
+.header__title {
+  top: 22rpx;
+  height: 48rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #0f1408;
+}
+
+.header__camera {
+  position: absolute;
+  left: 414rpx;
+  top: 110rpx;
+  width: 330rpx;
+  height: 230rpx;
+}
+
+.header__heading {
+  position: absolute;
+  left: 72rpx;
+  top: 156rpx;
+  height: 68rpx;
+  font-size: 42rpx;
+  font-weight: 700;
+  line-height: 68rpx;
+  color: #0a0f08;
+}
+
+.header__summary {
+  position: absolute;
+  left: 74rpx;
+  top: 227rpx;
+  height: 34rpx;
+  font-size: 20rpx;
+  line-height: 34rpx;
+  color: #424740;
+}
+
+/* ---------- 分类筛选 ---------- */
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  height: 92rpx;
+  padding: 0 54rpx;
+}
+
+.filters__chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52rpx;
+  padding: 0 24rpx;
+  border: 1rpx solid #e0e3d9;
+  border-radius: 26rpx;
+  background: #fbfcf9;
+  font-size: 19rpx;
+  color: #141a12;
+}
+
+.filters__chip.is-active {
+  border-color: #b2e514;
+  background: #b2e514;
+}
+
+/* ---------- 分组 ---------- */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  padding: 24rpx 72rpx 14rpx;
+}
+
+/* 赛程表分组的内外间距与图片尺寸都与赛事分组不同（node 23:292） */
+.section--bracket {
+  gap: 12rpx;
+  padding: 26rpx 72rpx 18rpx;
+}
+
+.section__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 42rpx;
+}
+
+.section--bracket .section__heading {
+  height: 44rpx;
+}
+
+.section__title {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  overflow: hidden;
+}
+
+.section__title-part {
+  font-size: 23rpx;
+  font-weight: 700;
+  color: #0f140d;
+  white-space: nowrap;
+}
+
+.section--bracket .section__title-part {
+  font-size: 25rpx;
+}
+
+.section__title-part--brand {
+  color: #80b214;
+}
+
+.section__more {
+  flex-shrink: 0;
+  font-size: 17rpx;
+  color: #6b7066;
+}
+
+.section__subtitle {
+  height: 28rpx;
+  font-size: 16rpx;
+  line-height: 28rpx;
+  color: #6b7066;
+}
+
+.section__photos {
+  display: flex;
+  gap: 18rpx;
+}
+
+.section--bracket .section__photos {
+  gap: 20rpx;
+}
+
+.section__photo {
+  flex-shrink: 0;
+  width: 190rpx;
+  height: 126rpx;
+  border-radius: 14rpx;
+}
+
+.section--bracket .section__photo {
+  width: 293rpx;
+  height: 184rpx;
+  border-radius: 16rpx;
+}
+
+.section__count {
+  height: 28rpx;
+  font-size: 17rpx;
+  line-height: 28rpx;
+  color: #6b7066;
+}
+
+.section--bracket .section__count {
+  height: 30rpx;
+  line-height: 30rpx;
+}
+
+.section__divider {
+  height: 1rpx;
+  background: #dbded4;
+}

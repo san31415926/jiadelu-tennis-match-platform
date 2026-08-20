@@ -5,7 +5,8 @@
     "pages/profile/index",
     "pages/ranking/index",
     "pages/calendar/index",
-    "pages/clubs/index"
+    "pages/clubs/index",
+    "pages/gallery/index"
   ],
   "window": {
     "navigationStyle": "custom",

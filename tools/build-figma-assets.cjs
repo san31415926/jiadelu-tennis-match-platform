@@ -62,6 +62,9 @@ const TASKS = [
 
   // 俱乐部页（node 23:345 / 23:368）
   ['cb-flag.png', 'images/club/header-flag.png', 640, null],
+
+  // 相册页（node 23:274）
+  ['gl-camera.png', 'images/gallery/header-camera.png', 660, null],
 ];
 
 /**
@@ -82,6 +85,16 @@ const PHOTO_TASKS = [
   ['cb-logo-4.png', 'images/club/logo-4.jpg', 256, null],
   ['cb-logo-5.png', 'images/club/logo-5.jpg', 256, null],
   ['cb-logo-6.png', 'images/club/logo-6.jpg', 256, null],
+
+  // 相册照片与对阵图，显示尺寸 293x184 与 190x126
+  ['gl-bracket-1.png', 'images/gallery/bracket-1.jpg', 586, null],
+  ['gl-bracket-2.png', 'images/gallery/bracket-2.jpg', 586, null],
+  ['gl-p1.png', 'images/gallery/photo-1.jpg', 380, null],
+  ['gl-p2.png', 'images/gallery/photo-2.jpg', 380, null],
+  ['gl-p3.png', 'images/gallery/photo-3.jpg', 380, null],
+  ['gl-p4.png', 'images/gallery/photo-4.jpg', 380, null],
+  ['gl-p5.png', 'images/gallery/photo-5.jpg', 380, null],
+  ['gl-p6.png', 'images/gallery/photo-6.jpg', 380, null],
 ];
 
 async function run() {

@@ -1,0 +1,67 @@
+<view class="gallery">
+  <!-- 头部，Figma node 23:274 -->
+  <view class="header" style="padding-top:{{statusBarHeight}}px">
+    <view class="header__inner">
+      <view class="header__ellipse"></view>
+
+      <view class="gallery-back" bindtap="onBack">‹</view>
+      <view class="header__title">相册</view>
+
+      <image class="header__camera" src="/assets/images/gallery/header-camera.png" mode="aspectFit" />
+
+      <view class="header__heading">赛事相册</view>
+      <view class="header__summary">{{summary}}</view>
+    </view>
+  </view>
+
+  <!-- 分类筛选，Figma node 23:281 -->
+  <view class="filters">
+    <view
+      class="filters__chip {{activeFilter === item ? 'is-active' : ''}}"
+      wx:for="{{filters}}"
+      wx:key="*this"
+      data-filter="{{item}}"
+      bindtap="onFilterTap"
+    >
+      {{item}}
+    </view>
+  </view>
+
+  <!-- 分组列表，Figma node 23:292 / 23:300 / 23:328 -->
+  <view
+    class="section {{item.layout === 'bracket' ? 'section--bracket' : ''}}"
+    wx:for="{{sections}}"
+    wx:key="id"
+  >
+    <view class="section__heading">
+      <view class="section__title">
+        <text
+          wx:for="{{item.titleParts}}"
+          wx:for-item="part"
+          wx:key="text"
+          class="section__title-part {{part.brand ? 'section__title-part--brand' : ''}}"
+        >{{part.text}}</text>
+      </view>
+      <view class="section__more" data-id="{{item.id}}" bindtap="onViewAll">查看全部 ›</view>
+    </view>
+
+    <view class="section__subtitle" wx:if="{{item.subtitle}}">{{item.subtitle}}</view>
+
+    <view class="section__photos">
+      <image
+        class="section__photo"
+        wx:for="{{item.photos}}"
+        wx:for-item="photo"
+        wx:key="*this"
+        src="{{photo}}"
+        mode="aspectFill"
+        data-src="{{photo}}"
+        data-group="{{item.id}}"
+        bindtap="onPreview"
+      />
+    </view>
+
+    <view class="section__count">{{item.count}}</view>
+    <view class="section__divider" wx:if="{{item.layout === 'photo'}}"></view>
+  </view>
+</view>

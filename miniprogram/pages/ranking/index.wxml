@@ -1,0 +1,111 @@
+<view class="ranking">
+  <!-- 头部，Figma node 15:4 -->
+  <view class="header" style="padding-top:{{statusBarHeight}}px">
+    <view class="header__inner">
+      <view class="header__wave"></view>
+
+      <view class="header__title">球员排名</view>
+
+      <view class="scope-tabs">
+        <view
+          wx:for="{{scopes}}"
+          wx:key="*this"
+          class="scope-tabs__item {{activeScope === item ? 'is-active' : ''}}"
+          data-scope="{{item}}"
+          bindtap="onScopeTap"
+        >
+          {{item}}
+        </view>
+      </view>
+
+      <view class="metric-tabs">
+        <view
+          wx:for="{{metrics}}"
+          wx:key="*this"
+          class="metric-tabs__item {{activeMetric === item ? 'is-active' : ''}}"
+          data-metric="{{item}}"
+          bindtap="onMetricTap"
+        >
+          {{item}}
+          <view class="metric-tabs__underline" wx:if="{{activeMetric === item}}"></view>
+        </view>
+      </view>
+    </view>
+
+    <view class="back-btn" style="top:{{statusBarHeight + 12}}px" bindtap="onBack">
+      <text class="back-btn__arrow">＜</text>
+      <text class="back-btn__text">返回</text>
+    </view>
+  </view>
+
+  <!-- 领奖台，Figma node 15:18：元素相互重叠，保持绝对定位 -->
+  <view class="podium">
+    <image class="podium__confetti podium__confetti--1" src="/assets/images/ranking/confetti.png" mode="aspectFit" />
+    <image class="podium__confetti podium__confetti--2" src="/assets/images/ranking/confetti.png" mode="aspectFit" />
+    <image class="podium__confetti podium__confetti--3" src="/assets/images/ranking/confetti.png" mode="aspectFit" />
+    <image class="podium__confetti podium__confetti--4" src="/assets/images/ranking/confetti.png" mode="aspectFit" />
+
+    <image class="podium__stand podium__stand--second" src="/assets/images/ranking/podium-second.png" mode="aspectFit" />
+    <image class="podium__stand podium__stand--third" src="/assets/images/ranking/podium-third.png" mode="aspectFit" />
+    <image class="podium__stand podium__stand--first" src="/assets/images/ranking/podium-first.png" mode="aspectFit" />
+
+    <!-- 二、三名用金色相框，第一名用桂冠；头像先渲染，装饰压在其上 -->
+    <view class="podium__frame podium__frame--second">
+      <image class="podium__frame-avatar" src="{{podium[0].avatar}}" mode="aspectFill" />
+      <image class="podium__frame-img" src="/assets/images/ranking/gold-frame.png" mode="aspectFit" />
+    </view>
+    <view class="podium__frame podium__frame--third">
+      <image class="podium__frame-avatar" src="{{podium[2].avatar}}" mode="aspectFill" />
+      <image class="podium__frame-img" src="/assets/images/ranking/gold-frame.png" mode="aspectFit" />
+    </view>
+    <image class="podium__first-avatar" src="{{podium[1].avatar}}" mode="aspectFill" />
+    <image class="podium__laurel" src="/assets/images/ranking/laurel-first.png" mode="aspectFit" />
+
+    <view class="podium__col podium__col--second">
+      <view class="podium__name">{{podium[0].nickname}}</view>
+      <view class="podium__club">{{podium[0].club}}</view>
+      <view class="podium__score">{{podium[0].score}}</view>
+    </view>
+    <view class="podium__col podium__col--first">
+      <view class="podium__name podium__name--first">{{podium[1].nickname}}</view>
+      <view class="podium__club">{{podium[1].club}}</view>
+      <view class="podium__score podium__score--first">{{podium[1].score}}</view>
+    </view>
+    <view class="podium__col podium__col--third">
+      <view class="podium__name podium__name--first">{{podium[2].nickname}}</view>
+      <view class="podium__club">{{podium[2].club}}</view>
+      <view class="podium__score">{{podium[2].score}}</view>
+    </view>
+  </view>
+
+  <!-- 4 名之后的列表，Figma node 15:47 -->
+  <view class="list">
+    <view class="list__row" wx:for="{{rows}}" wx:key="rank">
+      <view class="list__rank">{{item.rank}}</view>
+      <image class="list__avatar" src="{{item.avatar}}" mode="aspectFill" />
+      <view class="list__detail">
+        <view class="list__detail-top">
+          <text class="list__nickname">{{item.nickname}}</text>
+          <view class="list__badge">{{item.badge}}</view>
+        </view>
+        <view class="list__club">{{item.club}}</view>
+      </view>
+      <view class="list__score">{{item.score}}</view>
+    </view>
+  </view>
+
+  <view class="show-more" bindtap="onShowMore">
+    <text class="show-more__arrow">∨</text>
+    <text>展示 TOP50</text>
+  </view>
+
+  <view class="my-rank-spacer"></view>
+
+  <!-- 我的排名，设计中固定在底部 -->
+  <view class="my-rank">
+    <image class="my-rank__trophy" src="/assets/images/ranking/my-trophy.png" mode="aspectFit" />
+    <text class="my-rank__summary">{{myRanking.summary}}</text>
+    <text class="my-rank__action">{{myRanking.actionText}}</text>
+    <view class="my-rank__cta">›</view>
+  </view>
+</view>

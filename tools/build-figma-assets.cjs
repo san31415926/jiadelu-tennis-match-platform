@@ -50,10 +50,28 @@ const TASKS = [
   // 我的页头部装饰：金框头像 255x187、网球 133x116
   ['my-gold-avatar-frame.png', 'images/gold-avatar-frame.png', 510, null],
   ['my-tennis-ball.png', 'images/hero-tennis-ball.png', 266, null],
+
+  // 榜单页装饰与领奖台（node 15:18）
+  ['rk-confetti.png', 'images/ranking/confetti.png', 330, null],
+  ['rk-podium-first.png', 'images/ranking/podium-first.png', 528, null],
+  ['rk-podium-second.png', 'images/ranking/podium-second.png', 506, null],
+  ['rk-podium-third.png', 'images/ranking/podium-third.png', 506, null],
+  ['rk-gold-frame.png', 'images/ranking/gold-frame.png', 400, null],
+  ['rk-laurel-first.png', 'images/ranking/laurel-first.png', 500, null],
+  ['rk-my-trophy.png', 'images/ranking/my-trophy.png', 160, null],
 ];
 
-/** 球场照片走 JPEG，圆角由 WXSS 负责；源图本身不大，不做放大 */
-const PHOTO_TASKS = [['court-photo.png', 'images/court-photo.jpg', 572, null]];
+/**
+ * 照片类资产走 JPEG，圆角与裁切由 WXSS 负责。
+ * 榜单头像是示例数据，接入云开发后应改为云存储网络图。
+ */
+const PHOTO_TASKS = [
+  ['court-photo.png', 'images/court-photo.jpg', 572, null],
+  ['rk-avatar-demo.png', 'images/ranking/avatar-demo.jpg', 240, null],
+  ['rk-avatar-4.png', 'images/ranking/avatar-4.jpg', 160, null],
+  ['rk-avatar-5.png', 'images/ranking/avatar-5.jpg', 160, null],
+  ['rk-avatar-6.png', 'images/ranking/avatar-6.jpg', 160, null],
+];
 
 async function run() {
   const report = [];

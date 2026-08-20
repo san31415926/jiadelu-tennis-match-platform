@@ -1,0 +1,445 @@
+﻿/* 数值取自 Figma node 15:3 及其子节点 */
+
+.ranking {
+  min-height: 100vh;
+  background: #fcfef5;
+}
+
+/* ---------- 头部 ---------- */
+
+.header {
+  position: relative;
+  background: linear-gradient(180deg, #a1d60f 0%, #c7f033 60%, #f0faa6 100%);
+}
+
+.header__inner {
+  height: 272rpx;
+}
+
+/* 波浪路径取自 node 15:6 */
+.header__wave {
+  top: 174rpx;
+  height: 105rpx;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105' viewBox='0 0 750 105' preserveAspectRatio='none'%3E%3Cpath d='M0 0C125 70 235 70 350 30C500 -24 585 75 750 8V105H0V0Z' fill='%23FCFEF5'/%3E%3C/svg%3E");
+}
+
+.header__title {
+  top: 34rpx;
+  height: 54rpx;
+  font-size: 40rpx;
+  font-weight: 700;
+  line-height: 54rpx;
+  color: #1f2114;
+}
+
+.back-btn {
+  position: absolute;
+  left: 17rpx;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  width: 100rpx;
+  height: 48rpx;
+  border: 1rpx solid #ccd6b8;
+  border-radius: 24rpx;
+  background: #ccffc8;
+  opacity: 0.94;
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #548005;
+}
+
+.back-btn__arrow {
+  font-size: 20rpx;
+}
+
+/* 城市榜 / 全国榜，node 15:8 */
+.scope-tabs {
+  position: absolute;
+  left: 140rpx;
+  top: 91rpx;
+  display: flex;
+  gap: 12rpx;
+  width: 470rpx;
+  height: 58rpx;
+}
+
+.scope-tabs__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 229rpx;
+  height: 58rpx;
+  border-radius: 29rpx;
+  background: #e8f59e;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #6b7059;
+}
+
+.scope-tabs__item.is-active {
+  background: #2e3324;
+  color: #ffffff;
+}
+
+/* 积分 / 身价 / 战力，node 15:13 */
+.metric-tabs {
+  position: absolute;
+  left: 121rpx;
+  top: 239rpx;
+  display: flex;
+  gap: 46rpx;
+  width: 520rpx;
+}
+
+.metric-tabs__item {
+  position: relative;
+  flex: 1;
+  text-align: center;
+  font-size: 25rpx;
+  font-weight: 600;
+  color: #6b7059;
+}
+
+.metric-tabs__item.is-active {
+  color: #1f2114;
+}
+
+/* node 15:17：48x5 的圆角短线 */
+.metric-tabs__underline {
+  position: absolute;
+  left: 50%;
+  bottom: -12rpx;
+  width: 48rpx;
+  height: 5rpx;
+  margin-left: -24rpx;
+  border-radius: 2.5rpx;
+  background: #548005;
+}
+
+/* ---------- 领奖台 ---------- */
+
+.podium {
+  position: relative;
+  height: 454rpx;
+  background: #fcfef5;
+}
+
+.podium__confetti {
+  position: absolute;
+  width: 150rpx;
+  height: 210rpx;
+}
+
+.podium__confetti--1 {
+  left: 42rpx;
+  top: 8rpx;
+  opacity: 0.45;
+}
+
+.podium__confetti--2 {
+  left: 245rpx;
+  top: 19rpx;
+  opacity: 0.45;
+}
+
+.podium__confetti--3 {
+  left: 444rpx;
+  top: 19rpx;
+  opacity: 0.45;
+}
+
+.podium__confetti--4 {
+  left: 575rpx;
+  top: 0;
+  opacity: 0.38;
+}
+
+.podium__stand {
+  position: absolute;
+}
+
+.podium__stand--first {
+  left: 263rpx;
+  top: 160rpx;
+  width: 240rpx;
+  height: 190rpx;
+}
+
+.podium__stand--second {
+  left: 85rpx;
+  top: 210rpx;
+  width: 230rpx;
+  height: 160rpx;
+}
+
+.podium__stand--third {
+  left: 495rpx;
+  top: 210rpx;
+  width: 230rpx;
+  height: 160rpx;
+}
+
+.podium__frame {
+  position: absolute;
+  width: 181rpx;
+  height: 165rpx;
+}
+
+.podium__frame--second {
+  left: 95rpx;
+  top: 105rpx;
+}
+
+.podium__frame--third {
+  left: 503rpx;
+  top: 121rpx;
+}
+
+.podium__frame-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 181rpx;
+  height: 165rpx;
+}
+
+/* 头像尺寸与位置取自 node 15:41，金框按 DOM 顺序压在其上 */
+.podium__frame-avatar {
+  position: absolute;
+  left: 35rpx;
+  top: 34rpx;
+  width: 110rpx;
+  height: 110rpx;
+  border-radius: 50%;
+}
+
+.podium__laurel {
+  position: absolute;
+  left: 291rpx;
+  top: 73rpx;
+  width: 226rpx;
+  height: 145rpx;
+}
+
+.podium__first-avatar {
+  position: absolute;
+  left: 340rpx;
+  top: 81rpx;
+  width: 110rpx;
+  height: 110rpx;
+  border-radius: 50%;
+}
+
+.podium__col {
+  position: absolute;
+  top: 369rpx;
+  text-align: center;
+}
+
+.podium__col--second {
+  left: 26rpx;
+  width: 275rpx;
+}
+
+.podium__col--first {
+  left: 240rpx;
+  width: 270rpx;
+}
+
+.podium__col--third {
+  left: 500rpx;
+  width: 230rpx;
+}
+
+.podium__name {
+  height: 34rpx;
+  font-size: 25rpx;
+  line-height: 34rpx;
+  color: #1f2114;
+}
+
+/* 冠亚季军中，第一、三名的昵称在设计中是加粗的 */
+.podium__name--first {
+  font-weight: 700;
+}
+
+.podium__club {
+  height: 28rpx;
+  font-size: 18rpx;
+  line-height: 28rpx;
+  color: #6b7059;
+}
+
+.podium__score {
+  height: 42rpx;
+  font-size: 32rpx;
+  font-weight: 700;
+  line-height: 42rpx;
+  color: #1f2114;
+}
+
+.podium__score--first {
+  height: 48rpx;
+  font-size: 38rpx;
+  line-height: 48rpx;
+}
+
+/* ---------- 4 名之后的列表 ---------- */
+
+.list {
+  margin: 34rpx 30rpx 0;
+  width: 690rpx;
+  overflow: hidden;
+}
+
+.list__row {
+  display: flex;
+  align-items: center;
+  height: 94rpx;
+  background: var(--card-bg);
+  border-bottom: 1rpx solid #dbdecc;
+}
+
+.list__rank {
+  width: 86rpx;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1f2114;
+}
+
+.list__avatar {
+  flex-shrink: 0;
+  width: 70rpx;
+  height: 70rpx;
+  margin-left: 19rpx;
+  border-radius: 50%;
+}
+
+.list__detail {
+  flex: 1;
+  margin-left: 20rpx;
+  overflow: hidden;
+}
+
+.list__detail-top {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  height: 30rpx;
+}
+
+.list__nickname {
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #1f2114;
+}
+
+.list__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58rpx;
+  height: 29rpx;
+  border-radius: 16rpx;
+  background: #e8f59e;
+  font-size: 18rpx;
+  font-weight: 600;
+  color: #548005;
+}
+
+.list__club {
+  margin-top: 5rpx;
+  overflow: hidden;
+  font-size: 17rpx;
+  line-height: 24rpx;
+  color: #6b7059;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.list__score {
+  width: 130rpx;
+  padding-right: 24rpx;
+  text-align: right;
+  font-size: 32rpx;
+  color: #1f2114;
+}
+
+/* ---------- 展开与我的排名 ---------- */
+
+.show-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  width: 169rpx;
+  height: 28rpx;
+  margin: 8rpx auto 0;
+  border-radius: 82rpx;
+  background: #7ee7a3;
+  font-size: 20rpx;
+  color: #79815c;
+}
+
+.show-more__arrow {
+  font-size: 22rpx;
+}
+
+/* 为固定在底部的「我的排名」留出空间 */
+.my-rank-spacer {
+  height: calc(134rpx + env(safe-area-inset-bottom));
+}
+
+.my-rank {
+  position: fixed;
+  left: 42rpx;
+  bottom: calc(20rpx + env(safe-area-inset-bottom));
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  width: 666rpx;
+  height: 94rpx;
+  padding: 0 21rpx;
+  border: 1rpx solid #e0e5d6;
+  border-radius: 32rpx;
+  background: var(--card-bg);
+  box-shadow: 0 4rpx 10rpx rgba(51, 64, 31, 0.12);
+}
+
+.my-rank__trophy {
+  flex-shrink: 0;
+  width: 70rpx;
+  height: 64rpx;
+}
+
+.my-rank__summary {
+  flex: 1;
+  margin-left: 20rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #1f2114;
+}
+
+.my-rank__action {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #548005;
+}
+
+.my-rank__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36rpx;
+  height: 36rpx;
+  margin-left: 20rpx;
+  border-radius: 18rpx;
+  background: #e8f59e;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #548005;
+}

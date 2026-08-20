@@ -2,7 +2,8 @@
   "pages": [
     "pages/events/index",
     "pages/super-cup/index",
-    "pages/profile/index"
+    "pages/profile/index",
+    "pages/ranking/index"
   ],
   "window": {
     "navigationStyle": "custom",

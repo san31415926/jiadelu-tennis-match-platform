@@ -59,6 +59,9 @@ const TASKS = [
   ['rk-gold-frame.png', 'images/ranking/gold-frame.png', 400, null],
   ['rk-laurel-first.png', 'images/ranking/laurel-first.png', 500, null],
   ['rk-my-trophy.png', 'images/ranking/my-trophy.png', 160, null],
+
+  // 俱乐部页（node 23:345 / 23:368）
+  ['cb-flag.png', 'images/club/header-flag.png', 640, null],
 ];
 
 /**
@@ -71,6 +74,14 @@ const PHOTO_TASKS = [
   ['rk-avatar-4.png', 'images/ranking/avatar-4.jpg', 160, null],
   ['rk-avatar-5.png', 'images/ranking/avatar-5.jpg', 160, null],
   ['rk-avatar-6.png', 'images/ranking/avatar-6.jpg', 160, null],
+
+  // 俱乐部 logo 是示例数据，圆角由 WXSS 负责
+  ['cb-logo-1.png', 'images/club/logo-1.jpg', 256, null],
+  ['cb-logo-2.png', 'images/club/logo-2.jpg', 256, null],
+  ['cb-logo-3.png', 'images/club/logo-3.jpg', 256, null],
+  ['cb-logo-4.png', 'images/club/logo-4.jpg', 256, null],
+  ['cb-logo-5.png', 'images/club/logo-5.jpg', 256, null],
+  ['cb-logo-6.png', 'images/club/logo-6.jpg', 256, null],
 ];
 
 async function run() {

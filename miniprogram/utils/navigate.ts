@@ -5,6 +5,7 @@
 const IMPLEMENTED_PAGES = new Set<string>([
   '/pages/ranking/index',
   '/pages/calendar/index',
+  '/pages/clubs/index',
 ]);
 
 export function navigateToPage(path: string): void {

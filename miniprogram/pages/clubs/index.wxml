@@ -1,0 +1,76 @@
+<view class="clubs">
+  <!-- 头部，Figma node 23:345 -->
+  <view class="header" style="padding-top:{{statusBarHeight}}px">
+    <view class="header__inner">
+      <!-- 该页下缘同样是超宽椭圆（node 23:351） -->
+      <view class="header__ellipse"></view>
+
+      <view class="club-back" bindtap="onBack">‹</view>
+      <view class="header__title">俱乐部</view>
+
+      <image class="header__flag" src="/assets/images/club/header-flag.png" mode="aspectFit" />
+
+      <view class="header__heading">俱乐部</view>
+      <view class="header__summary">{{summary}}</view>
+    </view>
+  </view>
+
+  <!-- 搜索，Figma node 23:353 -->
+  <view class="search">
+    <view class="search__box">
+      <view class="search__icon"></view>
+      <input
+        class="search__input"
+        value="{{keyword}}"
+        placeholder="搜索俱乐部名称或 ID"
+        placeholder-class="search__placeholder"
+        bindinput="onKeywordInput"
+        confirm-type="search"
+      />
+    </view>
+  </view>
+
+  <!-- 筛选，Figma node 23:359 -->
+  <view class="filters">
+    <view
+      class="filters__chip {{activeFilter === item ? 'is-active' : ''}}"
+      wx:for="{{filters}}"
+      wx:key="*this"
+      data-filter="{{item}}"
+      bindtap="onFilterTap"
+    >
+      {{item}}
+    </view>
+  </view>
+
+  <!-- 列表，Figma node 23:368 -->
+  <view class="list">
+    <view class="list__row" wx:for="{{clubs}}" wx:key="id" data-id="{{item.id}}" bindtap="onClubTap">
+      <image class="list__logo" src="{{item.logo}}" mode="aspectFill" />
+      <view class="list__detail">
+        <view class="list__heading">
+          <text class="list__name">{{item.name}}</text>
+          <view class="list__badge" wx:if="{{item.rankBadge}}">{{item.rankBadge}}</view>
+        </view>
+        <view class="list__meta">{{item.meta}}</view>
+      </view>
+      <view
+        class="list__action {{item.joined ? 'list__action--joined' : ''}}"
+        catchtap="onJoinTap"
+        data-id="{{item.id}}"
+      >
+        {{item.joined ? '已加入' : '申请加入'}}
+      </view>
+    </view>
+
+    <view class="list__empty" wx:if="{{clubs.length === 0}}">没有匹配的俱乐部</view>
+  </view>
+
+  <view class="create-spacer"></view>
+
+  <!-- 底部固定按钮，Figma node 23:425 -->
+  <view class="create-btn" bindtap="onCreateClub">
+    <view class="create-btn__plus"></view>
+    <text>创建俱乐部</text>
+  </view>
+</view>

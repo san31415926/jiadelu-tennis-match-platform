@@ -1,0 +1,298 @@
+/* 数值取自 Figma node 23:343 及其子节点 */
+
+.clubs {
+  min-height: 100vh;
+  background: #fbfcf9;
+}
+
+/* ---------- 头部 ---------- */
+
+.header {
+  position: relative;
+  background: linear-gradient(90deg, #b7e91b 0%, #d8f65e 52%, #f5fac7 100%);
+}
+
+.header__inner {
+  height: 360rpx;
+}
+
+/* node 23:351：900x190 的椭圆，两侧超出屏幕 */
+.header__ellipse {
+  position: absolute;
+  left: -75rpx;
+  top: 278rpx;
+  width: 900rpx;
+  height: 190rpx;
+  border-radius: 50%;
+  background: #fbfcf9;
+}
+
+.club-back {
+  position: absolute;
+  left: 28rpx;
+  top: 14rpx;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 56rpx;
+  font-size: 46rpx;
+  color: #11150b;
+}
+
+.header__title {
+  top: 24rpx;
+  height: 42rpx;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #11150b;
+}
+
+.header__flag {
+  position: absolute;
+  left: 414rpx;
+  top: 82rpx;
+  width: 320rpx;
+  height: 268rpx;
+}
+
+.header__heading {
+  position: absolute;
+  left: 72rpx;
+  top: 154rpx;
+  height: 70rpx;
+  font-size: 48rpx;
+  font-weight: 700;
+  line-height: 70rpx;
+  color: #11150b;
+}
+
+.header__summary {
+  position: absolute;
+  left: 74rpx;
+  top: 226rpx;
+  height: 34rpx;
+  font-size: 22rpx;
+  line-height: 34rpx;
+  color: #5a6250;
+}
+
+/* ---------- 搜索 ---------- */
+
+.search {
+  display: flex;
+  justify-content: center;
+  height: 118rpx;
+  padding-top: 18rpx;
+  background: var(--card-bg);
+}
+
+.search__box {
+  display: flex;
+  align-items: center;
+  width: 642rpx;
+  height: 76rpx;
+  padding: 0 28rpx;
+  border-radius: 38rpx;
+  background: var(--card-bg);
+  box-shadow: 0 8rpx 18rpx rgba(170, 178, 158, 0.18);
+}
+
+/* node 23:355：圆环加斜柄的放大镜 */
+.search__icon {
+  flex-shrink: 0;
+  width: 28rpx;
+  height: 28rpx;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28' fill='none'%3E%3Ccircle cx='12' cy='12' r='8.5' stroke='%238E928F' stroke-width='2.3'/%3E%3Cpath d='M18.5 18.5L25 25' stroke='%238E928F' stroke-width='2.3' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.search__input {
+  flex: 1;
+  margin-left: 26rpx;
+  font-size: 22rpx;
+  color: #11150b;
+}
+
+.search__placeholder {
+  color: #a2a5a2;
+}
+
+/* ---------- 筛选 ---------- */
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  height: 92rpx;
+  padding: 0 54rpx;
+  background: var(--card-bg);
+}
+
+.filters__chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52rpx;
+  padding: 0 26rpx;
+  border: 1rpx solid #e0e3d9;
+  border-radius: 26rpx;
+  background: #fbfcf9;
+  font-size: 19rpx;
+  color: #151a12;
+}
+
+.filters__chip.is-active {
+  border-color: #b5e51a;
+  background: #b5e51a;
+}
+
+/* ---------- 列表 ---------- */
+
+.list {
+  padding: 0 54rpx;
+  background: var(--card-bg);
+}
+
+.list__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 148rpx;
+  border-bottom: 1rpx solid #dee1db;
+}
+
+.list__logo {
+  flex-shrink: 0;
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 18rpx;
+}
+
+.list__detail {
+  width: 330rpx;
+  height: 96rpx;
+  overflow: hidden;
+}
+
+.list__heading {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  height: 42rpx;
+}
+
+.list__name {
+  overflow: hidden;
+  font-size: 25rpx;
+  font-weight: 700;
+  color: #11150b;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.list__badge {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 104rpx;
+  height: 34rpx;
+  border-radius: 8rpx;
+  background: #eef7d3;
+  font-size: 16rpx;
+  color: #72a315;
+}
+
+.list__meta {
+  margin-top: 8rpx;
+  height: 34rpx;
+  font-size: 16rpx;
+  line-height: 34rpx;
+  color: #686e67;
+}
+
+.list__action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 150rpx;
+  height: 54rpx;
+  border-radius: 27rpx;
+  background: #b5e51a;
+  font-size: 18rpx;
+  color: #10150c;
+}
+
+/* 已加入用金色描边表示，node 23:413 */
+.list__action--joined {
+  border: 1.5rpx solid #d0a63e;
+  background: #fbfcf9;
+  color: #b18b36;
+}
+
+.list__empty {
+  padding: 96rpx 0;
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--text-muted);
+}
+
+/* ---------- 底部创建按钮 ---------- */
+
+.create-spacer {
+  height: calc(122rpx + env(safe-area-inset-bottom));
+}
+
+.create-btn {
+  position: fixed;
+  left: 82rpx;
+  bottom: calc(20rpx + env(safe-area-inset-bottom));
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20rpx;
+  width: 594rpx;
+  height: 82rpx;
+  border-radius: 41rpx;
+  background: linear-gradient(
+    90deg,
+    rgba(181, 229, 26, 0.6) 0%,
+    rgba(216, 246, 94, 0.6) 100%
+  );
+  box-shadow: 0 10rpx 18rpx rgba(125, 141, 93, 0.25);
+  font-size: 24rpx;
+  color: #11150b;
+}
+
+/* node 23:426：30x30 的加号 */
+.create-btn__plus {
+  position: relative;
+  width: 30rpx;
+  height: 30rpx;
+}
+
+.create-btn__plus::before,
+.create-btn__plus::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: #11150b;
+}
+
+.create-btn__plus::before {
+  width: 26rpx;
+  height: 3rpx;
+  margin: -1.5rpx 0 0 -13rpx;
+}
+
+.create-btn__plus::after {
+  width: 3rpx;
+  height: 26rpx;
+  margin: -13rpx 0 0 -1.5rpx;
+}

@@ -46,7 +46,7 @@ async function run() {
         withoutEnlargement: true,
         background: { r: 0, g: 0, b: 0, alpha: 0 },
       })
-      .png({ compressionLevel: 9, palette: true })
+      .png({ compressionLevel: 9, effort: 10 })
       .toFile(out);
     const { size } = await fsp.stat(out);
     report.push([target, `${meta.width}x${meta.height}`, meta.hasAlpha ? '透明' : '不透明', size]);

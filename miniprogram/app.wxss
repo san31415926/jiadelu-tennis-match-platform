@@ -1,14 +1,48 @@
 @import './styles/tokens.wxss';
 
+/**
+ * ============================================================================
+ * 全局样式 —— 所有页面和组件都会应用这里的规则
+ * ============================================================================
+ *
+ * 【这个文件是干什么的】
+ * 1. 设定全站的字体、字号、背景色基线
+ * 2. 放"每个页面都长一样"的部件：渐变头部、波浪下缘、页面标题、底栏占位
+ *
+ * 【和页面样式的关系】
+ * app.wxss 是全局的，页面自己的 index.wxss 可以覆盖这里的规则。
+ * 比如榜单页的头部高度和首页不同，就在它自己的 wxss 里重写 .header__inner 的高度。
+ *
+ * 【重要】
+ * 这里的 .header / .header__wave / .header__title 是七个页面共用的，
+ * 改动会一次影响所有页面，改之前先确认是不是真的想全站生效。
+ */
+
+/**
+ * 全站文字基线。
+ *
+ * font-size: 28rpx 是页面默认字号，具体元素基本都会自己指定字号覆盖它。
+ * font-family 里那一长串是"字体回退链"：优先用苹果的苹方，找不到就往后找，
+ * 保证 iOS 和安卓上都有合适的中文字体。
+ *
+ * 想让全站文字变大一档 → 把 28rpx 调大，但注意各元素自己指定的字号不会跟着变，
+ * 真要整体放大得逐个页面调，或者用后面「整体缩放」那个思路。
+ */
 page {
   background: var(--page-bg);
   color: var(--text-card-title);
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue',
     'Microsoft YaHei', sans-serif;
   font-size: 28rpx;
+  /* 让文字边缘更平滑，iOS 上效果明显 */
   -webkit-font-smoothing: antialiased;
 }
 
+/**
+ * 让所有元素的宽高包含内边距和边框。
+ * 不加这行的话，给一个 100rpx 宽的盒子加 20rpx 内边距，它会变成 140rpx 宽，
+ * 布局会到处对不上设计稿。这是必备的基础设定，一般不用动。
+ */
 view,
 text,
 image,
@@ -18,16 +52,39 @@ scroll-view {
   box-sizing: border-box;
 }
 
+/* 图片默认是行内元素，会在底部留一条诡异的空隙，改成块级消除它 */
 image {
   display: block;
 }
 
-/* 页面底部为自定义 tabBar 让出空间 */
+/**
+ * 底栏占位块。
+ *
+ * 自定义底栏是 fixed 悬浮在屏幕底部的，不占文档流，所以页面内容会被它盖住。
+ * 在页面最后放一个这么高的空 view，把内容顶上去。
+ *
+ * env(safe-area-inset-bottom) 是全面屏手机底部横杠的高度，
+ * 系统自动提供，老款手机上它等于 0。
+ *
+ * 如果你发现页面滚到底后最后一张卡片还是被底栏压住，就把这里的高度加大。
+ */
 .tabbar-spacer {
   height: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
 }
 
-/* 头部渐变通栏：内层 header__inner 承载按设计稿绝对定位的元素 */
+/**
+ * ----------------------------------------------------------------------------
+ * 渐变头部（七个页面共用的骨架）
+ * ----------------------------------------------------------------------------
+ *
+ * 结构是两层：
+ *   .header        外层，负责渐变背景 + 用 padding-top 避开状态栏
+ *   .header__inner 内层，高度等于设计稿标注的头部高度，内部元素按设计稿绝对定位
+ *
+ * 为什么分两层：设计稿是在没有状态栏的画板上画的，元素坐标都是从画板顶部算的。
+ * 如果直接把状态栏高度加到元素坐标上，每个元素都要重新算。分两层之后，
+ * 状态栏由外层用内边距"顶开"，内层坐标系和设计稿完全一致，照抄即可。
+ */
 .header {
   position: relative;
   width: 100%;
@@ -38,10 +95,33 @@ image {
   position: relative;
   width: 100%;
   height: var(--header-height);
+  /* 超出内层的部分裁掉，装饰图（比如网球、旗子）不会溢出到下方内容区 */
   overflow: hidden;
 }
 
-/* 头部下缘波浪，取自 Figma node 1:230 的矢量路径 */
+/**
+ * 头部下缘的波浪。
+ *
+ * 【为什么用 SVG 而不是图片】
+ * 波浪是一条不规则曲线，CSS 的 border-radius 画不出来。用图片则要为每种屏幕
+ * 宽度准备不同尺寸。所以这里把曲线路径直接内嵌成 SVG 背景图，它是矢量的，
+ * 任何宽度下都清晰，而且只占几百字节，不像 PNG 要几十 KB。
+ *
+ * 【路径怎么来的】
+ * 从 Figma node 1:230 导出的原始路径，一个字符没改。
+ * 那串 d="M0 260C92 219..." 就是曲线的数学描述，M 是起点，C 是三次贝塞尔曲线。
+ *
+ * 【想改波浪形状怎么办】
+ * 不建议手动改这串路径，很难改对。正确做法是在 Figma 里调好曲线，
+ * 重新导出 SVG，然后把新的 d 值替换进来。
+ *
+ * 【注意 fill 的颜色】
+ * fill='%23FBFFF4' 里 %23 就是 # 号（URL 里 # 有特殊含义必须转义）。
+ * 这个颜色必须和页面底色 --page-bg 完全一致，否则波浪和下方页面之间
+ * 会出现一条明显的色差线。
+ *
+ * preserveAspectRatio='none' 表示允许拉伸变形，这样波浪能横向铺满任意宽度屏幕。
+ */
 .header__wave {
   position: absolute;
   left: 0;
@@ -51,9 +131,19 @@ image {
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='321' viewBox='0 0 750 321' preserveAspectRatio='none'%3E%3Cpath d='M0 260C92 219 166 291 263 273C343 258 373 230 448 258C546 293 628 238 750 202V321H0V260Z' fill='%23FBFFF4'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-size: 100% 100%;
+  /* 波浪只是装饰，不该拦截点击。不加这行，它会挡住下面元素的点击事件 */
   pointer-events: none;
 }
 
+/**
+ * 页面顶部大标题，如「LTJIMMY赛事」「超级杯」「球员排名」。
+ *
+ * 用 flex 居中而不是 text-align: center，是为了让文字在 80rpx 的区域内
+ * 同时水平和垂直居中。
+ *
+ * 各页面的标题位置略有差异（设计稿如此），所以榜单页、日历页、俱乐部页
+ * 会在自己的 wxss 里覆盖 top 和 height。
+ */
 .header__title {
   position: absolute;
   left: 0;

@@ -2,7 +2,25 @@ import { GUEST_PROFILE, MOCK_PROFILE, PROFILE_MENU } from '../../mock/profile';
 import { navigateToPage } from '../../utils/navigate';
 import { syncTabBarSelected } from '../../utils/tabbar';
 
-/** XP 轨道在设计中宽 690rpx，小球直径 28rpx */
+/**
+ * ============================================================================
+ * 我的页逻辑
+ * ============================================================================
+ *
+ * 【两种状态共用一套布局】
+ * 未登录时用 GUEST_PROFILE（数值全是占位符），登录后换成 MOCK_PROFILE。
+ * 页面结构完全不变，只是数据不同——这样不用维护两套模板。
+ *
+ * 【登录态是全局的】
+ * 写在 app.globalData.isLoggedIn 里，因为首页和超级杯的「我的报名」筛选
+ * 也要判断登录。只存在本页 data 里的话，那两个页面读不到。
+ *
+ * 【进度条的宽度必须用 JS 算】
+ * 因为 WXSS 里没法把百分比换算成 rpx（进度条底槽是固定 690rpx 而不是 100%），
+ * 而小球的位置又依赖填充宽度。所以在 applyProfile 里算好再传给样式。
+ */
+
+/** 进度条的几何参数，和 index.wxss 里的数值必须一致，改一处要改两处 */
 const XP_TRACK_WIDTH = 690;
 const XP_TRACK_LEFT = 32;
 const XP_BALL_SIZE = 28;

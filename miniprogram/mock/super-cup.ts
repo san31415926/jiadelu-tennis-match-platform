@@ -1,7 +1,22 @@
 /**
- * 超级杯页假数据。
- * 与首页不同，这里的宫格在设计中是规整的 Auto Layout：
- * 两行四列，图标统一 110x105，因此不需要逐项几何。
+ * ============================================================================
+ * 超级杯页数据
+ * ============================================================================
+ *
+ * 【和首页的区别】
+ * 首页七宫格的图标是逐个手调位置和大小的（所以 HomeFeature 有 iconStyle 字段），
+ * 而超级杯的八个宫格在设计里是规整的两行四列，图标统一 110×105，
+ * 所以 SuperCupFeature 不需要 iconStyle，页面用 CSS 统一控制。
+ *
+ * 【复用了首页的类型】
+ * EventItem 和 HomeBanner 直接从 home.ts 引入，因为赛事卡片和轮播的结构
+ * 完全一样。改 home.ts 里那两个 interface 会同时影响这里。
+ *
+ * 【常见改动】
+ * 想改八个入口的名字/图标 → 改 SUPER_CUP_FEATURES
+ * 想改赛事内容             → 改 SUPER_CUP_EVENTS
+ * 想加第三行入口           → 加数据后要同时加大 tokens.wxss 的 --grid-height，
+ *                            并检查 pages/super-cup/index.ts 里 toRows 的每行个数
  */
 import type { EventItem, HomeBanner } from './home';
 
@@ -84,9 +99,19 @@ export const SUPER_CUP_FEATURES: SuperCupFeature[] = [
   },
 ];
 
-/** 俱乐部赛事按队计算签位，与个人赛的人数口径不同 */
 const COURT_PHOTO = '/assets/images/court-photo.jpg';
 
+/**
+ * 超级杯的赛事列表。
+ *
+ * 【注意 slots 的口径不同】
+ * 俱乐部赛事是按「队」报名的，所以写「12/16 队」；个人赛事按人，写「8/16」。
+ * 按钮文字也相应是「团队报名」而不是「立即报名」。
+ *
+ * 【「我的报名」是空数组】
+ * 故意留空用来演示空状态。未登录时会显示「登录后查看你报名的赛事」，
+ * 登录后显示「该分类下暂无赛事」。想看有数据的效果就往里加几条。
+ */
 export const SUPER_CUP_EVENTS: Record<string, EventItem[]> = {
   我的报名: [],
   报名中: [

@@ -7,8 +7,28 @@ import {
   type CalendarCell,
 } from '../../utils/calendar';
 
+/**
+ * ============================================================================
+ * 赛事日历页逻辑
+ * ============================================================================
+ *
+ * 【核心是一个 render 方法】
+ * 翻月、点日期、点今日，最终都归结为"用新的年月和选中日期重画一次"，
+ * 所以统一调 render(year, month, selectedKey)，不用三套逻辑。
+ *
+ * 【日期计算不在这里】
+ * 生成 42 个格子的逻辑在 utils/calendar.ts，这个文件只负责调用和渲染。
+ *
+ * 【默认打开当前月】
+ * 页面加载时调 jumpToToday()，所以打开就是今天所在的月份。
+ * 如果你的手机日期不在 2026 年 8 月，看不到示例赛事的小圆点，
+ * 需要手动翻月过去，或者改 mock/calendar.ts 里的日期键。
+ */
+
+/** 从赛事数据里提取出"哪些天有赛事"，用 Set 是为了查找快 */
 const EVENT_DAYS = new Set(Object.keys(CALENDAR_EVENTS));
 
+/** 月份标签，如「2026 / 08」。想改成「2026年8月」就改这里 */
 function monthLabelOf(year: number, month: number): string {
   return `${year} / ${month < 10 ? `0${month}` : month}`;
 }

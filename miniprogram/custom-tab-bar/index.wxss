@@ -1,4 +1,25 @@
-/* 底栏几何取自 Figma node 1:295：整条 153rpx，三项各 250rpx */
+/**
+ * ============================================================================
+ * 自定义底栏样式
+ * ============================================================================
+ * 几何数值全部来自 Figma node 1:295：整条高 153rpx，三格各 250rpx。
+ *
+ * 【注意】组件样式默认是隔离的，页面的 wxss 改不动这里的类。
+ * 想调底栏外观就在这个文件里改。
+ */
+
+/**
+ * 底栏容器。
+ *
+ * position: fixed 让它固定在屏幕底部、不随页面滚动。代价是它不占文档流，
+ * 会盖住页面内容，所以每个页面末尾要放一个 .tabbar-spacer 占位（见 app.wxss）。
+ *
+ * padding-bottom: env(safe-area-inset-bottom) 是给全面屏手机底部横杠留出空间，
+ * 否则图标文字会被横杠压住。老款手机上这个值是 0，不影响。
+ *
+ * z-index: 100 保证它盖在页面内容之上。如果某个页面有别的悬浮元素挡住了底栏，
+ * 把那个元素的 z-index 调到 100 以下。
+ */
 .tabbar {
   position: fixed;
   left: 0;
@@ -11,13 +32,35 @@
   background: #ffffff;
 }
 
+/**
+ * 单个 Tab 格子。
+ *
+ * 250rpx × 3 = 750rpx，正好铺满屏幕宽度。
+ * 如果以后加到四个 Tab，把这里改成 187.5rpx（750÷4），
+ * 同时 index.ts 里每个图标的 left 也要重算。
+ *
+ * position: relative 是必须的——里面的光晕、图标、文字都是绝对定位，
+ * 需要以这一格作为定位基准。
+ */
 .tabbar__item {
   position: relative;
   width: 250rpx;
   height: 153rpx;
 }
 
-/* 选中态椭圆光晕，node 1:297：81x76，在 250rpx 内居中 */
+/**
+ * 选中态的椭圆光晕（Figma node 1:297）。
+ *
+ * 81×76 的椭圆，left: 85rpx 让它在 250rpx 宽的格子里水平居中
+ * （(250 - 81) ÷ 2 ≈ 85）。所以如果改了格子宽度或光晕尺寸，
+ * left 要重新算，否则会偏。
+ *
+ * border-radius: 50% 让矩形变成椭圆（宽高不等所以不是正圆）。
+ *
+ * 想让光晕更大更醒目 → 加大 width/height 并相应减小 left/top
+ * 想换成正圆 → 把 height 改成和 width 一样的 81rpx
+ * 想去掉光晕 → 在 index.wxml 里删掉那行 <view class="tabbar__halo">
+ */
 .tabbar__halo {
   position: absolute;
   left: 85rpx;
@@ -28,11 +71,23 @@
   background: #e6ffb0;
 }
 
-/* 三个图标的位置与尺寸各不相同，由 iconStyle 逐项指定 */
+/**
+ * 图标。
+ * 具体的 left/top/width/height 由 index.ts 里每个 Tab 的 iconStyle 单独指定，
+ * 因为三个图标外形不同、尺寸不一样。这里只声明定位方式。
+ */
 .tabbar__icon {
   position: absolute;
 }
 
+/**
+ * 图标下方的文字。
+ *
+ * top: 87rpx 是文字区域的起始位置。想让文字离图标更远就加大这个值，
+ * 但注意别超过格子高度 153rpx。
+ *
+ * font-size: 32rpx 在手机上约等于 16pt，是设计稿的原值。
+ */
 .tabbar__label {
   position: absolute;
   left: 0;
@@ -44,6 +99,7 @@
   color: #6b7566;
 }
 
+/* 选中的那一项：文字变绿并加粗 */
 .tabbar__label.is-active {
   font-weight: 600;
   color: #59850a;

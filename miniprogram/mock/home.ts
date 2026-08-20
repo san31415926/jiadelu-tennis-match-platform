@@ -1,30 +1,81 @@
 /**
- * 首页假数据。云开发接通后由 services 层替换，页面结构不需要改动。
- * 宫格图标的位置与尺寸逐项来自 Figma node 1:239 的子节点标注。
+ * ============================================================================
+ * 首页数据 —— 想改首页显示的文字和赛事，就改这个文件
+ * ============================================================================
+ *
+ * 【这个文件是干什么的】
+ * 首页上所有的文字内容都在这里：轮播标题、七个宫格入口的名字、赛事卡片的
+ * 名称地点时间。页面只负责渲染，不含任何文案。
+ *
+ * 【接云开发后怎么办】
+ * 这个文件会被云函数返回的真实数据替换，但下面这些 interface（数据结构）
+ * 要保留，云数据库的字段名按它们来设计，这样页面代码一行都不用改。
+ *
+ * 【常见改动】
+ * 想改轮播文案         → 改 HOME_BANNERS 里的 title / subtitle
+ * 想加一个宫格入口     → 往 HOME_FEATURES 里加一项，注意同时要加大
+ *                        tokens.wxss 里的 --grid-height，否则新增的会被裁掉
+ * 想改赛事卡片内容     → 改 MOCK_EVENTS
+ * 想改筛选项名字       → 改 EVENT_FILTERS，但要同步改 MOCK_EVENTS 的键名，
+ *                        两者必须一致，否则切过去是空列表
  */
 
+/** 顶部轮播的一张 */
 export interface HomeBanner {
+  /** 唯一标识，wx:for 的 key 用它，随便起但不要重复 */
   id: string;
+  /** 大标题，36rpx 加粗 */
   title: string;
+  /** 副标题，19rpx 浅绿色 */
   subtitle: string;
+  /** 点击后跳转的页面路径。没做的页面会弹提示不跳转，见 utils/navigate.ts */
   target: string;
 }
 
+/** 首页七宫格的一个入口 */
 export interface HomeFeature {
+  /** 唯一标识。注意 'registrations' 这个值有特殊逻辑：点它是切筛选而不是跳页 */
   key: string;
+  /** 图标下方的文字，21rpx 加粗 */
   label: string;
+  /** 图标图片路径，用绝对路径 */
   icon: string;
+  /**
+   * 图标的位置和尺寸，写成 CSS 内联样式字符串。
+   *
+   * 【为什么每个都不一样】
+   * 这七个 3D 图标外形差别很大（领奖台是横的、礼盒是方的、香槟是竖的），
+   * 设计师在 Figma（node 1:239）里给每个都单独调了位置和大小，
+   * 套用统一尺寸会让画面参差不齐。
+   *
+   * 【坐标基准】
+   * left/top 相对每一格（158rpx 宽 × 154rpx 高）的左上角。
+   * 有些 top 是负数（如 -6rpx），表示图标顶部故意超出格子被裁掉一点，
+   * 这是设计稿的效果，不是错误。
+   *
+   * 【想让某个图标大一点】
+   * 加大 width/height，同时把 left 减掉宽度增量的一半，保持水平居中。
+   * 例如从 width:100rpx;left:29rpx 放大到 width:120rpx，left 就改成 19rpx。
+   */
   iconStyle: string;
+  /** 点击后跳转的页面路径 */
   path: string;
 }
 
+/** 一张赛事卡片。首页、超级杯、日历三个页面共用这个结构 */
 export interface EventItem {
   id: string;
+  /** 赛事名称，24rpx 加粗，太长会换行把卡片撑高，建议控制在 12 个字内 */
   title: string;
+  /** 左侧那张图，286×238 显示，图片本身建议 2 倍尺寸以上 */
   poster: string;
+  /** 地点，配一个圆点图标 */
   venue: string;
+  /** 时间，配一个时钟图标 */
   time: string;
+  /** 签位，如 8/16（个人赛按人）或 12/16 队（俱乐部赛按队），配一个人形图标 */
   slots: string;
+  /** 右下角按钮上的字。报名中写「立即报名」，已结束写「查看成绩」等 */
   actionText: string;
 }
 
@@ -101,10 +152,32 @@ export const HOME_FEATURES: HomeFeature[] = [
   },
 ];
 
+/**
+ * 状态筛选的四个选项。
+ *
+ * 数组里的文字既是显示的标签，也是下面 MOCK_EVENTS 的键名，两处必须一字不差。
+ *
+ * 【注意宽度】
+ * 设计稿给每个 Tab 固定了 174.5rpx 宽（Figma node 1:261），四个选项最多各放
+ * 4 个汉字。如果改成 5 个字以上会挤在一起，需要同时调整
+ * components/filter-tabs/index.wxss 里的 .filters__item 宽度。
+ *
+ * 【「我的报名」是特殊项】
+ * 它依赖登录态：未登录时列表为空并提示登录，见 pages/events/index.ts 里的
+ * LOGIN_REQUIRED_FILTER。
+ */
 export const EVENT_FILTERS = ['我的报名', '报名中', '进行中', '已结束'];
 
+/** 示例球场照片。接云开发后这里应换成云存储的网络图片地址 */
 const COURT_PHOTO = '/assets/images/court-photo.jpg';
 
+/**
+ * 四个筛选状态各自的赛事列表。
+ *
+ * 【键名必须和 EVENT_FILTERS 完全一致】否则切到那个筛选会显示空列表。
+ * 【空数组是合法的】页面会显示「该分类下暂无赛事」的空状态。
+ * 【想看多卡片效果】往某个数组里多加几条，卡片之间会自动留 16rpx 间距。
+ */
 export const MOCK_EVENTS: Record<string, EventItem[]> = {
   我的报名: [
     {

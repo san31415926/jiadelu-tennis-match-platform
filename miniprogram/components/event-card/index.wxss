@@ -1,5 +1,31 @@
-/* 赛事卡片，Figma node 1:272 / 1:378，两个页面结构完全一致 */
+/**
+ * ============================================================================
+ * 赛事卡片样式（首页、超级杯、赛事日历三个页面共用）
+ * ============================================================================
+ * 数值来自 Figma node 1:272 / 1:378，两个页面的卡片结构完全一致。
+ *
+ * 【改这里会影响三个页面】
+ * 首页、超级杯、日历都引用这个组件。如果只想改某一个页面的卡片，
+ * 不要动这里，去那个页面的 wxss 里给 .feed__card 加规则覆盖。
+ *
+ * 【卡片的横向空间是怎么分配的】
+ *   照片 286rpx + 间距 28rpx + 详情 376rpx = 690rpx
+ * 卡片总宽由外层页面的 padding 决定（首页是 750 - 26×2 = 698rpx），
+ * 所以右边会剩 8rpx 余量。这是设计稿的原始数值，不是算错了。
+ *
+ * 如果想让照片更大，加大 .event-card__photo 的 width 后，
+ * 必须把 .event-card__body 的 width 减掉同样的数值，否则会挤出卡片。
+ */
 
+/**
+ * 卡片外框。
+ *
+ * height: 274rpx 是固定高度。这意味着赛事名称太长换行时会被裁掉，
+ * 想让卡片能自适应高度，把 height 改成 min-height。
+ *
+ * padding: 18rpx 0 表示上下各 18rpx 内边距、左右为 0，
+ * 所以照片是贴着卡片左边缘的（设计稿如此）。
+ */
 .event-card {
   display: flex;
   gap: 28rpx;
@@ -10,6 +36,16 @@
   box-shadow: var(--shadow-card);
 }
 
+/**
+ * 左侧的赛事照片。
+ *
+ * flex-shrink: 0 很关键——不加的话，当右侧文字很长时，flex 布局会把
+ * 照片压窄变形。
+ *
+ * 图片的显示模式在 wxml 里用 mode="aspectFill" 指定，意思是保持比例
+ * 填满这个框、超出部分裁掉（不会变形）。想让图片完整显示不裁切就改成
+ * aspectFit，但会在框内留白。
+ */
 .event-card__photo {
   flex-shrink: 0;
   width: 286rpx;
@@ -17,6 +53,12 @@
   border-radius: var(--radius-photo);
 }
 
+/**
+ * 右侧的信息区。
+ *
+ * position: relative 是给底部按钮做定位基准的（按钮是绝对定位）。
+ * gap: 10rpx 是标题和三行信息之间的统一间距。
+ */
 .event-card__body {
   position: relative;
   display: flex;
@@ -27,6 +69,11 @@
   padding-top: 2rpx;
 }
 
+/**
+ * 赛事名称。
+ * 24rpx 在手机上约 12pt，是设计稿原值，偏小。如果决定整体放大字号，
+ * 这里和下面 .event-card__meta-text 的 17rpx 是最该调的两处。
+ */
 .event-card__title {
   height: 34rpx;
   font-size: 24rpx;
@@ -34,12 +81,21 @@
   color: var(--text-card-title);
 }
 
+/** 地点/时间/人数每一行的容器，图标和文字横向排列 */
 .event-card__meta {
   display: flex;
   gap: 10rpx;
   height: 24rpx;
 }
 
+/**
+ * 信息文字。
+ *
+ * flex: 1 让它占满剩余宽度，配合 overflow + text-overflow: ellipsis，
+ * 地点名称过长时会显示成「佛山球球热网球禅...」而不是溢出卡片。
+ *
+ * white-space: nowrap 强制不换行，这是省略号生效的前提。
+ */
 .event-card__meta-text {
   flex: 1;
   overflow: hidden;
@@ -50,7 +106,24 @@
   text-overflow: ellipsis;
 }
 
-/* 三个信息图标都是简单几何形，用矢量背景实现，不占用图片资源 */
+/**
+ * ----------------------------------------------------------------------------
+ * 三个信息图标
+ * ----------------------------------------------------------------------------
+ *
+ * 【为什么不用图片】
+ * 这三个图标是纯几何形状：一个实心圆、一个圆环加两根指针、两个圆加一条圆角条。
+ * 用 SVG 内联成背景图，总共只占几百字节，而三张 PNG 至少要几 KB，
+ * 而且矢量在任何屏幕密度下都清晰。
+ *
+ * 【想换颜色怎么办】
+ * 改下面 SVG 里的 %237D8583。%23 就是 # 号（URL 里必须这样转义），
+ * 所以 %237D8583 表示 #7D8583。三个图标要分别改。
+ *
+ * 【想换成自己的图标】
+ * 把 background-image 换成 url('/assets/icons/xxx.png') 即可，
+ * 但要注意 24×24 的显示尺寸下 PNG 需要至少 72×72 才够清晰。
+ */
 .meta-icon {
   flex-shrink: 0;
   width: 24rpx;
@@ -60,18 +133,29 @@
   background-size: 100% 100%;
 }
 
+/* 地点：一个实心圆点（Figma node 1:277） */
 .meta-icon--location {
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4' fill='%237D8583'/%3E%3C/svg%3E");
 }
 
+/* 时间：圆环 + 时针分针（Figma node 1:281） */
 .meta-icon--time {
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8.1' fill='none' stroke='%237D8583' stroke-width='1.8'/%3E%3Crect x='11' y='5' width='1.8' height='8' rx='0.9' fill='%237D8583'/%3E%3Crect x='11' y='11' width='7' height='1.8' rx='0.9' fill='%237D8583'/%3E%3C/svg%3E");
 }
 
+/* 人数：两个头 + 一条肩线（Figma node 1:287） */
 .meta-icon--participants {
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='6.5' cy='10.5' r='3.5' fill='%237D8583'/%3E%3Ccircle cx='17.5' cy='10.5' r='3.5' fill='%237D8583'/%3E%3Crect x='3' y='15' width='18' height='4' rx='2' fill='%237D8583'/%3E%3C/svg%3E");
 }
 
+/**
+ * 按钮所在的那一行。
+ *
+ * 用绝对定位固定在 top: 184rpx，而不是跟着上面的内容流排布——这样即使
+ * 某张卡片的信息行少一行，按钮位置也不会跳动，多张卡片能对齐。
+ *
+ * justify-content: flex-end 让按钮靠右。right: 4rpx 是设计稿给的右边距。
+ */
 .event-card__footer {
   position: absolute;
   left: 0;
@@ -83,6 +167,15 @@
   height: 54rpx;
 }
 
+/**
+ * 报名按钮。
+ *
+ * border-radius 用 --radius-button（27rpx），正好是高度 54rpx 的一半，
+ * 所以两端是完美的半圆。改了高度记得同步改圆角，否则会变成圆角矩形。
+ *
+ * 按钮上的文字由数据里的 actionText 决定（立即报名/团队报名/查看成绩…），
+ * 见 mock/home.ts 的 EventItem。
+ */
 .event-card__action {
   display: flex;
   align-items: center;

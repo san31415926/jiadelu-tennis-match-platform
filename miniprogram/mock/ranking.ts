@@ -1,20 +1,41 @@
 /**
- * 球员排行页假数据，与 Figma node 15:3 / 6:3 对应。
- * 两版设计稿的差别只是城市榜与全国榜的选中态相反，属于同一个状态维度。
+ * ============================================================================
+ * 球员排行数据 —— 榜单的球员名单与排序规则
+ * ============================================================================
  *
- * 三个指标（积分/身价/战力）是各自独立的数值，排序结果不同，
- * 因此这里存球员原始数据，由 rankPlayers 按当前维度排序，而不是写死三份榜单。
+ * 【设计稿有两版，这里只需要一份数据】
+ * Figma 里 6:2 和 15:2 两个画板看起来是两个页面，其实只是「城市榜/全国榜」
+ * 的选中态相反，属于同一页面的两个状态。所以代码里做成一个页面 + 一个切换。
+ *
+ * 【为什么不写死三份榜单】
+ * 积分榜、身价榜、战力榜的排名顺序是不一样的（身价最高的人积分不一定最高）。
+ * 如果写死三份数组，改一个球员的数据要改三处，很容易漏。
+ * 所以这里只存每个球员的原始三个数值，由 rankPlayers() 按当前选中的指标
+ * 实时排序。这也和真实的后端逻辑一致。
+ *
+ * 【常见改动】
+ * 加球员          → 往 RAW_PLAYERS 里加一条，头像会自动循环复用
+ * 改当前用户城市  → 改 CURRENT_CITY，会影响「城市榜」筛出哪些人
+ * 改指标名称      → 改 RANKING_METRICS，同时要改 valueOf() 里的判断分支
+ * 改收起时显示几行 → 改 COLLAPSED_ROW_COUNT
+ * 改身价的显示格式 → 改 formatMetric()
  */
 
+/** 一个球员的完整档案。三个数值字段各对应一个榜单指标 */
 export interface RankedPlayer {
   id: string;
   nickname: string;
   club: string;
+  /** 评级标签，如 A+ / B / C。显示在昵称右边的小胶囊里 */
   badge: string;
   avatar: string;
+  /** 所在城市，「城市榜」按它过滤 */
   city: string;
+  /** 积分，对应「积分」榜 */
   points: number;
+  /** 身价（元），对应「身价」榜，显示时会加 ¥ 和千分位 */
   marketValue: number;
+  /** 战力值，对应「战力」榜 */
   power: number;
 }
 
@@ -81,13 +102,29 @@ export const PLAYERS: RankedPlayer[] = RAW_PLAYERS.map((player, index) => ({
   avatar: avatarOf(index),
 }));
 
+/**
+ * 根据当前选中的指标，取出球员对应的那个数值。
+ * 新增指标（比如「胜率」）时要在这里加一个判断分支。
+ */
 function valueOf(player: RankedPlayer, metric: string): number {
   if (metric === '身价') return player.marketValue;
   if (metric === '战力') return player.power;
   return player.points;
 }
 
-/** 身价带货币符号与千分位，其余指标是纯数值 */
+/**
+ * 把数值格式化成显示文本。
+ *
+ * 身价加货币符号和千分位（12800 → ¥12,800），其余指标直接显示数字。
+ *
+ * 【想改格式】
+ * 想让身价显示成「1.28 万」→ 把这里改成除以 10000 再拼「万」
+ * 想给积分也加千分位     → 把最后一行改成 value.toLocaleString('en-US')
+ *
+ * 【注意列宽】
+ * 格式变长可能撑破布局。列表右侧的数值列宽度在
+ * pages/ranking/index.wxss 的 .list__score 里，默认 150rpx。
+ */
 export function formatMetric(value: number, metric: string): string {
   if (metric === '身价') {
     return `¥${value.toLocaleString('en-US')}`;
@@ -95,7 +132,19 @@ export function formatMetric(value: number, metric: string): string {
   return String(value);
 }
 
-/** 按范围过滤、按指标降序排列 */
+/**
+ * 榜单的核心函数：先按范围筛人，再按指标从高到低排序。
+ *
+ * @param scope  '城市榜' 或 '全国榜'
+ * @param metric '积分' / '身价' / '战力'
+ *
+ * 【为什么用 [...pool] 复制一份】
+ * sort() 会直接修改原数组。如果不复制，PLAYERS 的顺序会被永久打乱，
+ * 切换指标几次之后数据就乱了。这是很容易踩的坑。
+ *
+ * 【排序方向】
+ * b - a 是从大到小（降序）。想改成从小到大就写 a - b。
+ */
 export function rankPlayers(scope: string, metric: string): RankedPlayer[] {
   const pool =
     scope === '城市榜'
@@ -104,7 +153,16 @@ export function rankPlayers(scope: string, metric: string): RankedPlayer[] {
   return [...pool].sort((a, b) => valueOf(b, metric) - valueOf(a, metric));
 }
 
-/** 前三名交给领奖台，展示顺序是「亚军 冠军 季军」 */
+/**
+ * 取前三名给领奖台用。
+ *
+ * 【返回顺序是「亚军、冠军、季军」而不是 1、2、3】
+ * 因为领奖台的视觉顺序是从左到右：2 号台在左、1 号台在中间最高、3 号台在右。
+ * 页面里用 podium[0] / podium[1] / podium[2] 分别对应左中右三个位置。
+ *
+ * 【人数不足三人时】
+ * 缺的位置显示「虚位以待」和 --，不会报错。城市榜筛出的人少时可能出现。
+ */
 export function toPodium(players: RankedPlayer[], metric: string): PodiumPlayer[] {
   const [first, second, third] = players;
   const build = (player: RankedPlayer | undefined, rank: 1 | 2 | 3): PodiumPlayer => ({
@@ -117,6 +175,10 @@ export function toPodium(players: RankedPlayer[], metric: string): PodiumPlayer[
   return [build(second, 2), build(first, 1), build(third, 3)];
 }
 
+/**
+ * 第 4 名之后的球员转成列表行。
+ * slice(3) 是跳过前三名（他们在领奖台上），index + 4 让名次从 4 开始。
+ */
 export function toRows(players: RankedPlayer[], metric: string): RankingRow[] {
   return players.slice(3).map((player, index) => ({
     rank: index + 4,
@@ -128,11 +190,23 @@ export function toRows(players: RankedPlayer[], metric: string): RankingRow[] {
   }));
 }
 
-/** 未登录或未参赛时，底部卡片显示未上榜文案 */
+/**
+ * 底部那张固定的「我的排名」卡片。
+ *
+ * 功能清单要求未上榜时显示提示文案，所以这里默认是未上榜状态。
+ * 接云开发后应改为读当前用户的真实排名。
+ *
+ * 文字里的 • 前后各有两个空格，是设计稿的排版效果，别删。
+ */
 export const MY_RANKING = {
   summary: '我的排名  第128  •  积分 0  •  暂未上榜',
   actionText: '去参赛',
 };
 
-/** 收起状态下只露出 4~6 名，与设计稿一致 */
+/**
+ * 收起状态下列表显示几行。
+ *
+ * 设计稿（Figma node 15:47）画了 4、5、6 三名，所以是 3。
+ * 调大会让默认展示更多人，页面变长；调成 0 则收起时完全不显示列表。
+ */
 export const COLLAPSED_ROW_COUNT = 3;

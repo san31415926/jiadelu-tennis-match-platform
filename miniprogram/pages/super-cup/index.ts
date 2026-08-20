@@ -11,7 +11,17 @@ import { syncTabBarSelected } from '../../utils/tabbar';
 const DEFAULT_FILTER = '报名中';
 const LOGIN_REQUIRED_FILTER = '我的报名';
 
-/** 设计中宫格是两行四列的 Auto Layout，按行切分便于对齐行内边距 */
+/**
+ * 把八个入口切成每行四个。
+ *
+ * 【为什么要切行而不是直接 flex-wrap】
+ * 设计里每一行有独立的左右内边距（左 38rpx、右 32rpx，不对称），
+ * 用 flex-wrap 只能给整个容器设一次内边距，做不出这个效果。
+ * 切成两行后每行单独设内边距，才能精确复现。
+ *
+ * @param perRow 每行几个。改成 3 会变成三行（3+3+2），
+ *               但要同时调大格子宽度，否则一行留白很多。
+ */
 function toRows(features: SuperCupFeature[], perRow = 4): SuperCupFeature[][] {
   const rows: SuperCupFeature[][] = [];
   for (let index = 0; index < features.length; index += perRow) {
@@ -20,6 +30,18 @@ function toRows(features: SuperCupFeature[], perRow = 4): SuperCupFeature[][] {
   return rows;
 }
 
+/**
+ * ============================================================================
+ * 超级杯页逻辑
+ * ============================================================================
+ *
+ * 结构和首页几乎一样（都是轮播 + 宫格 + 筛选 + 卡片列表），区别只有：
+ *   1. 宫格是规整的两行四列，所以要先用 toRows 切行
+ *   2. 筛选选中色是 #76d709（设计稿里和首页的 #83d414 不同）
+ *   3. 数据来自 mock/super-cup.ts
+ *
+ * 「我的报名」的登录判断逻辑与首页一致，两边都改的时候别漏一个。
+ */
 Page({
   data: {
     statusBarHeight: 0,

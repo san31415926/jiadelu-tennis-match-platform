@@ -35,6 +35,10 @@ Figma 文件「网球赛事总结」，file key `nzKWauHC37fyjpAtA3rjfd`，已�
 
 ### 小程序
 
+改动小程序前建议先看 [`miniprogram/工程说明.md`](miniprogram/工程说明.md)，
+里面有目录结构、`.json` 配置逐项说明（JSON 不支持注释，只能写在文档里），
+以及「想改什么去动哪个文件」的速查表。代码文件本身每个都有详细注释。
+
 1. 安装[微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/stable.html)稳定版。
 2. 导入 `miniprogram/` 目录，编译类型选「小程序」。
 3. 把 `miniprogram/project.config.json` 里的 `appid` 换成自己的 AppID。

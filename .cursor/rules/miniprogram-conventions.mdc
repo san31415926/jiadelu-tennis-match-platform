@@ -1,0 +1,52 @@
+---
+description: 小程序代码的耦合约束与容易踩的坑
+globs: miniprogram/**
+alwaysApply: false
+---
+
+# 小程序约定
+
+## 新增页面必须同时改三处
+
+1. `app.json` 的 `pages` 数组（路径不带开头斜杠、不带后缀）
+2. `utils/navigate.ts` 的 `IMPLEMENTED_PAGES` 白名单（带开头斜杠）
+3. 页面自己的 `index.json` 里注册用到的组件
+
+漏第 1 处报 `page not found`，漏第 2 处入口点击只弹提示，漏第 3 处组件位置空白且
+不一定报错。
+
+## 必须成对修改的地方
+
+| 改了这个 | 必须同步改 |
+| --- | --- |
+| 筛选项文字（`EVENT_FILTERS` 等） | 对应数据对象的键名，两者必须一字不差 |
+| `--page-bg` | `app.wxss` 里波浪 SVG 的 `fill`，否则出现色差线 |
+| 药丸形元素的高度 | 它的 `border-radius`（规律是高度的一半） |
+| 宫格入口数量 | `tokens.wxss` 的 `--grid-height`，宫格区是固定高度会裁掉新增行 |
+| 卡片内照片宽度 | 详情区宽度，两者之和受卡片总宽约束 |
+
+## 遮挡关系用 DOM 顺序，不要用负 z-index
+
+领奖台的头像要垫在金框之下，正确做法是把头像写在金框之前（后写的自然压在上面）。
+用 `z-index: -1` 会让元素跑到页面背景之下直接看不见。
+
+## 登录态在全局
+
+`app.globalData.isLoggedIn`。首页与超级杯的「我的报名」筛选、我的页的资料展示都读它。
+不要在单个页面的 data 里另存一份。
+
+## Tab 页的两个必做项
+
+```typescript
+onShow() {
+  syncTabBarSelected(this, 0);  // 索引对应 app.json 里 tabBar.list 的顺序
+  // 如果页面数据依赖登录态，这里要重新取数（用户可能刚去登录完回来）
+}
+```
+
+写在 `onShow` 而不是 `onLoad`——Tab 页切走再切回不会重新 `onLoad`。
+
+## 简单图形不要用图片
+
+圆点、圆环、圆角条、椭圆光晕、加号一律用 CSS 或内联 SVG data URI 实现。
+位图只留 3D 图标和照片。主包上限 2MB，要省着用。

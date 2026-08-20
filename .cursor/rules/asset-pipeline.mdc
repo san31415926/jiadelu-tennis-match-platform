@@ -1,0 +1,51 @@
+---
+description: 图片资产的处理流水线与脚本用法
+globs: tools/**
+alwaysApply: false
+---
+
+# 资产流水线
+
+`tools/` 下的脚本依赖 `sharp`，复用同级 `image-to-slice-tool` 项目的 `node_modules`
+（那个目录不在本仓库内，获取方式见 README）。**不要在项目根安装 npm 依赖**来解决这件事。
+
+脚本用 `createRequire` 从那个目录解析 sharp：
+
+```javascript
+const toolRequire = createRequire(
+  path.join(__dirname, '..', 'image-to-slice-tool', 'package.json')
+);
+const sharp = toolRequire('sharp');
+```
+
+## 标准流程
+
+1. `tools/fetch-figma-assets.ps1` —— 下载 Figma MCP 返回的资产地址（**7 天过期**）
+2. `tools/build-figma-assets.cjs` —— 压缩落地到 `miniprogram/assets/`
+
+新增资产时把条目加进 `build-figma-assets.cjs` 的 `TASKS`（透明 PNG）或
+`PHOTO_TASKS`（照片，转 JPEG 更省）。输出尺寸取设计显示尺寸的约 2.2 倍，足够覆盖 3 倍屏。
+
+## PNG 编码不要用 palette
+
+`png({ palette: true })` 会生成带 tRNS 的调色板图，libpng 报
+`tRNS: invalid with alpha channel`，而且实测体积还更大。统一用：
+
+```javascript
+.png({ compressionLevel: 9, effort: 10 })
+```
+
+## 辅助脚本
+
+| 脚本 | 用途 |
+| --- | --- |
+| `detect-icon-boxes.cjs` | 自动检测素材板上每个图标的包围盒，别再目视估坐标 |
+| `probe-crop.cjs` | 裁剪并放大指定区域，人工核对切图坐标 |
+| `sample-design-colors.cjs` | 定点采样定稿图颜色 |
+| `extract-wave-path.cjs` | 提取头部波浪曲线生成 SVG path |
+
+**读图工具会缩放图片显示**，所以不能靠肉眼估坐标——素材板真实尺寸是 1536×1024，
+但显示出来像 1024×683，据此估的坐标全是错的。要用 `detect-icon-boxes.cjs` 或
+`sharp().metadata()` 拿真实尺寸。
+
+`tools/.probe/` 是临时产物，已在 `.gitignore` 里；`tools/.figma/raw/` 保留原始下载件。

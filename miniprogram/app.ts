@@ -6,6 +6,7 @@ App<IAppOption>({
     navBarHeight: 0,
     safeAreaBottom: 0,
     screenWidth: 375,
+    isLoggedIn: false,
     userProfile: null,
     cloudReady: false,
   },

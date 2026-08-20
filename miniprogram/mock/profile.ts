@@ -21,6 +21,21 @@ export interface ProfileSummary {
   xpPercent: number;
 }
 
+/**
+ * 未登录 / 未评级状态。设计稿只画了已登录态，这里沿用同一套布局，
+ * 只把数值换成占位符，符合功能清单「未评级显示 --」「默认昵称微信用户」的要求。
+ */
+export const GUEST_PROFILE: ProfileSummary = {
+  nickname: '微信用户',
+  rating: '未评级',
+  level: 'Lv.--',
+  marketValue: '--',
+  marketValueTrend: '',
+  points: '--',
+  xpHint: '完成首场比赛后开启等级',
+  xpPercent: 0,
+};
+
 export const MOCK_PROFILE: ProfileSummary = {
   nickname: '帆',
   rating: '评分 5.0',

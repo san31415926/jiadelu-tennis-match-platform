@@ -63,7 +63,9 @@
       </view>
     </view>
 
-    <view class="list__empty" wx:if="{{clubs.length === 0}}">没有匹配的俱乐部</view>
+    <view class="list__empty" wx:if="{{clubs.length === 0}}">
+      {{keyword ? '没有匹配「' + keyword + '」的俱乐部' : activeFilter + ' 下暂无俱乐部'}}
+    </view>
   </view>
 
   <view class="create-spacer"></view>

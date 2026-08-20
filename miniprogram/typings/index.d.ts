@@ -20,6 +20,8 @@ interface IAppOption {
     navBarHeight: number;
     safeAreaBottom: number;
     screenWidth: number;
+    /** 微信登录态，云开发接入后由云函数校验 */
+    isLoggedIn: boolean;
     userProfile: UserProfile | null;
     cloudReady: boolean;
   };

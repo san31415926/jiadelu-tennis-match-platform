@@ -10,13 +10,18 @@
       <image class="hero__avatar" src="/assets/images/gold-avatar-frame.png" mode="aspectFit" />
       <image class="hero__ball" src="/assets/images/hero-tennis-ball.png" mode="aspectFit" />
 
-      <view class="hero__nickname">{{profile.nickname}}</view>
+      <view
+        class="hero__nickname {{isLoggedIn ? '' : 'hero__nickname--guest'}}"
+        bindtap="onLogin"
+      >{{isLoggedIn ? profile.nickname : '登录'}}</view>
       <view class="hero__chip hero__chip--rating">{{profile.rating}}</view>
       <view class="hero__chip hero__chip--level">{{profile.level}}</view>
 
       <view class="hero__label hero__label--value">身价</view>
       <view class="hero__number hero__number--value">{{profile.marketValue}}</view>
-      <view class="hero__trend">{{profile.marketValueTrend}}</view>
+      <view class="hero__trend" wx:if="{{profile.marketValueTrend}}">
+        {{profile.marketValueTrend}}
+      </view>
 
       <view class="hero__label hero__label--points">积分</view>
       <view class="hero__number hero__number--points">{{profile.points}}</view>

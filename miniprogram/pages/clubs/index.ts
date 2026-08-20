@@ -1,4 +1,10 @@
-import { CLUB_FILTERS, CLUB_LIST, CLUB_SUMMARY, type ClubItem } from '../../mock/club';
+import {
+  CLUB_FILTERS,
+  CLUB_LIST,
+  CLUB_SUMMARY,
+  filterClubs,
+  type ClubItem,
+} from '../../mock/club';
 
 Page({
   data: {
@@ -7,25 +13,28 @@ Page({
     filters: CLUB_FILTERS,
     activeFilter: '全部',
     keyword: '',
-    clubs: CLUB_LIST as ClubItem[],
+    clubs: [] as ClubItem[],
   },
 
   onLoad() {
     const app = getApp<IAppOption>();
-    this.setData({ statusBarHeight: app.globalData.statusBarHeight });
+    this.setData({
+      statusBarHeight: app.globalData.statusBarHeight,
+      clubs: filterClubs('全部', ''),
+    });
   },
 
-  /** 关键词在本地过滤；接入云开发后改为服务端搜索 */
-  applyFilters(keyword: string) {
-    const trimmed = keyword.trim();
-    const clubs = trimmed
-      ? CLUB_LIST.filter((club) => club.name.includes(trimmed))
-      : CLUB_LIST;
-    this.setData({ keyword, clubs });
+  /** 筛选与关键词叠加生效；接入云开发后改为服务端查询 */
+  apply(filter: string, keyword: string) {
+    this.setData({
+      activeFilter: filter,
+      keyword,
+      clubs: filterClubs(filter, keyword),
+    });
   },
 
   onKeywordInput(event: WechatMiniprogram.Input) {
-    this.applyFilters(event.detail.value);
+    this.apply(this.data.activeFilter, event.detail.value);
   },
 
   onFilterTap(event: WechatMiniprogram.TouchEvent) {
@@ -33,8 +42,7 @@ Page({
     if (filter === this.data.activeFilter) {
       return;
     }
-    this.setData({ activeFilter: filter });
-    wx.showToast({ title: `${filter} 筛选待接入云开发`, icon: 'none' });
+    this.apply(filter, this.data.keyword);
   },
 
   onClubTap() {

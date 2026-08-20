@@ -80,6 +80,7 @@
 
   <!-- 4 名之后的列表，Figma node 15:47 -->
   <view class="list">
+    <view class="list__empty" wx:if="{{rows.length === 0}}">该榜单暂无更多球员</view>
     <view class="list__row" wx:for="{{rows}}" wx:key="rank">
       <view class="list__rank">{{item.rank}}</view>
       <image class="list__avatar" src="{{item.avatar}}" mode="aspectFill" />
@@ -94,9 +95,9 @@
     </view>
   </view>
 
-  <view class="show-more" bindtap="onShowMore">
-    <text class="show-more__arrow">∨</text>
-    <text>展示 TOP50</text>
+  <view class="show-more" wx:if="{{totalRows > 3}}" bindtap="onToggleExpand">
+    <text class="show-more__arrow">{{expanded ? '∧' : '∨'}}</text>
+    <text>{{expanded ? '收起' : '展示 TOP' + totalRows}}</text>
   </view>
 
   <view class="my-rank-spacer"></view>

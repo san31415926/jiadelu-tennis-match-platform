@@ -12,6 +12,7 @@
       class="feature"
       wx:for="{{features}}"
       wx:key="key"
+      data-key="{{item.key}}"
       data-path="{{item.path}}"
       bindtap="onFeatureTap"
       hover-class="feature--pressed"
@@ -38,7 +39,7 @@
       bind:cardtap="onEventTap"
       bind:actiontap="onSignupTap"
     />
-    <view class="feed__empty" wx:if="{{events.length === 0}}">该分类下暂无赛事</view>
+    <view class="feed__empty" wx:if="{{events.length === 0}}">{{emptyHint}}</view>
   </view>
 
   <view class="tabbar-spacer"></view>

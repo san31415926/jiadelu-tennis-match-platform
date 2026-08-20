@@ -66,16 +66,25 @@
   height: 116rpx;
 }
 
+/* 设计给昵称留了 99rpx（示例昵称只有一个字），长昵称截断显示 */
 .hero__nickname {
   position: absolute;
   left: 276rpx;
   top: 138rpx;
   width: 99rpx;
   height: 42rpx;
+  overflow: hidden;
   font-size: 34rpx;
   font-weight: 700;
   line-height: 42rpx;
   color: #1f2414;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.hero__nickname--guest {
+  text-decoration: underline;
+  color: #3d5c0a;
 }
 
 .hero__chip {

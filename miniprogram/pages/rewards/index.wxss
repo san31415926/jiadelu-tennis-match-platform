@@ -1,0 +1,34 @@
+/**
+ * ============================================================================
+ * 积分兑换页样式
+ * ============================================================================
+ *
+ * 旧版就是「黄条文字 + 整张海报」，这里按同一结构还原。
+ * 导航栏用 components/page-nav 的白底吸顶条。
+ *
+ * 海报用 widthFix：宽度撑满屏幕，高度按图片比例走，页面可以往下滚。
+ */
+
+.rewards {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/**
+ * 旧版黄条。背景接近截图里的橙黄，左右留一点字距。
+ * 想换颜色只改 background。
+ */
+.notice {
+  padding: 16rpx 28rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 40rpx;
+  color: #1c1f21;
+  background: #ffb020;
+}
+
+.poster {
+  display: block;
+  width: 100%;
+  vertical-align: top;
+}

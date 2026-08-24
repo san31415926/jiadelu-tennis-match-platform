@@ -1,31 +1,42 @@
 <view class="header" style="padding-top:{{statusBarHeight}}px">
-  <view class="header__inner">
-    <view class="header__wave"></view>
-    <view class="header__title" style="top:{{titleTop}}rpx">{{title}}</view>
+  <!-- 页标题单独占一行绿条，不叠在轮播图上，切图时也不会被照片挡住 -->
+  <view
+    class="header__title"
+    style="height:{{navBarHeight}}px;padding-left:{{menuInsetRight}}px;padding-right:{{menuInsetRight}}px"
+  >{{title}}</view>
 
-    <swiper
-      class="banner"
-      current="{{current}}"
-      bindchange="onChange"
-      circular
-      autoplay
-      interval="5000"
-      duration="400"
-    >
-      <swiper-item wx:for="{{banners}}" wx:key="id">
-        <view class="banner__slide" data-index="{{index}}" bindtap="onSlideTap">
-          <view class="banner__title">{{item.title}}</view>
-          <view class="banner__subtitle">{{item.subtitle}}</view>
-        </view>
-      </swiper-item>
-    </swiper>
+  <view class="header__inner">
+    <!--
+      整块绿色头部都是轮播：swiper 铺满 header__inner。
+      不要把 position:absolute 直接写在 swiper 上（原生组件经常不生效），
+      外层用普通 view 负责铺满，swiper 只在这个框里滑。
+      赛事名画进 jpg。指示点用 WXML，好跟当前张走。
+    -->
+    <view class="banner">
+      <swiper
+        class="banner__swiper"
+        circular
+        autoplay
+        interval="5000"
+        duration="400"
+        bindchange="onSwiperChange"
+      >
+        <swiper-item wx:for="{{banners}}" wx:key="id">
+          <view class="banner__slide" data-index="{{index}}" bindtap="onSlideTap">
+            <image class="banner__image" src="{{item.image}}" mode="aspectFill" />
+          </view>
+        </swiper-item>
+      </swiper>
+    </view>
 
     <view class="banner__dots">
       <view
         wx:for="{{banners}}"
         wx:key="id"
-        class="banner__dot banner__dot--{{index + 1}} {{current === index ? 'is-active' : ''}}"
+        class="banner__dot {{index === current ? 'banner__dot--on' : ''}}"
       ></view>
     </view>
+
+    <view class="header__wave"></view>
   </view>
 </view>

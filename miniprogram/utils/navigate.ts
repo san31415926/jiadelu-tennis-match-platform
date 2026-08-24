@@ -5,11 +5,13 @@
  *
  * 【这个文件是干什么的】
  * 首页七宫格、超级杯八宫格、我的页菜单一共有十几个入口，但有些页面还没有
- * 设计稿（积分兑换、历届冠军、年会典礼等）。如果直接 wx.navigateTo 跳过去，
- * 小程序会报「page not found」错误，体验很差。
+ * 设计稿。如果直接 wx.navigateTo 跳过去，小程序会报「page not found」，体验很差。
  *
  * 所以这里维护一份"已经做好的页面"白名单：在名单里的正常跳转，
  * 不在名单里的弹一个提示，不跳转。
+ *
+ * 白名单只比对路径、不含 ?id= 参数。海报页共用 /pages/poster/index，
+ * 用查询参数区分年会、冠军、四项杯赛等。
  *
  * 【新做完一个页面后要做两件事】
  * 1. 在下面的 IMPLEMENTED_PAGES 里加上它的路径
@@ -26,10 +28,24 @@ const IMPLEMENTED_PAGES = new Set<string>([
   '/pages/calendar/index',
   '/pages/clubs/index',
   '/pages/gallery/index',
+  '/pages/rewards/index',
+  '/pages/poster/index',
+  '/pages/club-ranking/index',
+  '/pages/membership/index',
+  '/pages/album-detail/index',
+  '/pages/profile-edit/index',
+  '/pages/business/index',
+  '/pages/about/index',
+  '/pages/service/index',
+  '/pages/club-home/index',
 ]);
 
+function pagePath(url: string): string {
+  return url.split('?')[0];
+}
+
 export function navigateToPage(path: string): void {
-  if (!IMPLEMENTED_PAGES.has(path)) {
+  if (!IMPLEMENTED_PAGES.has(pagePath(path))) {
     wx.showToast({ title: '该页面还在还原中', icon: 'none' });
     return;
   }

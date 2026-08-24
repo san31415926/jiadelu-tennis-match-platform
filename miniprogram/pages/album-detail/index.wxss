@@ -1,0 +1,104 @@
+/**
+ * ============================================================================
+ * 相册详情页样式
+ * ============================================================================
+ * 数值来自草稿 Figma「相册详情 / Prototype Screen / Editable」。
+ * 头部青柠渐变 + 椭圆下缘，跟相册列表是一家；下面是居中标题和三列照片墙。
+ *
+ * 【照片格子怎么算】
+ * 屏宽 750，左右各留 30，中间两条缝各 16：
+ *   (750 - 30×2 - 16×2) ÷ 3 = 218
+ * 高度按设计 146。改了边距或间距，宽高要一起重算，否则最后一列会掉下去。
+ *
+ * 【圆角用 --radius-card】
+ * 设计变量是 28rpx，比相册列表缩略图的 14rpx 更圆。想改圆润程度只动 token。
+ */
+
+.album {
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+  background: #fbfcf9;
+}
+
+.header {
+  position: relative;
+  background: linear-gradient(90deg, #b2e514 4.55%, #d6f557 20.59%, #f5fac7 51.18%);
+}
+
+.header__inner {
+  height: 220rpx;
+}
+
+/* 和相册列表同一只超出屏宽的椭圆，只是头部更矮，所以 top 更靠上 */
+.header__ellipse {
+  position: absolute;
+  left: -75rpx;
+  top: 138rpx;
+  width: 900rpx;
+  height: 190rpx;
+  border-radius: 50%;
+  background: #fbfcf9;
+}
+
+.header__camera {
+  position: absolute;
+  left: 560rpx;
+  top: 88rpx;
+  z-index: 1;
+  width: 180rpx;
+  height: 125rpx;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8rpx 40rpx 28rpx;
+}
+
+.hero__title {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  line-height: 42rpx;
+}
+
+.hero__title-part {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #0f1408;
+}
+
+.hero__title-part--brand {
+  color: #80b214;
+}
+
+.hero__meta {
+  margin-top: 12rpx;
+  font-size: 18rpx;
+  line-height: 28rpx;
+  color: #6b7066;
+}
+
+.hero__chip {
+  margin-top: 12rpx;
+  padding: 8rpx 18rpx;
+  border-radius: 18rpx;
+  background: #83d414;
+  font-size: 16rpx;
+  font-weight: 700;
+  color: #1f380a;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 0 30rpx 20rpx;
+}
+
+.grid__photo {
+  width: 218rpx;
+  height: 146rpx;
+  border-radius: var(--radius-card);
+}

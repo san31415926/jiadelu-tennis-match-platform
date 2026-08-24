@@ -1,10 +1,9 @@
 <view class="ranking">
+  <page-nav title="球员排名" />
   <!-- 头部，Figma node 15:4 -->
   <view class="header" style="padding-top:{{statusBarHeight}}px">
     <view class="header__inner">
       <view class="header__wave"></view>
-
-      <view class="header__title">球员排名</view>
 
       <view class="scope-tabs">
         <view
@@ -31,35 +30,32 @@
         </view>
       </view>
     </view>
-
-    <view class="back-btn" style="top:{{statusBarHeight + 12}}px" bindtap="onBack">
-      <text class="back-btn__arrow">＜</text>
-      <text class="back-btn__text">返回</text>
-    </view>
   </view>
 
-  <!-- 领奖台，Figma node 15:18：元素相互重叠，保持绝对定位 -->
+  <!--
+    领奖台，Figma node 15:18。
+    每个名次一张切图（台座 + 金圈，圈心已抠成透明孔）。
+    头像写在切图前面，从孔里露出来，金圈边压在头像上，这样不会错位也不会露白边。
+    冠军写在最后，DOM 靠后的压在亚季军之上。
+  -->
   <view class="podium">
     <image class="podium__confetti podium__confetti--1" src="/assets/images/ranking/confetti.png" mode="aspectFit" />
     <image class="podium__confetti podium__confetti--2" src="/assets/images/ranking/confetti.png" mode="aspectFit" />
     <image class="podium__confetti podium__confetti--3" src="/assets/images/ranking/confetti.png" mode="aspectFit" />
     <image class="podium__confetti podium__confetti--4" src="/assets/images/ranking/confetti.png" mode="aspectFit" />
 
-    <image class="podium__stand podium__stand--second" src="/assets/images/ranking/podium-second.png" mode="aspectFit" />
-    <image class="podium__stand podium__stand--third" src="/assets/images/ranking/podium-third.png" mode="aspectFit" />
-    <image class="podium__stand podium__stand--first" src="/assets/images/ranking/podium-first.png" mode="aspectFit" />
-
-    <!-- 二、三名用金色相框，第一名用桂冠；头像先渲染，装饰压在其上 -->
-    <view class="podium__frame podium__frame--second">
-      <image class="podium__frame-avatar" src="{{podium[0].avatar}}" mode="aspectFill" />
-      <image class="podium__frame-img" src="/assets/images/ranking/gold-frame.png" mode="aspectFit" />
+    <view class="podium__unit podium__unit--second">
+      <image class="podium__unit-avatar" src="{{podium[0].avatar}}" mode="aspectFill" />
+      <image class="podium__unit-img" src="/assets/images/ranking/podium-unit-2.png" mode="aspectFit" />
     </view>
-    <view class="podium__frame podium__frame--third">
-      <image class="podium__frame-avatar" src="{{podium[2].avatar}}" mode="aspectFill" />
-      <image class="podium__frame-img" src="/assets/images/ranking/gold-frame.png" mode="aspectFit" />
+    <view class="podium__unit podium__unit--third">
+      <image class="podium__unit-avatar" src="{{podium[2].avatar}}" mode="aspectFill" />
+      <image class="podium__unit-img" src="/assets/images/ranking/podium-unit-3.png" mode="aspectFit" />
     </view>
-    <image class="podium__first-avatar" src="{{podium[1].avatar}}" mode="aspectFill" />
-    <image class="podium__laurel" src="/assets/images/ranking/laurel-first.png" mode="aspectFit" />
+    <view class="podium__unit podium__unit--first">
+      <image class="podium__unit-avatar podium__unit-avatar--first" src="{{podium[1].avatar}}" mode="aspectFill" />
+      <image class="podium__unit-img" src="/assets/images/ranking/podium-unit-1.png" mode="aspectFit" />
+    </view>
 
     <view class="podium__col podium__col--second">
       <view class="podium__name">{{podium[0].nickname}}</view>
@@ -83,7 +79,9 @@
     <view class="list__empty" wx:if="{{rows.length === 0}}">该榜单暂无更多球员</view>
     <view class="list__row" wx:for="{{rows}}" wx:key="rank">
       <view class="list__rank">{{item.rank}}</view>
-      <image class="list__avatar" src="{{item.avatar}}" mode="aspectFill" />
+      <view class="list__avatar-slot">
+        <gold-avatar size="small" src="{{item.avatar}}" />
+      </view>
       <view class="list__detail">
         <view class="list__detail-top">
           <text class="list__nickname">{{item.nickname}}</text>

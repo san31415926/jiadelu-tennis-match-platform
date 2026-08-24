@@ -2,109 +2,136 @@
  * ============================================================================
  * 头部轮播样式
  * ============================================================================
- * 渐变背景、波浪、大标题的样式在 app.wxss 里（七个页面共用），
- * 这个文件只负责轮播文案和指示点。数值来自 Figma node 1:229。
+ * 渐变背景、波浪的基础样式在 app.wxss 里。这一页把页标题从轮播图里拆出来，
+ * 单独占状态栏下面那一行绿条，所以这里要把全局 .header__title 的绝对定位覆盖掉。
+ *
+ * 【轮播范围】
+ * header__inner（321rpx）整块都是图。底部波浪叠在图上。
+ * 赛事名按设计稿 36 / 19 画进 jpg；指示点用 WXML，好跟当前张走。
+ * 原图在 测试图/轮播图/，小程序用压缩 jpg，路径在 mock/home.ts。
  */
 
+.header {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-bottom: -2rpx;
+  background: var(--header-gradient);
+}
+
 /**
- * 轮播区域。
+ * 覆盖 app.wxss 里的绝对定位。组件 styleIsolation 是 apply-shared，
+ * 不写这几行标题会重新叠回图顶上。
+ */
+.header__title {
+  position: relative;
+  left: auto;
+  top: auto;
+  z-index: 4;
+  height: 44px;
+  box-sizing: border-box;
+  pointer-events: none;
+  text-shadow: none;
+}
+
+.header__inner {
+  position: relative;
+  width: 100%;
+  height: var(--header-height);
+  overflow: hidden;
+  /* swiper 原生组件底是深色，底下哪怕露 1px 也会变成一条黑横线 */
+  background: #fbfff4;
+}
+
+/** 波浪必须盖在轮播图上面，才能切出设计稿那条白边 */
+.header__wave {
+  z-index: 2;
+}
+
+/**
+ * 盖住头部最底那一线。高度落在波浪实心填充里，不会切到曲线。
+ * 图文件底边和微信 swiper 都可能露出 1px 深色缝。
+ */
+.header__inner::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  height: 24rpx;
+  background: #fbfff4;
+  pointer-events: none;
+}
+
+/**
+ * 轮播框 = 整块绿色头部。
  *
- * 绝对定位在 top: 94rpx，也就是大标题下方。高度 76rpx 刚好容纳
- * 主标题（46rpx 行高）+ 副标题（26rpx 行高）。
+ * 【为什么多包一层 view】
+ * 微信的 swiper 是原生组件，直接给它 position:absolute 经常不生效，
+ * 会从头部顶上以默认 150px 高度铺开。定位写在这层普通 view 上才稳。
  *
- * 如果轮播文案要加第三行，把 height 调大，但要注意别撞到 top: 192rpx
- * 位置的指示点。
- *
- * 自动播放间隔、是否循环这些行为参数在 index.wxml 的 swiper 标签上：
- *   interval="5000" 是 5 秒切一张，改成 3000 会更快
+ * 自动播放在 index.wxml 的 swiper 上：
+ *   interval="5000" 是 5 秒切一张
  *   duration="400"  是切换动画时长
- *   删掉 autoplay 就不自动播放，只能手动滑
+ *   删掉 autoplay 就不自动播放
  */
 .banner {
   position: absolute;
   left: 0;
-  top: 94rpx;
+  top: 0;
+  z-index: 0;
   width: 100%;
-  height: 76rpx;
+  /* 多出的高度被 header__inner overflow 裁掉，切掉 jpg 底边那条深色像素 */
+  height: calc(100% + 12rpx);
 }
 
-/** 每一张的内容容器。左内边距 52rpx 是设计稿给的左边距 */
+.banner__swiper {
+  width: 100%;
+  height: calc(var(--header-height) + 12rpx);
+  border: none;
+  background: #fbfff4;
+}
+
 .banner__slide {
-  padding-left: 52rpx;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #fbfff4;
 }
 
-/** 轮播主标题，如「广佛俱乐部联名赛」 */
-.banner__title {
-  font-size: 36rpx;
-  font-weight: 700;
-  line-height: 46rpx;
-  color: var(--text-banner-title);
-}
-
-/** 轮播副标题，如「球员精彩瞬间 · 点击查看」 */
-.banner__subtitle {
-  font-size: 19rpx;
-  line-height: 26rpx;
-  color: var(--text-banner-sub);
+.banner__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  vertical-align: top;
 }
 
 /**
- * ----------------------------------------------------------------------------
- * 轮播指示点
- * ----------------------------------------------------------------------------
- *
- * 【为什么三个点大小不一样】
- * 设计稿（Figma node 1:235）里三个点分别是 14、12、10 直径，还带一点垂直
- * 偏移，做出一种"往右后方延伸"的透视感。它是固定的装饰效果，不随当前页
- * 变化——也就是说切到第二张时，是第二个点变深色，但它仍然是 12rpx 的中号点。
- *
- * 【想改成常见的等大圆点】
- * 把下面三个 --1/--2/--3 的 width/height 都改成同一个值（比如 12rpx），
- * top 都改成 1rpx，left 按等间距重排（0 / 22 / 44）。
- *
- * 【超过三张轮播怎么办】
- * 现在只定义了三个位置类。如果轮播有四张以上，第四个点会没有样式而消失。
- * 需要在这里补 .banner__dot--4 等规则，或者改成上面说的等大等距方案，
- * 用一个通用类 + flex 布局自动排列。
+ * 指示点。位置来自 Figma node 1:235（left 55 / top 192）。
+ * 照片底是深色，选中用品牌青柠，未选中用半透明白。
  */
 .banner__dots {
   position: absolute;
   left: 55rpx;
   top: 192rpx;
-  width: 58rpx;
-  height: 14rpx;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  pointer-events: none;
 }
 
 .banner__dot {
-  position: absolute;
-  border-radius: 50%;
-  background: var(--dot-idle);
-  /* 切换时颜色渐变过渡，去掉这行会变成生硬的瞬间切换 */
-  transition: background-color 0.2s;
-}
-
-.banner__dot--1 {
-  left: 0;
-  top: 0;
-  width: 14rpx;
-  height: 14rpx;
-}
-
-.banner__dot--2 {
-  left: 25rpx;
-  top: 2rpx;
-  width: 12rpx;
-  height: 12rpx;
-}
-
-.banner__dot--3 {
-  left: 48rpx;
-  top: 4rpx;
   width: 10rpx;
   height: 10rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.38);
 }
 
-/** 当前那一页对应的点，颜色变深 */
-.banner__dot.is-active {
-  background: var(--dot-active);
+.banner__dot--on {
+  width: 22rpx;
+  border-radius: 6rpx;
+  background: #d4f34a;
 }

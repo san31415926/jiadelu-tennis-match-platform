@@ -50,6 +50,9 @@ const TASKS = [
   // 我的页头部装饰：金框头像 255x187、网球 133x116
   ['my-gold-avatar-frame.png', 'images/gold-avatar-frame.png', 510, null],
   ['my-tennis-ball.png', 'images/hero-tennis-ball.png', 266, null],
+  // 我的资料金圈 + 相机（透明圆孔，可套真实头像）
+  ['gold-avatar-ring.png', 'images/gold-avatar-ring.png', 422, 422],
+  ['camera-badge.png', 'icons/profile/camera-badge.png', 128, 128],
 
   // 榜单页装饰与领奖台（node 15:18）
   ['rk-confetti.png', 'images/ranking/confetti.png', 330, null],

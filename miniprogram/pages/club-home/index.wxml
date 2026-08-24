@@ -1,0 +1,65 @@
+<view class="club-home">
+  <page-nav title="俱乐部主页" />
+  <view class="sub-header" style="padding-top:{{statusBarHeight}}px">
+    <view class="sub-header__inner">
+      <view class="sub-header__wave"></view>
+      <image class="sub-header__ball" src="/assets/images/hero-tennis-ball.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <view class="hero">
+    <gold-avatar src="{{club.logo}}" size="club" />
+    <view class="hero__name">{{club.name}}</view>
+    <view class="hero__pills">
+      <view class="pill">{{club.city}}</view>
+      <view class="pill pill--lime" wx:if="{{club.recruiting}}">招新中</view>
+    </view>
+  </view>
+
+  <view class="stats">
+    <view class="stats__col">
+      <view class="stats__value stats__value--lime">{{club.power}}</view>
+      <view class="stats__label">总战力</view>
+    </view>
+    <view class="stats__divider"></view>
+    <view class="stats__col">
+      <view class="stats__value">{{club.members}}</view>
+      <view class="stats__label">成员</view>
+    </view>
+    <view class="stats__divider"></view>
+    <view class="stats__col">
+      <view class="stats__value">{{rankLabel}}</view>
+      <view class="stats__label">战力榜</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section__title">俱乐部成员</view>
+    <view class="section__count">{{shownLabel}}</view>
+  </view>
+
+  <view class="list">
+    <view class="row" wx:for="{{members}}" wx:key="id">
+      <gold-avatar src="{{item.avatar}}" size="member" />
+      <view class="row__info">
+        <view class="row__name-line">
+          <text class="row__name">{{item.nickname}}</text>
+          <view class="row__captain" wx:if="{{item.captain}}">队长</view>
+        </view>
+        <view class="row__join">{{item.joinedAt}}</view>
+      </view>
+      <view class="row__power">
+        <view class="row__power-value">{{item.power}}</view>
+        <view class="row__power-label">战力</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="cta-spacer"></view>
+  <view class="cta">
+    <view
+      class="cta__btn {{club.joined ? 'cta__btn--joined' : ''}}"
+      bindtap="onJoin"
+    >{{club.joined ? '已加入' : '申请加入'}}</view>
+  </view>
+</view>

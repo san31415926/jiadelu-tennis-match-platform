@@ -1,24 +1,24 @@
-﻿/**
+/**
  * ============================================================================
  * 球员排行页样式
  * ============================================================================
  * 数值来自 Figma node 15:3 及其子节点。
  *
  * 【这一页的三种布局方式，各有原因】
- *   头部     绝对定位 —— 标题、双榜切换、指标筛选是手工摆位的
- *   领奖台   绝对定位 —— 装饰碎片、台座、金框头像、桂冠是相互重叠的图层，
- *                        只有绝对定位能精确复现叠放关系和层级
+ *   头部     绝对定位 —— 双榜切换、指标筛选是手工摆位的
+ *   领奖台   绝对定位 —— 每个名次是「台座 + 金圈」合成切图，头像叠在圈心；
+ *                        三张切图仍会左右重叠，所以继续绝对定位
  *   下方列表 流式布局 —— 行数会随展开/收起变化，必须能自适应高度
  *
  * 【头部样式覆盖了 app.wxss】
- * .header__wave 和 .header__title 在 app.wxss 里有基础定义（七页共用），
+ * .header__wave 在 app.wxss 里有基础定义（七页共用），
  * 这一页的头部高度和波浪形状与首页不同，所以在下面重写了它们的
  * top / height / background-image。
  *
  * 【领奖台的遮挡关系靠 DOM 顺序，不是 z-index】
- * 在 index.wxml 里，头像写在金框和桂冠之前，后写的元素自然压在先写的上面。
- * 一开始用负 z-index 实现过，但那样头像会跑到页面背景之下直接看不见，
- * 是个容易踩的坑。所以调整顺序要在 wxml 里改，不要在这里加 z-index。
+ * 头像写在合成切图之后，才能盖住金圈中间的白色圆心。
+ * 冠军那一套写在亚季军后面，台座边缘重叠时冠军压在上面。
+ * 不要用负 z-index，头像会跑到页面背景底下看不见。
  */
 
 .ranking {
@@ -42,38 +42,6 @@
   top: 174rpx;
   height: 105rpx;
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105' viewBox='0 0 750 105' preserveAspectRatio='none'%3E%3Cpath d='M0 0C125 70 235 70 350 30C500 -24 585 75 750 8V105H0V0Z' fill='%23FCFEF5'/%3E%3C/svg%3E");
-}
-
-.header__title {
-  top: 34rpx;
-  height: 54rpx;
-  font-size: 40rpx;
-  font-weight: 700;
-  line-height: 54rpx;
-  color: #1f2114;
-}
-
-.back-btn {
-  position: absolute;
-  left: 17rpx;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6rpx;
-  width: 100rpx;
-  height: 48rpx;
-  border: 1rpx solid #ccd6b8;
-  border-radius: 24rpx;
-  background: #ccffc8;
-  opacity: 0.94;
-  font-size: 20rpx;
-  font-weight: 700;
-  color: #548005;
-}
-
-.back-btn__arrow {
-  font-size: 20rpx;
 }
 
 /* 城市榜 / 全国榜，node 15:8 */
@@ -185,80 +153,79 @@
   opacity: 0.38;
 }
 
-.podium__stand {
+/**
+ * 一座台 + 一个圈的合成切图。
+ *
+ * 三个盒子的宽高比必须和 PNG 一致（520×672 / 520×678 / 520×627），
+ * 这样 aspectFit 不会留白，头像用百分比定位才能对准金圈圆心。
+ * 三座台底边对齐在 359rpx，文字从 369rpx 开始，中间留 10rpx。
+ *
+ * 圆心百分比来自 tools/measure-podium-circles.cjs 对切图的实测，
+ * 不要在开发者工具里拖头像——拖完会写成内联样式，把对齐冲掉。
+ */
+.podium__unit {
   position: absolute;
 }
 
-.podium__stand--first {
-  left: 263rpx;
-  top: 160rpx;
+.podium__unit--first {
+  left: 255rpx;
+  top: 48rpx;
   width: 240rpx;
-  height: 190rpx;
+  height: 310rpx;
 }
 
-.podium__stand--second {
-  left: 85rpx;
-  top: 210rpx;
-  width: 230rpx;
-  height: 160rpx;
+.podium__unit--second {
+  left: 48rpx;
+  top: 72rpx;
+  width: 220rpx;
+  height: 287rpx;
 }
 
-.podium__stand--third {
-  left: 495rpx;
-  top: 210rpx;
-  width: 230rpx;
-  height: 160rpx;
+.podium__unit--third {
+  left: 482rpx;
+  top: 94rpx;
+  width: 220rpx;
+  height: 265rpx;
 }
 
-.podium__frame {
+.podium__unit-img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+/**
+ * 头像从金圈的透明圆孔里露出来。
+ *
+ * left/top/宽高都是相对切图盒子的百分比，数字来自实测圆心：
+ *   冠军 520×672，白圆 (133,25) 259×264
+ *   亚军 520×678，白圆 (112,26) 300×312
+ *   季军 520×627，白圆 (114,24) 293×302
+ * 改切图之后要重新跑测量脚本，再改这里。
+ */
+.podium__unit-avatar {
   position: absolute;
-  width: 181rpx;
-  height: 165rpx;
-}
-
-.podium__frame--second {
-  left: 95rpx;
-  top: 105rpx;
-}
-
-.podium__frame--third {
-  left: 503rpx;
-  top: 121rpx;
-}
-
-.podium__frame-img {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 181rpx;
-  height: 165rpx;
-}
-
-/* 头像尺寸与位置取自 node 15:41，金框按 DOM 顺序压在其上 */
-.podium__frame-avatar {
-  position: absolute;
-  left: 35rpx;
-  top: 34rpx;
-  width: 110rpx;
-  height: 110rpx;
+  z-index: 0;
+  left: 21.54%;
+  top: 4.72%;
+  width: 57.69%;
+  height: 44.25%;
   border-radius: 50%;
 }
 
-.podium__laurel {
-  position: absolute;
-  left: 291rpx;
-  top: 73rpx;
-  width: 226rpx;
-  height: 145rpx;
+.podium__unit-avatar--first {
+  left: 25.58%;
+  top: 4.09%;
+  width: 49.81%;
+  height: 38.54%;
 }
 
-.podium__first-avatar {
-  position: absolute;
-  left: 340rpx;
-  top: 81rpx;
-  width: 110rpx;
-  height: 110rpx;
-  border-radius: 50%;
+.podium__unit--third .podium__unit-avatar {
+  left: 21.92%;
+  top: 4.55%;
+  width: 56.35%;
+  height: 46.73%;
 }
 
 /**
@@ -278,18 +245,18 @@
 }
 
 .podium__col--second {
-  left: 26rpx;
-  width: 275rpx;
+  left: 48rpx;
+  width: 220rpx;
 }
 
 .podium__col--first {
-  left: 240rpx;
-  width: 270rpx;
+  left: 255rpx;
+  width: 240rpx;
 }
 
 .podium__col--third {
-  left: 500rpx;
-  width: 230rpx;
+  left: 482rpx;
+  width: 220rpx;
 }
 
 .podium__name {
@@ -349,12 +316,13 @@
   color: #1f2114;
 }
 
-.list__avatar {
+.list__avatar-slot {
+  /**
+   * 金框头像组件的占位。组件自己是 86×86，比原来的 70 圆头像略大，
+   * 仍能放进 94rpx 高的行。不要再给这里设宽高，会把圈裁掉。
+   */
   flex-shrink: 0;
-  width: 70rpx;
-  height: 70rpx;
   margin-left: 19rpx;
-  border-radius: 50%;
 }
 
 .list__detail {

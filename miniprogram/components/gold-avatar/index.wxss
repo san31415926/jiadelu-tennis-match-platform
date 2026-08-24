@@ -1,0 +1,123 @@
+/**
+ * ============================================================================
+ * 金框头像样式
+ * ============================================================================
+ * 大号数值来自草稿 Figma「我的资料」：金圈 192、头像 150、相机 58。
+ * 相机相对金圈的坐标是 left 149 / top 139（node 371:27 相对 365:5）。
+ * 小号按同一比例缩到能放进榜单行（行高 94rpx）。
+ * 另外两档：club 160/118（俱乐部主页 logo）、member 72/52（成员行）。
+ *
+ * 照片必须垫在金圈下面，金圈 PNG 圆心是透明的，头像从孔里露出来。
+ * overflow 不能 hidden，否则相机会被裁掉。
+ */
+
+.gold-avatar {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.gold-avatar__photo {
+  position: absolute;
+  z-index: 0;
+  border-radius: 50%;
+}
+
+.gold-avatar__ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+
+.gold-avatar__badge {
+  position: absolute;
+  z-index: 2;
+}
+
+/** 我的页。外框要比金圈略大，才能放下右下角相机 */
+.gold-avatar--large {
+  width: 207rpx;
+  height: 197rpx;
+}
+
+.gold-avatar--large .gold-avatar__photo {
+  left: 21rpx;
+  top: 21rpx;
+  width: 150rpx;
+  height: 150rpx;
+}
+
+.gold-avatar--large .gold-avatar__ring {
+  width: 192rpx;
+  height: 192rpx;
+}
+
+.gold-avatar--large .gold-avatar__badge {
+  left: 149rpx;
+  top: 139rpx;
+  width: 58rpx;
+  height: 58rpx;
+}
+
+/**
+ * 榜单列表。圈 86、头像 68，(86-68)/2 = 9，头像居中。
+ * 不要再加大，94rpx 的行会被撑开。
+ */
+.gold-avatar--small {
+  width: 86rpx;
+  height: 86rpx;
+}
+
+.gold-avatar--small .gold-avatar__photo {
+  left: 9rpx;
+  top: 9rpx;
+  width: 68rpx;
+  height: 68rpx;
+}
+
+.gold-avatar--small .gold-avatar__ring {
+  width: 86rpx;
+  height: 86rpx;
+}
+
+/**
+ * 俱乐部主页 logo。圈 160、头像 118，(160-118)/2 = 21。
+ * 草稿 node 445:37。
+ */
+.gold-avatar--club {
+  width: 160rpx;
+  height: 160rpx;
+}
+
+.gold-avatar--club .gold-avatar__photo {
+  left: 21rpx;
+  top: 21rpx;
+  width: 118rpx;
+  height: 118rpx;
+}
+
+.gold-avatar--club .gold-avatar__ring {
+  width: 160rpx;
+  height: 160rpx;
+}
+
+/**
+ * 俱乐部主页成员行。圈 72、头像 52，(72-52)/2 = 10。
+ * 草稿 node 446:40。
+ */
+.gold-avatar--member {
+  width: 72rpx;
+  height: 72rpx;
+}
+
+.gold-avatar--member .gold-avatar__photo {
+  left: 10rpx;
+  top: 10rpx;
+  width: 52rpx;
+  height: 52rpx;
+}
+
+.gold-avatar--member .gold-avatar__ring {
+  width: 72rpx;
+  height: 72rpx;
+}

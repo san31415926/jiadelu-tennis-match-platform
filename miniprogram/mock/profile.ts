@@ -15,6 +15,7 @@
  * 想加菜单项           → 往 PROFILE_MENU 里加，列表会自动变长（不是固定高度）
  * 想改示例资料         → 改 MOCK_PROFILE
  * 想改未登录时的文案   → 改 GUEST_PROFILE
+ * 想改分享卡片标题     → 改 pages/profile/index.ts 的 onShareAppMessage
  */
 
 /** 我的页功能菜单的一项 */
@@ -24,8 +25,19 @@ export interface ProfileMenuItem {
   label: string;
   /** 左侧的 3D 图标，显示为 88×88 */
   icon: string;
-  /** 点击跳转的页面。这些页面都还没做，所以点了会弹提示 */
-  path: string;
+  /**
+   * 点击跳转的页面。分享项没有页面，可以不填。
+   * 这些二级页点了会跳转；参赛记录还没做，见 utils/navigate.ts。
+   */
+  path?: string;
+  /**
+   * 点击行为。不填就按 path 跳转。
+   *
+   * share   = 调起微信「转发给好友」。必须用 wxml 里 button 的 open-type="share"。
+   * contact = 打开微信小程序客服会话。必须用 button 的 open-type="contact"，
+   *           后台还要在公众平台开通客服。现在还没接，点了仍走 path 弹提示。
+   */
+  action?: 'share' | 'contact';
   /**
    * 是否需要水平翻转图标。
    *
@@ -42,6 +54,11 @@ export interface ProfileMenuItem {
 export interface ProfileSummary {
   /** 昵称。设计只给了 99rpx 宽（示例昵称是一个字「帆」），过长会截断成省略号 */
   nickname: string;
+  /**
+   * 头像图路径。我的页金框组件用它。
+   * 现在是示例图；接微信登录后改成用户 avatarUrl，金圈不用换。
+   */
+  avatar: string;
   /** 评分胶囊里的文字，如「评分 5.0」或「未评级」 */
   rating: string;
   /** 等级胶囊，如「Lv.18」或「Lv.--」 */
@@ -71,6 +88,7 @@ export interface ProfileSummary {
  */
 export const GUEST_PROFILE: ProfileSummary = {
   nickname: '微信用户',
+  avatar: '/assets/images/ranking/avatar-demo.jpg',
   rating: '未评级',
   level: 'Lv.--',
   marketValue: '--',
@@ -82,6 +100,7 @@ export const GUEST_PROFILE: ProfileSummary = {
 
 export const MOCK_PROFILE: ProfileSummary = {
   nickname: '帆',
+  avatar: '/assets/images/ranking/avatar-demo.jpg',
   rating: '评分 5.0',
   level: 'Lv.18',
   marketValue: '¥12,800',
@@ -125,9 +144,20 @@ export const PROFILE_MENU: ProfileMenuItem[] = [
     path: '/pages/records/index',
   },
   {
+    key: 'share',
+    label: '分享好友',
+    icon: '/assets/icons/profile/share-friends.png',
+    action: 'share',
+  },
+  {
     key: 'service',
     label: '联系客服',
     icon: '/assets/icons/profile/customer-service.png',
     path: '/pages/service/index',
+    /**
+     * 目标效果：点这一行直接打开微信客服对话框，不必再进二级页。
+     * 接上时把 action 改成 'contact'，并在 pages/profile/index.wxml
+     * 给这一项加 button open-type="contact"（写法同分享好友）。
+     */
   },
 ];

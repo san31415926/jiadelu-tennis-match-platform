@@ -1,0 +1,20 @@
+<view class="info">
+  <page-nav title="{{page.title}}" />
+  <view class="sub-header" style="padding-top:{{statusBarHeight}}px">
+    <view class="sub-header__inner">
+      <view class="sub-header__wave"></view>
+      <image class="sub-header__ball" src="/assets/images/hero-tennis-ball.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <image class="hero-icon" src="{{page.icon}}" mode="aspectFit" />
+  <view class="kicker">{{page.kicker}}</view>
+
+  <view class="card">
+    <view class="card__title">{{page.cardTitle}}</view>
+    <view class="card__sub">{{page.cardSub}}</view>
+    <!-- 客服会话必须写在 button 上，视觉仍是设计里那颗青柠胶囊 -->
+    <button class="contact-btn" open-type="contact">{{page.button}}</button>
+    <view class="card__hours">{{page.hours}}</view>
+  </view>
+</view>

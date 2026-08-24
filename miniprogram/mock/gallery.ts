@@ -20,7 +20,8 @@
  * 【常见改动】
  * 加一个赛事相册 → 往 GALLERY_SECTIONS 加一项，category 要填五个筛选之一
  * 改分类筛选     → 改 GALLERY_FILTERS，同时要有对应 category 的分组
- * 换照片         → 改 photos 数组，赛事分组建议放 3 张（正好铺满一行）
+ * 换照片         → 改 photos 数组，列表页赛事分组建议放 3 张；详情页会循环铺满 12 格
+ * 点「查看全部」 → 进 pages/album-detail，靠 ?id= 对应这里的 id
  */
 
 /** 一个相册分组 */
@@ -147,4 +148,27 @@ export function filterSections(filter: string): GallerySection[] {
     return GALLERY_SECTIONS;
   }
   return GALLERY_SECTIONS.filter((section) => section.category === filter);
+}
+
+/**
+ * 按分组 id 取相册。相册详情页用它。
+ * id 对不上时退回第一组，避免空白页。
+ */
+export function getGallerySection(id: string): GallerySection {
+  return GALLERY_SECTIONS.find((section) => section.id === id) ?? GALLERY_SECTIONS[0];
+}
+
+/**
+ * 详情网格至少铺 12 张（4 行 × 3 列），和草稿 Figma「相册详情」一致。
+ * 现在每组只有 2～3 张示例图，不够就按顺序循环。接云存储后 photos 够长就不再循环。
+ */
+export function expandAlbumPhotos(photos: string[], minCount = 12): string[] {
+  if (photos.length >= minCount) {
+    return photos;
+  }
+  const out: string[] = [];
+  for (let i = 0; i < minCount; i += 1) {
+    out.push(photos[i % photos.length]);
+  }
+  return out;
 }

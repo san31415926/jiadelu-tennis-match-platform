@@ -6,7 +6,17 @@
     "pages/ranking/index",
     "pages/calendar/index",
     "pages/clubs/index",
-    "pages/gallery/index"
+    "pages/gallery/index",
+    "pages/album-detail/index",
+    "pages/rewards/index",
+    "pages/poster/index",
+    "pages/club-ranking/index",
+    "pages/membership/index",
+    "pages/profile-edit/index",
+    "pages/business/index",
+    "pages/about/index",
+    "pages/service/index",
+    "pages/club-home/index"
   ],
   "window": {
     "navigationStyle": "custom",

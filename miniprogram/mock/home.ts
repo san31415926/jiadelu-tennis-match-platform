@@ -12,7 +12,11 @@
  * 要保留，云数据库的字段名按它们来设计，这样页面代码一行都不用改。
  *
  * 【常见改动】
- * 想改轮播文案         → 改 HOME_BANNERS 里的 title / subtitle
+ * 想改轮播图           → 换 miniprogram/assets/images/banners/ 里对应 jpg，
+ *                        原图在仓库根目录 测试图/轮播图/
+ * 想改轮播文案         → 文案已经画进 jpg（主标题 36、副标题 19，对齐 Figma）
+ *                        换图才改得了字；title/subtitle 只是对照用
+ * 想加一张轮播         → 往 HOME_BANNERS 加一项，指示点会自动变多
  * 想加一个宫格入口     → 往 HOME_FEATURES 里加一项，注意同时要加大
  *                        tokens.wxss 里的 --grid-height，否则新增的会被裁掉
  * 想改赛事卡片内容     → 改 MOCK_EVENTS
@@ -24,10 +28,12 @@
 export interface HomeBanner {
   /** 唯一标识，wx:for 的 key 用它，随便起但不要重复 */
   id: string;
-  /** 大标题，36rpx 加粗 */
+  /** 大标题。已经画进轮播 jpg，页面上不再叠一层；留着方便对照换图 */
   title: string;
-  /** 副标题，19rpx 浅绿色 */
+  /** 副标题，同样画进 jpg */
   subtitle: string;
+  /** 轮播配图。铺满整块绿色头部（750×321），图片本身建议宽 1200 左右的 jpg */
+  image: string;
   /** 点击后跳转的页面路径。没做的页面会弹提示不跳转，见 utils/navigate.ts */
   target: string;
 }
@@ -81,22 +87,46 @@ export interface EventItem {
 
 export const HOME_BANNERS: HomeBanner[] = [
   {
-    id: 'banner-super-cup',
+    id: 'banner-club-union',
     title: '广佛俱乐部联名赛',
     subtitle: '球员精彩瞬间 · 点击查看',
+    image: '/assets/images/banners/banner-01-club-union.jpg',
     target: '/pages/gallery/index',
   },
   {
     id: 'banner-rookie-cup',
-    title: '俱乐部新秀杯（第二届）',
-    subtitle: '12 支球队集结 · 查看赛程',
+    title: '俱乐部新秀杯',
+    subtitle: '第二届 · 12 支球队集结',
+    image: '/assets/images/banners/banner-02-rookie-cup.jpg',
     target: '/pages/super-cup/index',
   },
   {
     id: 'banner-annual',
-    title: 'LTJIMMY® 年度颁奖典礼',
+    title: '年度颁奖典礼',
     subtitle: '11 月 15 日 · 广州四季酒店',
-    target: '/pages/ceremony/index',
+    image: '/assets/images/banners/banner-03-ceremony.jpg',
+    target: '/pages/poster/index?id=ceremony',
+  },
+  {
+    id: 'banner-super-cup',
+    title: '超级杯冠军之夜',
+    subtitle: '俱乐部荣耀时刻',
+    image: '/assets/images/banners/banner-04-super-cup.jpg',
+    target: '/pages/super-cup/index',
+  },
+  {
+    id: 'banner-night-court',
+    title: '夜间球场开放',
+    subtitle: '灯光球场 · 预约开打',
+    image: '/assets/images/banners/banner-05-night-court.jpg',
+    target: '/pages/clubs/index',
+  },
+  {
+    id: 'banner-mixed-doubles',
+    title: '混双精彩对决',
+    subtitle: '默契搭档 · 点击查看',
+    image: '/assets/images/banners/banner-06-mixed-doubles.jpg',
+    target: '/pages/gallery/index',
   },
 ];
 
@@ -127,7 +157,7 @@ export const HOME_FEATURES: HomeFeature[] = [
     label: '历届冠军',
     icon: '/assets/icons/home/past-champions.png',
     iconStyle: 'left:29rpx;top:5rpx;width:99rpx;height:86rpx',
-    path: '/pages/champions/index',
+    path: '/pages/poster/index?id=champions',
   },
   {
     key: 'photos',
@@ -141,7 +171,7 @@ export const HOME_FEATURES: HomeFeature[] = [
     label: '年会典礼',
     icon: '/assets/icons/home/annual-ceremony.png',
     iconStyle: 'left:24rpx;top:-12rpx;width:103rpx;height:101rpx',
-    path: '/pages/ceremony/index',
+    path: '/pages/poster/index?id=ceremony',
   },
   {
     key: 'registrations',

@@ -6,8 +6,18 @@
 
       <view class="hero__title">我的</view>
 
-      <!-- 金框与头像在设计中是一张合成图，接入真实头像时需要拆成金框 + 头像两层 -->
-      <image class="hero__avatar" src="/assets/images/gold-avatar-frame.png" mode="aspectFit" />
+      <!--
+        金框 + 头像 + 相机。金圈是独立透明 PNG，头像从圆孔露出来，
+        以后换真实微信头像只改 profile.avatar。点头像走 onAvatarTap。
+      -->
+      <view class="hero__avatar">
+        <gold-avatar
+          src="{{profile.avatar}}"
+          size="large"
+          show-badge="{{false}}"
+          bind:avatartap="onAvatarTap"
+        />
+      </view>
       <image class="hero__ball" src="/assets/images/hero-tennis-ball.png" mode="aspectFit" />
 
       <view
@@ -33,25 +43,49 @@
     </view>
   </view>
 
-  <!-- 功能菜单，Figma node 10:234 -->
+  <!-- 会员横幅，功能清单 3.2。点「开通会员」进 pages/membership -->
+  <view class="vip-bar">
+    <image
+      class="vip-bar__emblem"
+      src="/assets/icons/profile/vip-wheat-tennis.png"
+      mode="aspectFit"
+    />
+    <view class="vip-bar__text">注册后可享超值权益</view>
+    <view class="vip-bar__btn" bindtap="onOpenMembership">开通会员</view>
+  </view>
+
+  <!-- 功能菜单，Figma node 10:234。分享好友必须用 button + open-type="share"，微信不让 JS 直接弹出转发面板 -->
   <view class="menu">
-    <view
-      class="menu__item"
-      wx:for="{{menu}}"
-      wx:key="key"
-      data-path="{{item.path}}"
-      bindtap="onMenuTap"
-      hover-class="menu__item--pressed"
-      hover-stay-time="60"
-    >
-      <image
-        class="menu__icon {{item.mirrored ? 'menu__icon--mirrored' : ''}}"
-        src="{{item.icon}}"
-        mode="aspectFit"
-      />
-      <text class="menu__label">{{item.label}}</text>
-      <text class="menu__arrow">›</text>
-    </view>
+    <block wx:for="{{menu}}" wx:key="key">
+      <view wx:if="{{item.action === 'share'}}" class="menu__item">
+        <image class="menu__icon" src="{{item.icon}}" mode="aspectFit" />
+        <text class="menu__label">{{item.label}}</text>
+        <text class="menu__arrow">›</text>
+        <!-- 透明热区：open-type="share" 只能写在 button 上，视觉仍走上面那一行 -->
+        <button
+          class="menu__share-hit"
+          open-type="share"
+          hover-class="menu__item--pressed"
+          hover-stay-time="60"
+        ></button>
+      </view>
+      <view
+        wx:else
+        class="menu__item"
+        data-path="{{item.path}}"
+        bindtap="onMenuTap"
+        hover-class="menu__item--pressed"
+        hover-stay-time="60"
+      >
+        <image
+          class="menu__icon {{item.mirrored ? 'menu__icon--mirrored' : ''}}"
+          src="{{item.icon}}"
+          mode="aspectFit"
+        />
+        <text class="menu__label">{{item.label}}</text>
+        <text class="menu__arrow">›</text>
+      </view>
+    </block>
   </view>
 
   <view class="tabbar-spacer"></view>

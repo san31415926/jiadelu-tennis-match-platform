@@ -3,8 +3,9 @@ import {
   GALLERY_SECTIONS,
   GALLERY_SUMMARY,
   filterSections,
-  type GallerySection,
 } from '../../mock/gallery';
+import type { GallerySection } from '../../mock/gallery';
+import { navigateToPage } from '../../utils/navigate';
 
 /**
  * ============================================================================
@@ -57,11 +58,8 @@ Page({
     wx.previewImage({ current, urls: group.photos });
   },
 
-  onViewAll() {
-    wx.showToast({ title: '相册全集页待设计', icon: 'none' });
-  },
-
-  onBack() {
-    wx.navigateBack();
+  onViewAll(event: WechatMiniprogram.TouchEvent) {
+    const id = String(event.currentTarget.dataset.id);
+    navigateToPage(`/pages/album-detail/index?id=${id}`);
   },
 });

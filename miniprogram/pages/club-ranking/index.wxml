@@ -1,0 +1,89 @@
+<view class="club-ranking">
+  <page-nav title="俱乐部榜单" />
+  <view class="header" style="padding-top:{{statusBarHeight}}px">
+    <view class="header__inner">
+      <view class="header__wave"></view>
+
+      <view class="metric-tabs">
+        <view
+          wx:for="{{metrics}}"
+          wx:key="*this"
+          class="metric-tabs__item {{activeMetric === item ? 'is-active' : ''}}"
+          data-metric="{{item}}"
+          bindtap="onMetricTap"
+        >
+          {{item}}
+          <view class="metric-tabs__underline" wx:if="{{activeMetric === item}}"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="podium">
+    <image class="podium__confetti podium__confetti--1" src="/assets/images/ranking/confetti.png" mode="aspectFit" />
+    <image class="podium__confetti podium__confetti--2" src="/assets/images/ranking/confetti.png" mode="aspectFit" />
+    <image class="podium__confetti podium__confetti--3" src="/assets/images/ranking/confetti.png" mode="aspectFit" />
+    <image class="podium__confetti podium__confetti--4" src="/assets/images/ranking/confetti.png" mode="aspectFit" />
+
+    <view class="podium__unit podium__unit--second">
+      <image class="podium__unit-avatar" src="{{podium[0].avatar}}" mode="aspectFill" />
+      <image class="podium__unit-img" src="/assets/images/ranking/podium-unit-2.png" mode="aspectFit" />
+    </view>
+    <view class="podium__unit podium__unit--third">
+      <image class="podium__unit-avatar" src="{{podium[2].avatar}}" mode="aspectFill" />
+      <image class="podium__unit-img" src="/assets/images/ranking/podium-unit-3.png" mode="aspectFit" />
+    </view>
+    <view class="podium__unit podium__unit--first">
+      <image class="podium__unit-avatar podium__unit-avatar--first" src="{{podium[1].avatar}}" mode="aspectFill" />
+      <image class="podium__unit-img" src="/assets/images/ranking/podium-unit-1.png" mode="aspectFit" />
+    </view>
+
+    <view class="podium__col podium__col--second">
+      <view class="podium__name">{{podium[0].nickname}}</view>
+      <view class="podium__club">{{podium[0].club}}</view>
+      <view class="podium__score">{{podium[0].score}}</view>
+    </view>
+    <view class="podium__col podium__col--first">
+      <view class="podium__name podium__name--first">{{podium[1].nickname}}</view>
+      <view class="podium__club">{{podium[1].club}}</view>
+      <view class="podium__score podium__score--first">{{podium[1].score}}</view>
+    </view>
+    <view class="podium__col podium__col--third">
+      <view class="podium__name podium__name--first">{{podium[2].nickname}}</view>
+      <view class="podium__club">{{podium[2].club}}</view>
+      <view class="podium__score">{{podium[2].score}}</view>
+    </view>
+  </view>
+
+  <view class="list">
+    <view class="list__empty" wx:if="{{rows.length === 0}}">该榜单暂无更多俱乐部</view>
+    <view class="list__row" wx:for="{{rows}}" wx:key="rank">
+      <view class="list__rank">{{item.rank}}</view>
+      <view class="list__avatar-slot">
+        <gold-avatar size="small" src="{{item.avatar}}" />
+      </view>
+      <view class="list__detail">
+        <view class="list__detail-top">
+          <text class="list__nickname">{{item.nickname}}</text>
+          <view class="list__badge">{{item.badge}}</view>
+        </view>
+        <view class="list__club">{{item.club}}</view>
+      </view>
+      <view class="list__score">{{item.score}}</view>
+    </view>
+  </view>
+
+  <view class="show-more" wx:if="{{totalRows > 3}}" bindtap="onToggleExpand">
+    <text class="show-more__arrow">{{expanded ? '∧' : '∨'}}</text>
+    <text>{{expanded ? '收起' : '展示 TOP' + totalCount}}</text>
+  </view>
+
+  <view class="my-rank-spacer"></view>
+
+  <view class="my-rank">
+    <image class="my-rank__trophy" src="/assets/images/ranking/my-trophy.png" mode="aspectFit" />
+    <text class="my-rank__summary">{{myRanking.summary}}</text>
+    <text class="my-rank__action">{{myRanking.actionText}}</text>
+    <view class="my-rank__cta">›</view>
+  </view>
+</view>

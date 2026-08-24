@@ -1,0 +1,232 @@
+@import '../../styles/subpage-header.wxss';
+
+/**
+ * ============================================================================
+ * 俱乐部主页样式
+ * ============================================================================
+ * 草稿 Figma「俱乐部主页 / Prototype Screen / Editable」(444:36)。
+ * 头部复用 subpage-header（青柠渐变 + 波浪 + 返回 + 网球）。
+ *
+ * 金圈 logo 160 / 成员头像 72，尺寸写在 gold-avatar 组件里。
+ * 想改总战力颜色 → .stats__value--lime
+ * 想改申请按钮颜色 → .cta__btn 的 background
+ */
+
+.club-home {
+  min-height: 100vh;
+  background: #f0ffd5;
+}
+
+/**
+ * 草稿里 logo 顶在头部 168rpx 处，头部 inner 高 300，
+ * 所以往上拉 132rpx，让金圈压在波浪上。
+ */
+.hero {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -132rpx;
+}
+
+.hero__name {
+  margin-top: 12rpx;
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #101214;
+}
+
+.hero__pills {
+  display: flex;
+  gap: 10rpx;
+  margin-top: 12rpx;
+}
+
+.pill {
+  padding: 6rpx 16rpx;
+  border: 1rpx solid #ccd9b2;
+  border-radius: 18rpx;
+  background: #ffffff;
+  font-size: 20rpx;
+  font-weight: 500;
+  color: #777b80;
+}
+
+.pill--lime {
+  border: none;
+  background: #83d414;
+  font-weight: 700;
+  color: #101214;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  width: 694rpx;
+  height: 140rpx;
+  margin: 24rpx 28rpx 0;
+  padding: 0 12rpx;
+  border-radius: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 6rpx 12rpx rgba(38, 56, 20, 0.08);
+}
+
+.stats__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.stats__value {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #101214;
+}
+
+.stats__value--lime {
+  font-size: 44rpx;
+  color: #83d414;
+}
+
+.stats__label {
+  font-size: 22rpx;
+  font-weight: 500;
+  color: #777b80;
+}
+
+.stats__divider {
+  width: 2rpx;
+  height: 64rpx;
+  background: #dbe5c2;
+}
+
+.section {
+  display: flex;
+  align-items: center;
+  padding: 32rpx 36rpx 16rpx;
+}
+
+.section__title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #101214;
+}
+
+.section__count {
+  flex: 1;
+  font-size: 22rpx;
+  font-weight: 500;
+  color: #777b80;
+  text-align: right;
+}
+
+.list {
+  width: 694rpx;
+  margin: 0 28rpx;
+  overflow: hidden;
+  border-radius: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 6rpx 12rpx rgba(38, 56, 20, 0.08);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 16rpx 20rpx;
+}
+
+.row + .row {
+  border-top: 1rpx solid #e5edd6;
+}
+
+.row__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.row__name-line {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.row__name {
+  overflow: hidden;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #101214;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.row__captain {
+  flex-shrink: 0;
+  padding: 2rpx 10rpx;
+  border-radius: 18rpx;
+  background: #83d414;
+  font-size: 16rpx;
+  font-weight: 700;
+  color: #101214;
+}
+
+.row__join {
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  font-weight: 500;
+  color: #777b80;
+}
+
+.row__power {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2rpx;
+}
+
+.row__power-value {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #101214;
+}
+
+.row__power-label {
+  font-size: 18rpx;
+  font-weight: 500;
+  color: #777b80;
+}
+
+.cta-spacer {
+  height: calc(128rpx + env(safe-area-inset-bottom));
+}
+
+.cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: 16rpx 28rpx calc(16rpx + env(safe-area-inset-bottom));
+  background: #ffffff;
+}
+
+.cta__btn {
+  height: 80rpx;
+  border-radius: 16rpx;
+  background: #83d414;
+  font-size: 30rpx;
+  font-weight: 700;
+  line-height: 80rpx;
+  text-align: center;
+  color: #101214;
+}
+
+.cta__btn--joined {
+  border: 1.5rpx solid #d0a63e;
+  background: #fbfcf9;
+  color: #b18b36;
+}

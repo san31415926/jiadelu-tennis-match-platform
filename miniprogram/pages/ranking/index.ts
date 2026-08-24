@@ -6,9 +6,8 @@ import {
   rankPlayers,
   toPodium,
   toRows,
-  type PodiumPlayer,
-  type RankingRow,
 } from '../../mock/ranking';
+import type { PodiumPlayer, RankingRow } from '../../mock/ranking';
 
 /**
  * ============================================================================
@@ -32,7 +31,7 @@ Page({
     statusBarHeight: 0,
     scopes: RANKING_SCOPES,
     /** 默认打开全国榜。改成 '城市榜' 就默认显示同城排名 */
-    activeScope: '全国榜',
+    activeScope: '城市榜',
     metrics: RANKING_METRICS,
     activeMetric: '积分',
     expanded: false,
@@ -80,9 +79,5 @@ Page({
 
   onToggleExpand() {
     this.setData({ expanded: !this.data.expanded }, () => this.refresh());
-  },
-
-  onBack() {
-    wx.navigateBack();
   },
 });

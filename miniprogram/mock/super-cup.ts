@@ -14,6 +14,7 @@
  *
  * 【常见改动】
  * 想改八个入口的名字/图标 → 改 SUPER_CUP_FEATURES
+ * 想改轮播图/文案         → 改 SUPER_CUP_BANNERS（图和首页共用 banners 目录）
  * 想改赛事内容             → 改 SUPER_CUP_EVENTS
  * 想加第三行入口           → 加数据后要同时加大 tokens.wxss 的 --grid-height，
  *                            并检查 pages/super-cup/index.ts 里 toRows 的每行个数
@@ -32,19 +33,43 @@ export const SUPER_CUP_BANNERS: HomeBanner[] = [
     id: 'sc-banner-union',
     title: '广佛俱乐部联名赛',
     subtitle: '球员精彩瞬间 · 点击查看',
+    image: '/assets/images/banners/banner-01-club-union.jpg',
     target: '/pages/gallery/index',
   },
   {
-    id: 'sc-banner-leaderboard',
-    title: '俱乐部战力榜更新',
-    subtitle: '86 家俱乐部 · 查看排名',
+    id: 'sc-banner-rookie',
+    title: '俱乐部新秀杯',
+    subtitle: '第二届 · 12 支球队集结',
+    image: '/assets/images/banners/banner-02-rookie-cup.jpg',
+    target: '/pages/super-cup/index',
+  },
+  {
+    id: 'sc-banner-ceremony',
+    title: '年度颁奖典礼',
+    subtitle: '11 月 15 日 · 广州四季酒店',
+    image: '/assets/images/banners/banner-03-ceremony.jpg',
+    target: '/pages/poster/index?id=ceremony',
+  },
+  {
+    id: 'sc-banner-champion',
+    title: '超级杯冠军之夜',
+    subtitle: '俱乐部荣耀时刻',
+    image: '/assets/images/banners/banner-04-super-cup.jpg',
+    target: '/pages/super-cup/index',
+  },
+  {
+    id: 'sc-banner-night',
+    title: '夜间球场开放',
+    subtitle: '灯光球场 · 预约开打',
+    image: '/assets/images/banners/banner-05-night-court.jpg',
     target: '/pages/clubs/index',
   },
   {
-    id: 'sc-banner-evergreen',
-    title: '常青杯报名开启',
-    subtitle: '年长组专属赛事 · 立即了解',
-    target: '/pages/super-cup/index',
+    id: 'sc-banner-mixed',
+    title: '混双精彩对决',
+    subtitle: '默契搭档 · 点击查看',
+    image: '/assets/images/banners/banner-06-mixed-doubles.jpg',
+    target: '/pages/gallery/index',
   },
 ];
 
@@ -53,43 +78,43 @@ export const SUPER_CUP_FEATURES: SuperCupFeature[] = [
     key: 'super-cup-event',
     label: '超级杯赛事',
     icon: '/assets/icons/super-cup/super-cup-event.png',
-    path: '/pages/super-cup/index',
+    path: '/pages/poster/index?id=super-cup',
   },
   {
     key: 'rookie-cup-event',
     label: '新秀杯赛事',
     icon: '/assets/icons/super-cup/rookie-cup-event.png',
-    path: '/pages/super-cup/index',
+    path: '/pages/poster/index?id=rookie-cup',
   },
   {
     key: 'women-club-event',
     label: '女俱乐部赛',
     icon: '/assets/icons/super-cup/women-club-event.png',
-    path: '/pages/super-cup/index',
+    path: '/pages/poster/index?id=women-cup',
   },
   {
     key: 'evergreen-cup-event',
     label: '常青杯赛事',
     icon: '/assets/icons/super-cup/evergreen-cup-event.png',
-    path: '/pages/super-cup/index',
+    path: '/pages/poster/index?id=evergreen-cup',
   },
   {
     key: 'club-leaderboard',
     label: '俱乐部榜单',
     icon: '/assets/icons/super-cup/club-leaderboard.png',
-    path: '/pages/clubs/index',
+    path: '/pages/club-ranking/index',
   },
   {
     key: 'past-champions',
     label: '历届冠军',
     icon: '/assets/icons/super-cup/past-champions.png',
-    path: '/pages/champions/index',
+    path: '/pages/poster/index?id=champions',
   },
   {
     key: 'annual-best',
     label: '年度最佳',
     icon: '/assets/icons/super-cup/annual-best.png',
-    path: '/pages/ceremony/index',
+    path: '/pages/poster/index?id=annual-best',
   },
   {
     key: 'club-badge',

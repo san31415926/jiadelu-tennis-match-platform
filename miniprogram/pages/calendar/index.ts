@@ -4,8 +4,8 @@ import {
   buildMonthCells,
   formatDayHeading,
   toDateKey,
-  type CalendarCell,
 } from '../../utils/calendar';
+import type { CalendarCell } from '../../utils/calendar';
 
 /**
  * ============================================================================
@@ -103,9 +103,5 @@ Page({
 
   onSignupTap() {
     wx.showToast({ title: '报名流程待接入云开发', icon: 'none' });
-  },
-
-  onBack() {
-    wx.navigateBack();
   },
 });

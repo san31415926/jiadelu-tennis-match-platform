@@ -1,0 +1,44 @@
+{
+  "appid": "wx24d6883783457cb5",
+  "projectname": "LTJIMMY网球赛事",
+  "description": "LTJIMMY 网球赛事平台小程序。导入开发者工具时选仓库根目录即可，真正打包的只有 miniprogram/",
+  "miniprogramRoot": "miniprogram/",
+  "srcMiniprogramRoot": "miniprogram/",
+  "compileType": "miniprogram",
+  "libVersion": "latest",
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "folder",
+        "value": "typings"
+      }
+    ],
+    "include": []
+  },
+  "setting": {
+    "useCompilerPlugins": [
+      "typescript"
+    ],
+    "coverView": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "minifyWXML": true,
+    "minifyWXSS": true,
+    "urlCheck": true,
+    "autoAudits": false,
+    "checkInvalidKey": true,
+    "uploadWithSourceMap": true,
+    "ignoreUploadUnusedFiles": true,
+    "compileHotReLoad": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "condition": {}
+}

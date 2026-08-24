@@ -52,32 +52,11 @@
   background: #fbfcf9;
 }
 
-.gallery-back {
-  position: absolute;
-  left: 24rpx;
-  top: 18rpx;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56rpx;
-  height: 58rpx;
-  font-size: 46rpx;
-  color: #0f1408;
-}
-
-.header__title {
-  top: 22rpx;
-  height: 48rpx;
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #0f1408;
-}
-
 .header__camera {
   position: absolute;
   left: 414rpx;
   top: 110rpx;
+  z-index: 0;
   width: 330rpx;
   height: 230rpx;
 }
@@ -181,13 +160,13 @@
 
 .section__more {
   flex-shrink: 0;
-  font-size: 17rpx;
+  font-size: 24rpx;
   color: #6b7066;
 }
 
 .section__subtitle {
   height: 28rpx;
-  font-size: 16rpx;
+  font-size: 20rpx;
   line-height: 28rpx;
   color: #6b7066;
 }
@@ -216,7 +195,7 @@
 
 .section__count {
   height: 28rpx;
-  font-size: 17rpx;
+  font-size: 22rpx;
   line-height: 28rpx;
   color: #6b7066;
 }

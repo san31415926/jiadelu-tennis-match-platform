@@ -1,10 +1,12 @@
-import { EVENT_FILTERS, type EventItem } from '../../mock/home';
+import { EVENT_FILTERS } from '../../mock/home';
+import type { EventItem } from '../../mock/home';
 import {
   SUPER_CUP_BANNERS,
   SUPER_CUP_EVENTS,
   SUPER_CUP_FEATURES,
-  type SuperCupFeature,
 } from '../../mock/super-cup';
+import type { SuperCupFeature } from '../../mock/super-cup';
+import { headerMetrics } from '../../utils/header';
 import { navigateToPage } from '../../utils/navigate';
 import { syncTabBarSelected } from '../../utils/tabbar';
 
@@ -45,6 +47,8 @@ function toRows(features: SuperCupFeature[], perRow = 4): SuperCupFeature[][] {
 Page({
   data: {
     statusBarHeight: 0,
+    navBarHeight: 44,
+    menuInsetRight: 96,
     banners: SUPER_CUP_BANNERS,
     featureRows: toRows(SUPER_CUP_FEATURES),
     filters: EVENT_FILTERS,
@@ -54,8 +58,7 @@ Page({
   },
 
   onLoad() {
-    const app = getApp<IAppOption>();
-    this.setData({ statusBarHeight: app.globalData.statusBarHeight });
+    this.setData(headerMetrics());
     this.applyFilter(DEFAULT_FILTER);
   },
 

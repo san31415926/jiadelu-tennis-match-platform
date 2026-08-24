@@ -1,12 +1,10 @@
 <view class="calendar">
+  <page-nav title="赛事日历" />
   <!-- 头部，Figma node 17:94 -->
   <view class="header" style="padding-top:{{statusBarHeight}}px">
     <view class="header__inner">
       <!-- 该页的下缘是一个超出屏宽的椭圆，而非波浪路径 -->
       <view class="header__ellipse"></view>
-
-      <view class="cal-back" bindtap="onBack">‹</view>
-      <view class="header__title">赛事日历</view>
 
       <view class="month-controls">
         <view class="month-controls__arrow" bindtap="onPrevMonth">‹</view>

@@ -1,5 +1,5 @@
 {
-  "appid": "REPLACE_WITH_YOUR_APPID",
+  "appid": "wx24d6883783457cb5",
   "projectname": "LTJIMMY网球赛事",
   "description": "LTJIMMY 网球赛事平台小程序",
   "miniprogramRoot": "./",
@@ -9,8 +9,8 @@
   "packOptions": {
     "ignore": [
       {
-        "type": "folder",
-        "value": "typings"
+        "value": "typings",
+        "type": "folder"
       }
     ],
     "include": []
@@ -36,7 +36,16 @@
       "ignore": [],
       "disablePlugins": [],
       "outputPath": ""
-    }
+    },
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "condition": false
   },
-  "condition": {}
+  "condition": {},
+  "simulatorPluginLibVersion": {},
+  "editorSetting": {}
 }

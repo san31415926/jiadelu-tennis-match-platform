@@ -1,11 +1,9 @@
 <view class="gallery">
+  <page-nav title="相册" />
   <!-- 头部，Figma node 23:274 -->
   <view class="header" style="padding-top:{{statusBarHeight}}px">
     <view class="header__inner">
       <view class="header__ellipse"></view>
-
-      <view class="gallery-back" bindtap="onBack">‹</view>
-      <view class="header__title">相册</view>
 
       <image class="header__camera" src="/assets/images/gallery/header-camera.png" mode="aspectFit" />
 

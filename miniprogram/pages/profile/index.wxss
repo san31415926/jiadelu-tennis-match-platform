@@ -17,7 +17,11 @@
  *
  * 【下半部分的菜单是流式布局】
  * 菜单用的是普通文档流，所以往 mock/profile.ts 里加菜单项会自动变长，
- * 不需要改任何高度。
+ * 不需要改任何高度。球员卡和菜单中间那条 VIP 横幅也是流式的。
+ *
+ * 【头像是金框组件，不是一张合成图】
+ * 头部头像用 components/gold-avatar，金圈和相机是独立切图。
+ * 想换示例头像改 mock/profile.ts 的 avatar 字段。
  */
 
 .profile {
@@ -56,44 +60,38 @@
   background-size: 100% 100%;
 }
 
-/* 标题在设计中的中心是 x=354，比屏幕正中略偏左 */
+/* 标题在设计中的中心是 x=354，比屏幕正中略偏左。z-index 避免被金框/网球盖住 */
 .hero__title {
   position: absolute;
   left: 174rpx;
-  top: 28rpx;
+  top: 20rpx;
+  z-index: 3;
   width: 360rpx;
   height: 28rpx;
   text-align: center;
-  font-size: 32rpx;
+  font-size: 40rpx;
   font-weight: 700;
-  line-height: 28rpx;
+  line-height: 48rpx;
   color: #1c1f21;
 }
 
 /**
- * 金色相框 + 头像。
- *
- * 【这是一张合成图，是个待改的技术债】
- * 设计稿里金框和头像被压成了一张图片导出，所以现在换不了头像——
- * 真实用户的微信头像没法放进这个金框里。
- *
- * 接真实头像时要改成两层结构：
- *   <image 用户头像 圆形 />       垫在下面
- *   <image 金框（需要透明背景）/>  压在上面
- * 需要先在 Figma 里把金框单独导出成透明 PNG。
+ * 金框头像组件的位置。组件自己是 207×197（含右下角相机），
+ * 这里只负责放到头部里。数值沿用原先合成图的 left/top，
+ * 避免昵称、胶囊和头像挤在一起。
  */
 .hero__avatar {
   position: absolute;
   left: 32rpx;
   top: 12rpx;
-  width: 255rpx;
-  height: 187rpx;
+  z-index: 1;
 }
 
 .hero__ball {
   position: absolute;
   left: 597rpx;
   top: 28rpx;
+  z-index: 1;
   width: 133rpx;
   height: 116rpx;
 }
@@ -246,7 +244,52 @@
   background: #d1f038;
 }
 
-/* ---------- 功能菜单 ---------- */
+/* ---------- 会员横幅 ---------- */
+
+/**
+ * 插在球员卡和菜单中间。白卡片 + 金穗网球 VIP 标 + 青柠开通按钮。
+ * 标是生图抠出来的透明 PNG：assets/icons/profile/vip-wheat-tennis.png
+ * 想改文案改 index.wxml；想改按钮颜色改 .vip-bar__btn 的 background。
+ */
+.vip-bar {
+  display: flex;
+  align-items: center;
+  height: 108rpx;
+  margin: 0 20rpx;
+  padding: 0 16rpx 0 12rpx;
+  border-radius: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 4rpx 10rpx rgba(38, 56, 20, 0.08);
+}
+
+.vip-bar__emblem {
+  flex-shrink: 0;
+  width: 88rpx;
+  height: 81rpx;
+}
+
+.vip-bar__text {
+  flex: 1;
+  margin-left: 12rpx;
+  overflow: hidden;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #1f2114;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.vip-bar__btn {
+  flex-shrink: 0;
+  height: 52rpx;
+  padding: 0 22rpx;
+  border-radius: 26rpx;
+  background: #83d414;
+  color: #1f2114;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 52rpx;
+}
 
 .menu {
   overflow: hidden;
@@ -268,6 +311,7 @@
  * 不用手动维护。最后一项也有分隔线，和设计稿一致。
  */
 .menu__item {
+  position: relative;
   display: flex;
   gap: 14rpx;
   align-items: center;
@@ -279,6 +323,29 @@
 
 .menu__item--pressed {
   background: #f6f9ee;
+}
+
+/**
+ * 「分享好友」必须用 button 的 open-type="share"，微信不让 JS 直接调转发。
+ * 原生 button 自带边框、居中、内边距，直接当菜单行会缩成一小块。
+ * 所以这一行的样子仍用普通 view，button 做成铺满的透明热区。
+ */
+.menu__share-hit {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.menu__share-hit::after {
+  border: none;
 }
 
 .menu__icon {

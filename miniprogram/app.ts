@@ -26,6 +26,8 @@ App<IAppOption>({
     statusBarHeight: 0,
     /** 自定义导航栏的推荐高度，做返回按钮垂直居中时可用 */
     navBarHeight: 0,
+    /** 标题左右留白，避开右上角胶囊按钮，单位 px */
+    menuInsetRight: 0,
     /** 底部安全区高度（全面屏手机底部那条横杠区域） */
     safeAreaBottom: 0,
     /** 屏幕逻辑宽度，需要按屏幕尺寸做判断时用 */
@@ -66,6 +68,10 @@ App<IAppOption>({
     this.globalData.statusBarHeight = statusBarHeight;
     this.globalData.navBarHeight = navBarHeight > 0 ? navBarHeight : 44;
     this.globalData.screenWidth = windowInfo.windowWidth;
+    this.globalData.menuInsetRight = Math.max(
+      96,
+      windowInfo.windowWidth - menuButton.left + 8,
+    );
     // 屏幕总高减去安全区底边，得到底部横杠占的高度；老款手机是 0
     this.globalData.safeAreaBottom = Math.max(
       0,

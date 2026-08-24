@@ -1,0 +1,13 @@
+<view class="page-nav-root">
+  <view class="page-nav page-nav--{{variant}}" style="padding-top: {{statusBarHeight}}px">
+    <view class="page-nav__bar" style="height: {{navBarHeight}}px">
+      <view class="page-back" bindtap="onBack">‹ 返回</view>
+      <view class="page-nav__title">{{title}}</view>
+    </view>
+  </view>
+  <view
+    wx:if="{{occupy}}"
+    class="page-nav__spacer"
+    style="height: {{statusBarHeight + navBarHeight}}px"
+  ></view>
+</view>

@@ -1,0 +1,29 @@
+/**
+ * ============================================================================
+ * 海报页样式
+ * ============================================================================
+ * 旧版就是「黄条文字 + 整张海报」。积分兑换、年会、历届冠军、四项杯赛、
+ * 年度最佳都用这一套。导航栏用 components/page-nav 的白底吸顶条。
+ *
+ * 海报用 widthFix：宽度撑满，高度按图片比例走，页面可以往下滚。
+ */
+
+.poster-page {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+.notice {
+  padding: 16rpx 28rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 40rpx;
+  color: #1c1f21;
+  background: #ffb020;
+}
+
+.poster {
+  display: block;
+  width: 100%;
+  vertical-align: top;
+}

@@ -1,9 +1,10 @@
 <view class="super-cup">
   <hero-carousel
     title="超级杯"
-    title-top="10"
     banners="{{banners}}"
     status-bar-height="{{statusBarHeight}}"
+    nav-bar-height="{{navBarHeight}}"
+    menu-inset-right="{{menuInsetRight}}"
     bind:bannertap="onBannerTap"
   />
 
@@ -19,7 +20,7 @@
         hover-class="feature--pressed"
         hover-stay-time="60"
       >
-        <image class="feature__icon" src="{{item.icon}}" mode="aspectFit" />
+        <image style="width: 91rpx; display: block; box-sizing: border-box" class="feature__icon" src="{{item.icon}}" mode="aspectFit" />
         <view class="feature__label">{{item.label}}</view>
       </view>
     </view>

@@ -1,0 +1,13 @@
+<view class="poster-page">
+  <page-nav title="{{title}}" variant="plain" occupy="{{true}}" />
+
+  <view class="notice">{{notice}}</view>
+
+  <image
+    class="poster"
+    src="{{poster}}"
+    mode="widthFix"
+    bindtap="onPreviewPoster"
+    show-menu-by-longpress
+  />
+</view>

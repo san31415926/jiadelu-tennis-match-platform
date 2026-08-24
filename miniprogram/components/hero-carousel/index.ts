@@ -4,41 +4,35 @@
  * ============================================================================
  *
  * 【这个组件包含什么】
- * 顶部那整块绿色渐变区域：页面大标题、可自动播放的轮播文案、三个指示点、
- * 以及下缘的波浪。渐变背景和波浪的样式在 app.wxss 里（因为七个页面都用），
- * 这个组件的 wxss 只管轮播部分。
+ * 上面一行绿条放页标题（不叠在图上），下面 321rpx 整块是轮播图，
+ * 底部波浪叠在图上。赛事名画进 jpg；指示点仍用 WXML，好跟当前张走。
+ *
+ * 【轮播图从哪来】
+ * 原图在仓库根目录 测试图/轮播图/，小程序用的是压缩 jpg：
+ * miniprogram/assets/images/banners/。换图时两处都要换，并改
+ * mock/home.ts / mock/super-cup.ts 里对应项的 image 路径。
+ * 图上的赛事名是画进 jpg 的，改字要重新出图，改 mock 里的 title 不会显示在轮播上。
  *
  * 【怎么用】
  *   <hero-carousel
  *     title="LTJIMMY赛事"
- *     title-top="0"                        <!-- 标题微调，见下方说明 -->
  *     banners="{{banners}}"
  *     status-bar-height="{{statusBarHeight}}"
+ *     nav-bar-height="{{navBarHeight}}"
+ *     menu-inset-right="{{menuInsetRight}}"
  *     bind:bannertap="onBannerTap"
  *   />
  *
- * 【status-bar-height 是必须传的】
- * 因为我们用了自定义导航栏，需要手动避开手机顶部状态栏。这个值由
- * app.ts 在启动时测量并存在 globalData 里，页面在 onLoad 里取出来传进来。
- * 不传的话标题会被状态栏压住。
+ * 【status-bar-height / nav-bar-height / menu-inset-right 都要传】
+ * 自定义导航栏要自己避开状态栏和右上角胶囊。「LTJIMMY赛事」比较长，
+ * 不留 menu-inset-right 会被胶囊挡住。三个值都在 app.ts 启动时量好。
  */
 Component({
   properties: {
-    /** 页面大标题，40rpx 加粗居中 */
+    /** 页面大标题，40rpx 加粗居中，固定在轮播上方的绿条里 */
     title: {
       type: String,
       value: '',
-    },
-    /**
-     * 标题的垂直微调（单位 rpx）。
-     *
-     * 标题在一个 80rpx 高的区域里垂直居中，这个值是那个区域的上偏移。
-     * 首页传 0，超级杯传 10 —— 因为设计稿里两页的标题位置差了一点点。
-     * 调大数值标题往下移，调小往上移（可以是负数）。
-     */
-    titleTop: {
-      type: Number,
-      value: 0,
     },
     /** 轮播数据，结构见 mock/home.ts 的 HomeBanner */
     banners: {
@@ -50,19 +44,24 @@ Component({
       type: Number,
       value: 0,
     },
+    /** 和胶囊按钮同高的那一行，标题垂直居中用。单位 px */
+    navBarHeight: {
+      type: Number,
+      value: 44,
+    },
+    /** 标题左右内边距，避开胶囊。单位 px */
+    menuInsetRight: {
+      type: Number,
+      value: 96,
+    },
   },
 
   data: {
-    /** 当前显示第几张，指示点靠它判断哪个要高亮 */
     current: 0,
   },
 
   methods: {
-    /**
-     * 轮播切换时同步指示点。
-     * swiper 组件自己会处理滑动和自动播放，我们只需要接住它的 change 事件。
-     */
-    onChange(event: WechatMiniprogram.SwiperChange) {
+    onSwiperChange(event: WechatMiniprogram.SwiperChange) {
       this.setData({ current: event.detail.current });
     },
 

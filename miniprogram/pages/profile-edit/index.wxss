@@ -1,0 +1,154 @@
+@import '../../styles/subpage-header.wxss';
+
+/**
+ * ============================================================================
+ * 我的资料页样式
+ * ============================================================================
+ * 数值来自终稿 Figma node 64:377。
+ *
+ * 头像用 gold-avatar 大号（圈 192、头像 150、相机 58），居中叠在头部波浪上。
+ * 三张卡片是流式的，加字段不用改总高。
+ *
+ * 卡片渐变 from #abd7a7 to rgba(126,224,117,0.6)，圆角 28，和设计变量 radius/card 一致。
+ */
+
+.edit {
+  min-height: 100vh;
+  padding-bottom: 48rpx;
+  background: #f0ffd5;
+}
+
+.avatar-block {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  /* 头部 inner 300，金圈 top 165，向上叠 135 */
+  margin-top: -135rpx;
+}
+
+.avatar-hint {
+  margin-top: 10rpx;
+  height: 26rpx;
+  font-size: 22rpx;
+  line-height: 26rpx;
+  text-align: center;
+  color: #7d8583;
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  margin: 18rpx 28rpx 0;
+  overflow: hidden;
+  border-radius: 28rpx;
+  background: linear-gradient(180deg, #abd7a7 0%, rgba(126, 224, 117, 0.6) 100%);
+  box-shadow: 0 10rpx 12rpx rgba(31, 46, 31, 0.12);
+}
+
+.card__title {
+  padding: 22rpx 36rpx 8rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  line-height: 28rpx;
+  color: #42385f;
+}
+
+.row,
+.stat {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80rpx;
+  padding: 0 24rpx 0 28rpx;
+}
+
+.stat {
+  height: 72rpx;
+  padding-right: 28rpx;
+}
+
+.row::after,
+.stat::after {
+  content: '';
+  position: absolute;
+  left: 28rpx;
+  right: 28rpx;
+  bottom: 0;
+  height: 1rpx;
+  background: #e8ece0;
+}
+
+.row--last::after,
+.stat--last::after {
+  display: none;
+}
+
+.row__label {
+  font-size: 28rpx;
+  color: #1b201d;
+}
+
+.row__right {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.row__value {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #202c29;
+}
+
+.row__arrow {
+  font-size: 32rpx;
+  line-height: 40rpx;
+  color: #202c29;
+}
+
+.pills {
+  display: flex;
+  gap: 12rpx;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50rpx;
+  padding: 0 28rpx;
+  border: 1rpx solid #e8ece0;
+  border-radius: 23rpx;
+  background: #ffffff;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #7d8583;
+}
+
+.pill--gender {
+  border-color: transparent;
+  background: #8098ee;
+  color: #1b201d;
+}
+
+.pill--hand {
+  border-color: transparent;
+  background: #d4a414;
+  color: #1b201d;
+}
+
+.save {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 694rpx;
+  height: 88rpx;
+  margin: 28rpx 28rpx 0;
+  border-radius: 44rpx;
+  background: #54b50a;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #ffffff;
+}

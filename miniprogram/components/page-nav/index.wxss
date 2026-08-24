@@ -1,0 +1,66 @@
+/**
+ * 吸顶条本身不占文档流（fixed），绿头页靠下面的装饰头把内容顶开。
+ * occupy 打开时才用 .page-nav__spacer 垫出同等高度。
+ *
+ * 背景必须是实色：滚到白底内容上时，字才不会糊进去。
+ * 高度跟右上角胶囊对齐（navBarHeight，单位 px），不要再写一套 rpx 去估。
+ */
+
+.page-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: #b2e514;
+}
+
+.page-nav--gold {
+  background: #edc71f;
+}
+
+.page-nav--plain {
+  background: #ffffff;
+}
+
+.page-nav__bar {
+  position: relative;
+}
+
+/**
+ * 返回和标题都绝对定位在栏里，不要走 flex。
+ * 标题若 width:100% 再跟返回并排，返回会被挤成「返 / 回」两行。
+ */
+.page-nav .page-back {
+  position: absolute;
+  left: 24rpx;
+  top: 0;
+  z-index: 4;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #1c1f21;
+}
+
+.page-nav__title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 3;
+  height: 100%;
+  padding: 0 180rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1c1f21;
+  white-space: nowrap;
+  pointer-events: none;
+}

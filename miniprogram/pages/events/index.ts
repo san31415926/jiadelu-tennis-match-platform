@@ -3,8 +3,9 @@ import {
   HOME_BANNERS,
   HOME_FEATURES,
   MOCK_EVENTS,
-  type EventItem,
 } from '../../mock/home';
+import type { EventItem } from '../../mock/home';
+import { headerMetrics } from '../../utils/header';
 import { navigateToPage } from '../../utils/navigate';
 import { syncTabBarSelected } from '../../utils/tabbar';
 
@@ -31,6 +32,8 @@ Page({
   data: {
     /** 状态栏高度，传给头部组件用来避开手机顶部状态栏 */
     statusBarHeight: 0,
+    navBarHeight: 44,
+    menuInsetRight: 96,
     banners: HOME_BANNERS,
     features: HOME_FEATURES,
     filters: EVENT_FILTERS,
@@ -41,8 +44,7 @@ Page({
   },
 
   onLoad() {
-    const app = getApp<IAppOption>();
-    this.setData({ statusBarHeight: app.globalData.statusBarHeight });
+    this.setData(headerMetrics());
     this.applyFilter(DEFAULT_FILTER);
   },
 

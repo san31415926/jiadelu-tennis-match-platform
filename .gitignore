@@ -12,6 +12,9 @@ miniprogram/miniprogram_npm/
 # 切图坐标探测的临时产物
 tools/.probe/
 
+# Figma 导出原图，体积大、可随时再下，不进仓库
+tools/.figma/raw/
+
 # 系统与日志
 .DS_Store
 Thumbs.db

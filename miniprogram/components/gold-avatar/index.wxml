@@ -1,0 +1,10 @@
+<view class="gold-avatar gold-avatar--{{size}}" bindtap="onTap">
+  <image class="gold-avatar__photo" src="{{src}}" mode="aspectFill" />
+  <image class="gold-avatar__ring" src="/assets/images/gold-avatar-ring.png" mode="aspectFit" />
+  <image
+    wx:if="{{showBadge}}"
+    class="gold-avatar__badge"
+    src="/assets/icons/profile/camera-badge.png"
+    mode="aspectFit"
+  />
+</view>

@@ -148,12 +148,38 @@ image {
   position: absolute;
   left: 0;
   top: 0;
+  z-index: 3;
+  box-sizing: border-box;
   width: 100%;
   height: 80rpx;
+  padding: 0 180rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 40rpx;
   font-weight: 600;
   color: var(--text-nav-title);
+  /* 标题是装饰文字，不拦返回按钮的点击 */
+  pointer-events: none;
+}
+
+/**
+ * 全站返回按钮。写在 components/page-nav 里，跟标题同一条吸顶栏，
+ * 高度跟着栏走（100%），垂直居中对齐右上角胶囊。
+ *
+ * 不要再把返回写进各页的 .header__inner：那一层会跟着页面滚走。
+ */
+.page-back {
+  position: absolute;
+  left: 24rpx;
+  top: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: 100%;
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #1c1f21;
+  white-space: nowrap;
 }

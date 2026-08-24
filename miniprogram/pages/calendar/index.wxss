@@ -45,28 +45,6 @@
   background: #f8faf2;
 }
 
-.cal-back {
-  position: absolute;
-  left: 28rpx;
-  top: 23rpx;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56rpx;
-  height: 56rpx;
-  font-size: 46rpx;
-  color: #141a12;
-}
-
-.header__title {
-  top: 28rpx;
-  height: 58rpx;
-  font-size: 34rpx;
-  font-weight: 700;
-  color: #0d1208;
-}
-
 .month-controls {
   position: absolute;
   left: 30rpx;
@@ -117,6 +95,7 @@
   position: absolute;
   left: 548rpx;
   top: 160rpx;
+  z-index: 0;
   width: 120rpx;
   height: 105rpx;
 }

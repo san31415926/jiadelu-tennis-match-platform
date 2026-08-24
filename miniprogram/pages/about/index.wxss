@@ -1,0 +1,107 @@
+@import '../../styles/subpage-header.wxss';
+
+/**
+ * ============================================================================
+ * 关于我们页样式
+ * ============================================================================
+ * 终稿 node 68:618。金色渐变头、米色底、卡片 from #fffcf0 to rgba(252,232,158,0.72)，
+ * 二维码虚线 #c7940f。和商务合作同结构，只换配色。
+ */
+
+.info {
+  min-height: 100vh;
+  padding-bottom: 48rpx;
+}
+
+.info--gold {
+  background: #fff9e8;
+}
+
+.hero-icon {
+  position: relative;
+  z-index: 2;
+  width: 120rpx;
+  height: 120rpx;
+  margin: -114rpx auto 0;
+}
+
+.hero-icon--mirrored {
+  transform: scaleX(-1);
+}
+
+.kicker {
+  margin-top: 12rpx;
+  height: 28rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  line-height: 28rpx;
+  text-align: center;
+  color: #7d8583;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 694rpx;
+  margin: 14rpx 28rpx 0;
+  padding: 28rpx 32rpx 32rpx;
+  border-radius: 28rpx;
+  box-shadow: 0 10rpx 12rpx rgba(31, 46, 31, 0.12);
+}
+
+.card--gold {
+  background: linear-gradient(180deg, #fffcf0 0%, rgba(252, 232, 158, 0.72) 100%);
+}
+
+.card__title {
+  font-size: 30rpx;
+  font-weight: 700;
+  line-height: 38rpx;
+  color: #42385f;
+}
+
+.card__sub {
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  line-height: 28rpx;
+  text-align: center;
+  color: #7d8583;
+}
+
+.qr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 280rpx;
+  height: 280rpx;
+  margin-top: 16rpx;
+  border: 3rpx dashed #c7940f;
+  border-radius: 24rpx;
+  background: #ffffff;
+}
+
+.qr__hint {
+  width: 240rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  line-height: 32rpx;
+  text-align: center;
+  color: #c7940f;
+  white-space: pre-wrap;
+}
+
+.card__account {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  line-height: 30rpx;
+  color: #1b201d;
+}
+
+.card__hours {
+  margin-top: 8rpx;
+  font-size: 20rpx;
+  line-height: 25rpx;
+  color: #7d8583;
+}

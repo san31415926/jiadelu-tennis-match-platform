@@ -9,7 +9,8 @@
  * 这样加一个俱乐部只要填对标签，四个筛选都会自动正确。
  *
  * 【常见改动】
- * 加俱乐部       → 往 CLUB_LIST 加一条，记得填 city/recruiting/powerRank
+ * 加俱乐部       → 往 CLUB_LIST 加一条，记得填 city/recruiting/powerRank/members/power
+ *                 主页成员名单另加在文件底部 CLUB_MEMBERS
  * 改「同城」的城市 → 改 CURRENT_CITY
  * 改「战力榜前50」的门槛 → 改 filterClubs() 里的 powerRank > 50
  * 加一个筛选条件 → 在 CLUB_FILTERS 加名字，并在 filterClubs() 里加判断分支
@@ -24,6 +25,12 @@ export interface ClubItem {
   logo: string;
   /** 一行灰色小字，内容由下面的 metaOf() 拼出来 */
   meta: string;
+  /** 成员人数，主页「成员」和列表 meta 都读它 */
+  members: number;
+  /** 俱乐部总战力，主页绿色大数字和列表 meta 都读它 */
+  power: number;
+  /** 成立日期，只出现在列表那行小字里 */
+  founded: string;
   /** 所在城市，「同城」筛选按它和 CURRENT_CITY 比对 */
   city: string;
   /** 是否正在招新，对应「招新中」筛选 */
@@ -62,6 +69,9 @@ export const CLUB_LIST: ClubItem[] = [
     id: 'club-1',
     name: '菜菜才不菜',
     logo: '/assets/images/club/logo-1.jpg',
+    members: 24,
+    power: 1860,
+    founded: '2026-08-06',
     meta: metaOf(24, 1860, '2026-08-06'),
     city: '广州',
     recruiting: true,
@@ -72,6 +82,9 @@ export const CLUB_LIST: ClubItem[] = [
     id: 'club-2',
     name: 'GagaTennis Club',
     logo: '/assets/images/club/logo-2.jpg',
+    members: 31,
+    power: 1790,
+    founded: '2025-11-20',
     meta: metaOf(31, 1790, '2025-11-20'),
     city: '佛山',
     recruiting: true,
@@ -81,6 +94,9 @@ export const CLUB_LIST: ClubItem[] = [
     id: 'club-3',
     name: '椒个鹏友',
     logo: '/assets/images/club/logo-3.jpg',
+    members: 18,
+    power: 1640,
+    founded: '2026-03-14',
     meta: metaOf(18, 1640, '2026-03-14'),
     city: '广州',
     recruiting: false,
@@ -90,6 +106,9 @@ export const CLUB_LIST: ClubItem[] = [
     id: 'club-4',
     name: 'Volt Court 颜技社',
     logo: '/assets/images/club/logo-4.jpg',
+    members: 26,
+    power: 1580,
+    founded: '2025-06-01',
     meta: metaOf(26, 1580, '2025-06-01'),
     city: '深圳',
     recruiting: true,
@@ -99,6 +118,9 @@ export const CLUB_LIST: ClubItem[] = [
     id: 'club-5',
     name: 'inininAlive Club',
     logo: '/assets/images/club/logo-5.jpg',
+    members: 22,
+    power: 1520,
+    founded: '2026-01-08',
     meta: metaOf(22, 1520, '2026-01-08'),
     city: '广州',
     recruiting: false,
@@ -109,6 +131,9 @@ export const CLUB_LIST: ClubItem[] = [
     id: 'club-6',
     name: 'RisingAce 网球社',
     logo: '/assets/images/club/logo-6.jpg',
+    members: 29,
+    power: 1470,
+    founded: '2025-09-16',
     meta: metaOf(29, 1470, '2025-09-16'),
     city: '东莞',
     recruiting: true,
@@ -141,4 +166,117 @@ export function filterClubs(filter: string, keyword: string): ClubItem[] {
     }
     return true;
   });
+}
+
+/** 俱乐部主页成员行。主页只展示前几条，总人数仍用 ClubItem.members */
+export interface ClubMember {
+  id: string;
+  nickname: string;
+  avatar: string;
+  /** 已经带「加入」前缀，wxml 直接显示 */
+  joinedAt: string;
+  power: number;
+  captain?: boolean;
+}
+
+const MEMBER_AVATARS = [
+  '/assets/images/ranking/avatar-demo.jpg',
+  '/assets/images/ranking/avatar-4.jpg',
+  '/assets/images/ranking/avatar-5.jpg',
+  '/assets/images/ranking/avatar-6.jpg',
+];
+
+function memberOf(
+  id: string,
+  nickname: string,
+  joinedAt: string,
+  power: number,
+  avatarIndex: number,
+  captain?: boolean
+): ClubMember {
+  return {
+    id,
+    nickname,
+    avatar: MEMBER_AVATARS[avatarIndex % MEMBER_AVATARS.length],
+    joinedAt,
+    power,
+    captain,
+  };
+}
+
+/**
+ * 每个俱乐部主页上展示的成员（草稿只画了 6 行）。
+ * 总人数仍以 CLUB_LIST 的 members 为准，所以会出现「6 / 26 人」。
+ * 改名单就改这里；头像循环复用榜单那四张示例图。
+ */
+const CLUB_MEMBERS: Record<string, ClubMember[]> = {
+  'club-1': [
+    memberOf('m1-1', '豆豆龙', '加入 2026-08-06', 1620, 0, true),
+    memberOf('m1-2', '阿宽', '加入 2026-08-08', 1200, 1),
+    memberOf('m1-3', '小满', '加入 2026-08-10', 1840, 2),
+    memberOf('m1-4', '果果', '加入 2026-08-12', 1320, 3),
+    memberOf('m1-5', '阿福', '加入 2026-08-14', 1360, 0),
+    memberOf('m1-6', '小林', '加入 2026-08-16', 1500, 1),
+  ],
+  'club-2': [
+    memberOf('m2-1', 'Kiwi', '加入 2025-11-20', 1590, 2, true),
+    memberOf('m2-2', '小鹿', '加入 2025-12-01', 1240, 3),
+    memberOf('m2-3', 'nana', '加入 2026-01-08', 1820, 0),
+    memberOf('m2-4', '阿海', '加入 2026-02-14', 1280, 1),
+    memberOf('m2-5', '阿杰', '加入 2026-03-20', 1430, 2),
+    memberOf('m2-6', '奶茶', '加入 2026-04-02', 1470, 3),
+  ],
+  'club-3': [
+    memberOf('m3-1', '奶茶', '加入 2026-03-14', 1470, 0, true),
+    memberOf('m3-2', '瑰夏豆豆', '加入 2026-03-18', 1980, 1),
+    memberOf('m3-3', '老陈', '加入 2026-04-01', 1650, 2),
+    memberOf('m3-4', '阿May', '加入 2026-04-16', 1720, 3),
+    memberOf('m3-5', '小虎', '加入 2026-05-08', 1400, 0),
+    memberOf('m3-6', '阿泰', '加入 2026-05-22', 1540, 1),
+  ],
+  'club-4': [
+    memberOf('m4-1', '阿泰', '加入 2025-06-01', 1540, 0, true),
+    memberOf('m4-2', '菠墩墩', '加入 2026-03-12', 980, 1),
+    memberOf('m4-3', '詹詹乐', '加入 2026-04-08', 920, 2),
+    memberOf('m4-4', 'Carven', '加入 2026-05-20', 880, 3),
+    memberOf('m4-5', '黎明', '加入 2026-07-01', 760, 0),
+    memberOf('m4-6', '未来', '加入 2026-08-01', 720, 1),
+  ],
+  'club-5': [
+    memberOf('m5-1', '阿杰', '加入 2026-01-08', 1430, 2, true),
+    memberOf('m5-2', '吕布', '加入 2026-01-12', 1910, 3),
+    memberOf('m5-3', '阿飞', '加入 2026-02-02', 1760, 0),
+    memberOf('m5-4', '大熊', '加入 2026-02-18', 1680, 1),
+    memberOf('m5-5', '阿宽', '加入 2026-03-06', 1200, 2),
+    memberOf('m5-6', '小鹿', '加入 2026-03-28', 1240, 3),
+  ],
+  'club-6': [
+    memberOf('m6-1', '小林', '加入 2025-09-16', 1500, 0, true),
+    memberOf('m6-2', '小虎', '加入 2025-10-01', 1400, 1),
+    memberOf('m6-3', '阿福', '加入 2025-11-11', 1360, 2),
+    memberOf('m6-4', '果果', '加入 2026-01-09', 1320, 3),
+    memberOf('m6-5', '阿海', '加入 2026-03-03', 1280, 0),
+    memberOf('m6-6', 'Kiwi', '加入 2026-04-18', 1590, 1),
+  ],
+};
+
+/** 主页列表最多展示这么多行，和草稿 6 行对齐 */
+const HOME_MEMBER_PREVIEW = 6;
+
+/**
+ * 按 id 取俱乐部主页数据。id 对不上就退回第一家，避免空白页。
+ * 接云开发后：俱乐部档案 + 成员列表分成两次查询即可。
+ */
+export function getClubHome(id: string): {
+  club: ClubItem;
+  members: ClubMember[];
+  shownLabel: string;
+} {
+  const club = CLUB_LIST.find((item) => item.id === id) ?? CLUB_LIST[0];
+  const members = (CLUB_MEMBERS[club.id] ?? []).slice(0, HOME_MEMBER_PREVIEW);
+  return {
+    club,
+    members,
+    shownLabel: `${members.length} / ${club.members} 人`,
+  };
 }

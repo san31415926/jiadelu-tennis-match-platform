@@ -3,6 +3,8 @@
     title="LTJIMMY赛事"
     banners="{{banners}}"
     status-bar-height="{{statusBarHeight}}"
+    nav-bar-height="{{navBarHeight}}"
+    menu-inset-right="{{menuInsetRight}}"
     bind:bannertap="onBannerTap"
   />
 
@@ -31,7 +33,7 @@
   />
 
   <view class="feed">
-    <event-card
+    <event-card style="height: 274rpx; display: block; box-sizing: border-box"
       class="feed__card"
       wx:for="{{events}}"
       wx:key="id"

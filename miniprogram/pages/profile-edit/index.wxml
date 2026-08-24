@@ -1,0 +1,115 @@
+<view class="edit">
+  <page-nav title="我的资料" />
+  <view class="sub-header" style="padding-top:{{statusBarHeight}}px">
+    <view class="sub-header__inner">
+      <view class="sub-header__wave"></view>
+      <image class="sub-header__ball" src="/assets/images/hero-tennis-ball.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <view class="avatar-block">
+    <gold-avatar
+      src="{{form.avatar}}"
+      size="large"
+      show-badge="{{true}}"
+      bind:avatartap="onPickAvatar"
+    />
+  </view>
+  <view class="avatar-hint">点击更换头像</view>
+
+  <view class="card">
+    <view class="card__title">账号信息</view>
+    <view class="row" bindtap="onEditNickname">
+      <text class="row__label">昵称</text>
+      <view class="row__right">
+        <text class="row__value">{{form.nickname}}</text>
+        <text class="row__arrow">›</text>
+      </view>
+    </view>
+    <view class="row" bindtap="onEditPhone">
+      <text class="row__label">手机号</text>
+      <view class="row__right">
+        <text class="row__value">{{form.phone}}</text>
+        <text class="row__arrow">›</text>
+      </view>
+    </view>
+    <view class="row row--last" bindtap="onCopyUid">
+      <text class="row__label">UID</text>
+      <view class="row__right">
+        <text class="row__value">{{form.uid}}</text>
+        <text class="row__arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card__title">报名资料</view>
+    <view class="row" bindtap="onEditRealName">
+      <text class="row__label">真实姓名</text>
+      <view class="row__right">
+        <text class="row__value">{{form.realName}}</text>
+        <text class="row__arrow">›</text>
+      </view>
+    </view>
+    <view class="row">
+      <text class="row__label">性别</text>
+      <view class="pills">
+        <view
+          wx:for="{{genders}}"
+          wx:key="*this"
+          class="pill {{form.gender === item ? 'pill--gender' : ''}}"
+          data-value="{{item}}"
+          bindtap="onGenderTap"
+        >{{item}}</view>
+      </view>
+    </view>
+    <view class="row">
+      <text class="row__label">惯用手</text>
+      <view class="pills">
+        <view
+          wx:for="{{hands}}"
+          wx:key="*this"
+          class="pill {{form.hand === item ? 'pill--hand' : ''}}"
+          data-value="{{item}}"
+          bindtap="onHandTap"
+        >{{item}}</view>
+      </view>
+    </view>
+    <view class="row" bindtap="onEditCity">
+      <text class="row__label">所在城市</text>
+      <view class="row__right">
+        <text class="row__value">{{form.city}}</text>
+        <text class="row__arrow">›</text>
+      </view>
+    </view>
+    <view class="row row--last" bindtap="onEditClub">
+      <text class="row__label">所属俱乐部</text>
+      <view class="row__right">
+        <text class="row__value">{{form.club}}</text>
+        <text class="row__arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card__title">球员档案（比赛成绩自动生成，不可手动修改）</view>
+    <view class="stat">
+      <text class="row__label">评分</text>
+      <text class="row__value">{{form.rating}}</text>
+    </view>
+    <view class="stat">
+      <text class="row__label">等级</text>
+      <text class="row__value">{{form.level}}</text>
+    </view>
+    <view class="stat">
+      <text class="row__label">积分</text>
+      <text class="row__value">{{form.points}}</text>
+    </view>
+    <view class="stat stat--last">
+      <text class="row__label">身价</text>
+      <text class="row__value">{{form.marketValue}}</text>
+    </view>
+  </view>
+
+  <view class="save" bindtap="onSave">保存资料</view>
+</view>

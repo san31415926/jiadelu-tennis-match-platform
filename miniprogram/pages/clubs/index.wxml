@@ -1,12 +1,10 @@
 <view class="clubs">
+  <page-nav title="俱乐部" />
   <!-- 头部，Figma node 23:345 -->
   <view class="header" style="padding-top:{{statusBarHeight}}px">
     <view class="header__inner">
       <!-- 该页下缘同样是超宽椭圆（node 23:351） -->
       <view class="header__ellipse"></view>
-
-      <view class="club-back" bindtap="onBack">‹</view>
-      <view class="header__title">俱乐部</view>
 
       <image class="header__flag" src="/assets/images/club/header-flag.png" mode="aspectFit" />
 

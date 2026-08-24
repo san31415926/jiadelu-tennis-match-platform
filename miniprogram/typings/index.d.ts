@@ -18,6 +18,8 @@ interface IAppOption {
   globalData: {
     statusBarHeight: number;
     navBarHeight: number;
+    /** 标题左右留白，避开右上角胶囊按钮，单位 px */
+    menuInsetRight: number;
     safeAreaBottom: number;
     screenWidth: number;
     /** 微信登录态，云开发接入后由云函数校验 */

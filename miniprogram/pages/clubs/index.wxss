@@ -43,32 +43,11 @@
   background: #fbfcf9;
 }
 
-.club-back {
-  position: absolute;
-  left: 28rpx;
-  top: 14rpx;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56rpx;
-  height: 56rpx;
-  font-size: 46rpx;
-  color: #11150b;
-}
-
-.header__title {
-  top: 24rpx;
-  height: 42rpx;
-  font-size: 40rpx;
-  font-weight: 700;
-  color: #11150b;
-}
-
 .header__flag {
   position: absolute;
   left: 414rpx;
   top: 82rpx;
+  z-index: 0;
   width: 320rpx;
   height: 268rpx;
 }

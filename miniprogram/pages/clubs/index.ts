@@ -3,8 +3,9 @@ import {
   CLUB_LIST,
   CLUB_SUMMARY,
   filterClubs,
-  type ClubItem,
 } from '../../mock/club';
+import type { ClubItem } from '../../mock/club';
+import { navigateToPage } from '../../utils/navigate';
 
 /**
  * ============================================================================
@@ -58,8 +59,9 @@ Page({
     this.apply(filter, this.data.keyword);
   },
 
-  onClubTap() {
-    wx.showToast({ title: '俱乐部主页待设计', icon: 'none' });
+  onClubTap(event: WechatMiniprogram.TouchEvent) {
+    const id = String(event.currentTarget.dataset.id);
+    navigateToPage(`/pages/club-home/index?id=${id}`);
   },
 
   onJoinTap(event: WechatMiniprogram.TouchEvent) {
@@ -73,9 +75,5 @@ Page({
 
   onCreateClub() {
     wx.showToast({ title: '创建俱乐部待接入云开发', icon: 'none' });
-  },
-
-  onBack() {
-    wx.navigateBack();
   },
 });

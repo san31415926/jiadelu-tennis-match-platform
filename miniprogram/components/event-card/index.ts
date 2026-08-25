@@ -7,15 +7,16 @@
  * 在页面的 json 里注册：
  *   "usingComponents": { "event-card": "../../components/event-card/index" }
  * 在 wxml 里使用：
- *   <event-card event="{{item}}" bind:cardtap="onEventTap" bind:actiontap="onSignupTap" />
+ *   <event-card event="{{item}}" bind:cardtap="onEventTap" bind:venuetap="onVenueTap" />
  *
  * 【两个事件的区别】
- * cardtap   点卡片任意位置触发，一般用来跳赛事详情
- * actiontap 点右下角按钮触发，一般用来走报名流程
+ * cardtap   点卡片主体，一般用来跳赛事详情
+ * venuetap  点底部场馆行（有 venueLink 的卡才有这一行），跳店铺页 pages/venue
  *
- * 按钮在 wxml 里用的是 catchtap 而不是 bindtap —— catch 会阻止事件继续
- * 向上冒泡到卡片，所以点按钮只会触发 actiontap，不会同时触发 cardtap。
- * 如果改成 bindtap，点一次按钮会触发两个事件，出现"又跳详情又弹报名"的 bug。
+ * 场馆行用的是 catchtap 而不是 bindtap —— catch 会阻止事件继续向上冒泡到
+ * 卡片，所以点场馆只会触发 venuetap，不会同时触发 cardtap。
+ *
+ * 右下角现在是价格不是报名按钮。报名入口在赛事详情页。
  */
 Component({
   properties: {
@@ -41,8 +42,8 @@ Component({
       this.triggerEvent('cardtap', { id: this.currentId() });
     },
 
-    onActionTap() {
-      this.triggerEvent('actiontap', { id: this.currentId() });
+    onVenueTap() {
+      this.triggerEvent('venuetap', { id: this.currentId() });
     },
   },
 });

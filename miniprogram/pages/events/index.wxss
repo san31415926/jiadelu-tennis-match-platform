@@ -1,151 +1,563 @@
 /**
  * ============================================================================
- * 赛事首页样式
+ * 赛事首页样式 —— 视觉刷新草稿 V5
  * ============================================================================
- * 数值来自 Figma node 1:206 及其子节点。设计稿画板宽 750px，对应 750rpx，
- * 所以设计稿上量到的数字直接写，不用换算。
+ * 数值来自 Figma node 145:199（默认 / 侧栏收起）。设计稿 1px = 1rpx。
  *
- * 【这个页面的三块内容】
- *   1. 头部轮播 —— 由 hero-carousel 组件负责，样式在组件里和 app.wxss 里
- *   2. 七宫格   —— 就在这个文件里
- *   3. 筛选条 + 赛事卡片 —— 筛选条和卡片是组件，这里只管它们的外层容器
+ * 【这一页的块】
+ *   1. 顶栏 88rpx（不含状态栏）—— 汉堡 + 居中字标
+ *   2. 轮播 320rpx —— 图 + 渐变遮罩 + 叠字 + 指示点
+ *   3. 内容白底区 —— 热门活动横滑、城市搜索、胶囊筛选、赛事卡
+ *   4. 左侧栏 520rpx —— 原来的七宫格入口
+ *
+ * 侧栏打开是同一页的状态（157:199），不要另做一页。
  */
 
-/**
- * ----------------------------------------------------------------------------
- * 七宫格
- * ----------------------------------------------------------------------------
- *
- * 【布局是怎么算出来的】
- * 设计稿里七个格子的横坐标是 38 / 212 / 386 / 560，纵坐标是 14 / 180。
- * 相邻两列相差 174rpx，格子宽 158rpx，所以列间距 = 174 - 158 = 16rpx。
- * 两行相差 166rpx，格子高 154rpx，所以行间距 = 166 - 154 = 12rpx。
- * 于是用「左内边距 38 + gap 12rpx 16rpx」就能精确复现绝对定位的效果，
- * 而且用 flex-wrap 自动换行，比写 14 个绝对定位坐标好维护得多。
- *
- * 【想改成一行五个】
- * 把 .feature 的 width 从 158rpx 改小（比如 130rpx），
- * flex-wrap 会自动重排。但图标的 iconStyle 里的 left 也要跟着调，
- * 否则图标会偏出格子。
- *
- * 【想加第三行入口】
- * 除了往 mock/home.ts 的 HOME_FEATURES 加数据，还必须加大
- * tokens.wxss 里的 --grid-height（当前 350rpx），
- * 因为这个容器是固定高度，第三行会被裁掉看不见。
- * 一行的高度是 154 + 12 = 166rpx，所以加到 516rpx 就能放三行。
- */
-.feature-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx 16rpx;
-  height: var(--grid-height);
-  padding: 14rpx 0 0 38rpx;
-  background: var(--grid-gradient);
+.home {
+  min-height: 100vh;
+  background: #f7f7f6;
 }
 
 /**
- * 单个格子。
- *
- * overflow: hidden 是刻意的：有几个图标的 iconStyle 里 top 是负值
- * （比如年会典礼是 -12rpx），意思是图标顶部故意超出格子被裁掉一点，
- * 这是设计稿的效果。去掉这行会看到图标"长出来"，反而不对。
+ * 顶栏绿渐变。高度 = 状态栏 + 88rpx 导航行。
+ * 稿上整条 176（含假状态栏），真机状态栏用 padding-top 接上。
  */
-.feature {
+.topbar {
+  background: var(--header-gradient);
+}
+
+.topbar__row {
   position: relative;
-  width: 158rpx;
-  height: 154rpx;
+  height: 88rpx;
+}
+
+/**
+ * 汉堡 72×72，三条 48×5 圆角条。left 24 跟稿上对齐。
+ */
+.hamburger {
+  position: absolute;
+  left: 24rpx;
+  top: 8rpx;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8rpx;
+  width: 72rpx;
+  height: 72rpx;
+  padding: 0 12rpx;
+}
+
+.hamburger--pressed {
+  opacity: 0.6;
+}
+
+.hamburger__line {
+  width: 48rpx;
+  height: 5rpx;
+  border-radius: 2.5rpx;
+  background: #2e2e2e;
+}
+
+/**
+ * 字标相对屏幕居中，不给汉堡让位——稿上就是这样叠的。
+ * 右侧速度线是纯 CSS，不占图。
+ */
+.wordmark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.wordmark__title {
+  font-size: 42rpx;
+  font-weight: 700;
+  line-height: 56rpx;
+  color: #263312;
+  text-shadow: 0 3rpx 4rpx rgba(13, 20, 5, 0.16);
+}
+
+.wordmark__speed {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  margin: 4rpx 0 0 8rpx;
+  transform: rotate(12deg);
+}
+
+.wordmark__dash {
+  height: 4rpx;
+  border-radius: 2rpx;
+  background: #d13708;
+}
+
+.wordmark__dash--1 {
+  width: 58rpx;
+  opacity: 0.85;
+}
+
+.wordmark__dash--2 {
+  width: 40rpx;
+  opacity: 0.55;
+}
+
+.wordmark__dash--3 {
+  width: 24rpx;
+  opacity: 0.38;
+}
+
+/* ---------- 轮播 ---------- */
+
+.hero {
+  position: relative;
+  width: 100%;
+  height: 320rpx;
+  overflow: hidden;
+  background: #1a1f16;
+}
+
+.hero__swiper,
+.hero__slide {
+  width: 100%;
+  height: 320rpx;
+}
+
+.hero__image {
+  width: 100%;
+  height: 320rpx;
+}
+
+.hero__scrim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(13, 18, 13, 0.35) 0%,
+    rgba(13, 18, 13, 0.1) 45%,
+    rgba(13, 18, 13, 0.82) 100%
+  );
+}
+
+.hero__copy {
+  position: absolute;
+  left: 32rpx;
+  right: 32rpx;
+  top: 118rpx;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero__title {
+  font-size: 56rpx;
+  font-weight: 700;
+  line-height: 72rpx;
+  color: #ffffff;
+}
+
+.hero__sub {
+  margin-top: 6rpx;
+  font-size: 26rpx;
+  line-height: 33rpx;
+  color: #ffffff;
+}
+
+.hero__dots {
+  position: absolute;
+  left: 32rpx;
+  bottom: 30rpx;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  pointer-events: none;
+}
+
+.hero__dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.hero__dot--on {
+  width: 22rpx;
+  border-radius: 6rpx;
+  background: #83d414;
+}
+
+/**
+ * 内容区。上圆角 40，左右 32，块与块 gap 28。
+ * 底色几乎透明，露出页底 #f7f7f6。
+ */
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 28rpx;
+  padding: 36rpx 32rpx 24rpx;
+  border-radius: 40rpx 40rpx 0 0;
+  background: #f7f7f6;
+}
+
+/* ---------- 热门活动 ---------- */
+
+.hot {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.hot-mark {
+  position: relative;
+  width: 167rpx;
+  height: 52rpx;
+}
+
+.hot-mark__title {
+  position: absolute;
+  left: 8rpx;
+  top: 8rpx;
+  font-size: 32rpx;
+  font-weight: 800;
+  font-style: italic;
+  line-height: 38rpx;
+  letter-spacing: -0.64rpx;
+  color: #1e5adc;
+}
+
+.hot-mark__dot {
+  position: absolute;
+  width: 5rpx;
+  height: 5rpx;
+  border-radius: 50%;
+  background: #7dd3fc;
+}
+
+.hot-mark__dot--tl {
+  left: 4rpx;
+  top: 6rpx;
+}
+
+.hot-mark__dot--br {
+  left: 133rpx;
+  top: 38rpx;
+}
+
+.hot-mark__speed {
+  position: absolute;
+  left: 137rpx;
+  top: 20rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.hot-mark__bar {
+  height: 2rpx;
+  border-radius: 1rpx;
+  background: #7dd3fc;
+}
+
+.hot__scroller {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.hot-card {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 10rpx;
+  width: 240rpx;
+  margin-right: 16rpx;
+  padding-bottom: 12rpx;
+  overflow: hidden;
+  vertical-align: top;
+  border: 1rpx solid #e8e8e5;
+  border-radius: 20rpx;
+  background: #ffffff;
+}
+
+.hot-card:last-child {
+  margin-right: 0;
+}
+
+.hot-card__photo {
+  position: relative;
+  width: 240rpx;
+  height: 160rpx;
   overflow: hidden;
 }
 
-/**
- * 点击时的反馈。
- *
- * 通过 wxml 里的 hover-class="feature--pressed" 生效，
- * hover-stay-time="60" 表示手指离开后这个样式还保留 60 毫秒，
- * 太短会感觉没反应，太长会觉得卡。
- *
- * 想让反馈更明显：把 opacity 调低（如 0.5），或者加
- * transform: scale(0.95) 做一个按下缩小的效果。
- */
-.feature--pressed {
-  opacity: 0.75;
+.hot-card__image {
+  width: 240rpx;
+  height: 160rpx;
 }
 
-/**
- * 图标。
- *
- * 这里只声明"绝对定位"，具体的 left/top/width/height 由
- * mock/home.ts 里每一项的 iconStyle 字段单独指定——因为七个 3D 图标
- * 外形差异大，设计师给每个都调过。详见那个文件里的说明。
- */
-.feature__icon {
+.hot-card__rank {
   position: absolute;
-}
-
-/**
- * 图标下方的文字。
- *
- * top: 91rpx 是它在格子里的位置。如果你把图标改大了导致文字被压住，
- * 就把这个值调大。
- */
-.feature__label {
-  position: absolute;
-  left: 0;
-  top: 91rpx;
-  width: 100%;
-  height: 32rpx;
+  top: 10rpx;
+  right: 10rpx;
+  min-width: 28rpx;
+  padding: 4rpx 10rpx;
+  border-radius: 8rpx;
+  background: rgba(131, 212, 20, 0.6);
+  font-size: 16rpx;
+  font-weight: 700;
+  line-height: 21rpx;
+  color: #1a1f16;
   text-align: center;
-  font-size: 21rpx;
-  font-weight: 600;
-  color: var(--text-grid-label);
 }
 
-/**
- * ----------------------------------------------------------------------------
- * 赛事列表区
- * ----------------------------------------------------------------------------
- *
- * 【padding 的三个值】
- * 16rpx 上 / 26rpx 左右 / 24rpx 下。左右的 26rpx 决定了卡片宽度：
- * 750 - 26×2 = 698rpx。想让卡片更宽就减小这个值。
- *
- * 【圆角 40rpx】
- * 这个大圆角让绿色渐变区看起来像一张托盘把卡片"端"起来。
- * 改成 0 会变成通栏色块，视觉上会显得比较硬。
- */
+.hot-card__title,
+.hot-card__sub {
+  padding: 0 12rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.hot-card__title {
+  font-size: 22rpx;
+  font-weight: 800;
+  line-height: 30rpx;
+  letter-spacing: -0.44rpx;
+  color: #1f211c;
+}
+
+.hot-card__sub {
+  font-size: 16rpx;
+  line-height: 23rpx;
+  color: #73786b;
+}
+
+/* ---------- 搜索 ---------- */
+
+.search {
+  display: flex;
+  align-items: center;
+  height: 64rpx;
+}
+
+.search__city {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6rpx;
+  padding-right: 12rpx;
+}
+
+.search__pin {
+  width: 22rpx;
+  height: 26rpx;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='26' viewBox='0 0 22 26'%3E%3Cpath fill='%2383d414' d='M11 0C5.5 0 1 4.3 1 9.7 1 16.8 11 26 11 26s10-9.2 10-16.3C21 4.3 16.5 0 11 0zm0 13.2a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.search__city-name {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #1f211c;
+}
+
+.search__caret {
+  font-size: 18rpx;
+  color: #73786b;
+}
+
+.search__field {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+  height: 64rpx;
+  padding: 0 20rpx 0 24rpx;
+  border-radius: 32rpx;
+  background: #f3f3f1;
+}
+
+.search__input {
+  flex: 1;
+  min-width: 0;
+  height: 64rpx;
+  font-size: 24rpx;
+  color: #1f211c;
+}
+
+.search__placeholder {
+  color: #9b9e96;
+}
+
+.search__icon {
+  flex-shrink: 0;
+  width: 32rpx;
+  height: 32rpx;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='14' cy='14' r='8' fill='none' stroke='%239b9e96' stroke-width='2.4'/%3E%3Cpath stroke='%239b9e96' stroke-width='2.4' stroke-linecap='round' d='M20.2 20.2L26 26'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* ---------- 赛事列表 ---------- */
+
 .feed {
   display: flex;
   flex-direction: column;
-  padding: 16rpx 26rpx 24rpx;
-  border-radius: var(--radius-feed);
-  background: var(--feed-gradient);
+  gap: 16rpx;
 }
 
-/**
- * 多张卡片之间的间距。
- *
- * 【设计稿里没有这个间距】
- * 设计只画了一张卡片，所以没标间距。但实际数据会有多场赛事，
- * 卡片紧贴在一起时各自的投影会互相压叠，很脏。所以补了 16rpx。
- *
- * 【+ 号选择器的含义】
- * .feed__card + .feed__card 表示"紧跟在另一张卡片后面的卡片"，
- * 所以第一张不会有上间距，只有第二张开始才加。
- */
-.feed__card + .feed__card {
-  margin-top: 16rpx;
+.list-filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-/**
- * 空状态提示。
- *
- * 文案不是写死的，由 index.ts 的 emptyHint 字段决定：
- * 未登录看「我的报名」时显示"登录后查看你报名的赛事"，
- * 其他情况显示"该分类下暂无赛事"。
- */
+.list-filters__row {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.list-filters__item {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  line-height: 29rpx;
+  letter-spacing: 1.32rpx;
+  color: #1f211c;
+}
+
+.list-filters__item.is-on {
+  color: #83d414;
+}
+
+.list-filters__caret {
+  font-size: 16rpx;
+  font-weight: 400;
+  line-height: 21rpx;
+  letter-spacing: 0;
+  color: #73786b;
+}
+
+.list-filters__reset {
+  flex-shrink: 0;
+  padding: 0 0 0 16rpx;
+  font-size: 28rpx;
+  line-height: 36rpx;
+  color: #73786b;
+}
+
 .feed__empty {
   padding: 72rpx 0;
   text-align: center;
   font-size: 22rpx;
-  color: var(--text-muted);
+  color: #73786b;
+}
+
+/* ---------- 侧栏 ---------- */
+
+.drawer-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 300;
+  background: rgba(20, 24, 16, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+}
+
+.drawer-mask.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.drawer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 301;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  width: 520rpx;
+  padding: 100rpx 32rpx 28rpx;
+  background: #ffffff;
+  transform: translateX(-100%);
+  transition: transform 0.22s ease;
+  pointer-events: none;
+}
+
+.drawer.is-open {
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.drawer__item {
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+  padding: 22rpx 16rpx 22rpx 20rpx;
+  border-radius: 16rpx;
+  background: #f7f7f6;
+}
+
+.drawer__icon {
+  flex-shrink: 0;
+  width: 96rpx;
+  height: 96rpx;
+}
+
+.drawer__label {
+  font-size: 36rpx;
+  font-weight: 500;
+  line-height: 46rpx;
+  color: #1f211c;
+}
+
+.drawer__spacer {
+  flex: 1;
+  min-height: 24rpx;
+}
+
+.drawer__line {
+  height: 1rpx;
+  background: #e6e6e6;
+}
+
+.drawer__foot {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 18rpx 8rpx;
+}
+
+.drawer__foot-icon {
+  width: 36rpx;
+  font-size: 32rpx;
+  line-height: 44rpx;
+  color: #595959;
+}
+
+.drawer__foot-text {
+  font-size: 32rpx;
+  font-weight: 500;
+  line-height: 42rpx;
+  color: #2e2e2e;
 }

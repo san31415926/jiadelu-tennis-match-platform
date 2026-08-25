@@ -1,0 +1,65 @@
+<view class="records">
+  <page-nav title="参赛记录" variant="mint" />
+  <view class="sub-header sub-header--mint" style="padding-top:{{statusBarHeight}}px">
+    <view class="sub-header__inner sub-header__inner--compact">
+      <view class="sub-header__wave"></view>
+    </view>
+  </view>
+
+  <view class="summary">
+    <view class="summary__title-row">
+      <image class="summary__trophy" src="/assets/icons/profile/records-trophy.png" mode="aspectFit" />
+      <view class="summary__title-col">
+        <view class="summary__title">参赛记录</view>
+        <view class="summary__recent">{{summary.recent}}</view>
+      </view>
+    </view>
+    <view class="summary__stats">
+      <view class="stat">
+        <view class="stat__num">{{summary.matches}}</view>
+        <view class="stat__label">场比赛</view>
+      </view>
+      <view class="stat">
+        <view class="stat__num stat__num--win">{{summary.wins}}</view>
+        <view class="stat__label">胜</view>
+      </view>
+      <view class="stat">
+        <view class="stat__num">{{summary.losses}}</view>
+        <view class="stat__label">负</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="filters">
+    <view
+      class="filters__chip {{activeFilter === item ? 'is-active' : ''}}"
+      wx:for="{{filters}}"
+      wx:key="*this"
+      data-filter="{{item}}"
+      bindtap="onFilterTap"
+    >{{item}}</view>
+  </view>
+
+  <view class="list">
+    <view
+      class="row"
+      wx:for="{{records}}"
+      wx:key="id"
+      data-id="{{item.eventId}}"
+      bindtap="onRecordTap"
+      hover-class="row--pressed"
+      hover-stay-time="60"
+    >
+      <view class="row__info">
+        <view class="row__title">{{item.title}}</view>
+        <view class="row__meta">{{item.date}} · {{item.category}} · {{item.venue}}</view>
+      </view>
+      <view class="row__result">
+        <view class="badge {{item.result === '胜' ? 'badge--win' : 'badge--loss'}}">{{item.result}}</view>
+        <view class="row__score">{{item.score}}</view>
+      </view>
+      <view class="row__arrow">›</view>
+    </view>
+    <view class="list__empty" wx:if="{{records.length === 0}}">暂无该结果的比赛</view>
+  </view>
+</view>

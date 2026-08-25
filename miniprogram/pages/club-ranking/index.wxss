@@ -1,9 +1,14 @@
 /**
  * ============================================================================
- * 俱乐部榜单页样式
+ * 俱乐部榜单页样式 —— 视觉刷新草稿 V5
  * ============================================================================
- * 布局仿球员排行（Figma node 15:3），去掉城市榜/全国榜那一排切换。
- * 指标只剩战力、积分，所以 metric-tabs 上移到原来双榜的位置。
+ * 数值来自 Figma node 287:292（本月 × 积分）。设计稿 1px = 1rpx。
+ *
+ * 绿头 + 领奖台沿用球员排行的骨架，不要做成白顶栏。
+ * page-nav 叠在绿头上（不要开 occupy），本月 / 累计在原来城市榜的位置。
+ *
+ * 想改本月/累计的选中色 → .scope-tabs__item.is-active
+ * 想改展开条文案样式 → .show-more（V5 是顶部分割线，不是绿色药丸）
  */
 
 .club-ranking {
@@ -19,20 +24,49 @@
 }
 
 .header__inner {
-  height: 230rpx;
+  height: 272rpx;
 }
 
-/* 波浪路径取自 node 15:6 */
+/* 波浪路径取自 node 287:296，fill 必须和页底 #fcfef5 一致 */
 .header__wave {
-  top: 132rpx;
+  top: 174rpx;
   height: 105rpx;
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105' viewBox='0 0 750 105' preserveAspectRatio='none'%3E%3Cpath d='M0 0C125 70 235 70 350 30C500 -24 585 75 750 8V105H0V0Z' fill='%23FCFEF5'/%3E%3C/svg%3E");
+}
+
+/* 本月 / 累计，对齐球员排行的城市榜位置（node 287:298） */
+.scope-tabs {
+  position: absolute;
+  left: 140rpx;
+  top: 91rpx;
+  display: flex;
+  gap: 12rpx;
+  width: 470rpx;
+  height: 58rpx;
+}
+
+.scope-tabs__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 229rpx;
+  height: 58rpx;
+  border-radius: 29rpx;
+  background: #e8f59e;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #6b7059;
+}
+
+.scope-tabs__item.is-active {
+  background: #2e3324;
+  color: #ffffff;
 }
 
 .metric-tabs {
   position: absolute;
   left: 121rpx;
-  top: 108rpx;
+  top: 239rpx;
   display: flex;
   gap: 46rpx;
   width: 520rpx;
@@ -51,7 +85,7 @@
   color: #1f2114;
 }
 
-/* node 15:17：48x5 的圆角短线 */
+/* node 287:307：48x5 的圆角短线 */
 .metric-tabs__underline {
   position: absolute;
   left: 50%;
@@ -71,13 +105,6 @@
   background: #fcfef5;
 }
 
-/**
- * 装饰用的金色碎片。
- *
- * 四个位置用的是同一张图片（只下载了一份，省体积），靠不同的 left/top 和
- * opacity 摆出散落感。想让画面更干净就把 opacity 调低，或者直接在
- * index.wxml 里删掉几个 .podium__confetti 元素。
- */
 .podium__confetti {
   position: absolute;
   width: 150rpx;
@@ -110,13 +137,7 @@
 
 /**
  * 一座台 + 一个圈的合成切图。
- *
- * 三个盒子的宽高比必须和 PNG 一致（520×672 / 520×678 / 520×627），
- * 这样 aspectFit 不会留白，头像用百分比定位才能对准金圈圆心。
- * 三座台底边对齐在 359rpx，文字从 369rpx 开始，中间留 10rpx。
- *
- * 圆心百分比来自 tools/measure-podium-circles.cjs 对切图的实测，
- * 不要在开发者工具里拖头像——拖完会写成内联样式，把对齐冲掉。
+ * 圆心百分比来自 tools/measure-podium-circles.cjs，和球员排行共用切图，不要单独拖。
  */
 .podium__unit {
   position: absolute;
@@ -150,15 +171,6 @@
   height: 100%;
 }
 
-/**
- * 头像从金圈的透明圆孔里露出来。
- *
- * left/top/宽高都是相对切图盒子的百分比，数字来自实测圆心：
- *   冠军 520×672，白圆 (133,25) 259×264
- *   亚军 520×678，白圆 (112,26) 300×312
- *   季军 520×627，白圆 (114,24) 293×302
- * 改切图之后要重新跑测量脚本，再改这里。
- */
 .podium__unit-avatar {
   position: absolute;
   z-index: 0;
@@ -183,16 +195,6 @@
   height: 46.73%;
 }
 
-/**
- * 领奖台下方的三列文字（昵称、俱乐部、分数）。
- *
- * 三列的 left 和 width 各不相同，因为要和上方三个台座的中心对齐——
- * 冠军台在正中且更宽，亚军季军台偏两侧。
- * 每列内部用 text-align: center 让文字在该列里居中。
- *
- * 想调整某一列的水平位置，改对应 --second / --first / --third 的 left。
- * 判断有没有对齐，看文字中心是否在台座数字（2、1、3）的正下方。
- */
 .podium__col {
   position: absolute;
   top: 369rpx;
@@ -224,7 +226,6 @@
   text-overflow: ellipsis;
 }
 
-/* 冠亚季军中，第一、三名的昵称在设计中是加粗的 */
 .podium__name--first {
   font-weight: 700;
 }
@@ -275,25 +276,15 @@
 }
 
 .list__avatar-slot {
-  /**
-   * 金框头像组件的占位，和球员榜同一套 86×86 金圈。
-   * 俱乐部 logo 也套金圈，保持列表观感一致。
-   */
   flex-shrink: 0;
   margin-left: 19rpx;
 }
 
 .list__detail {
   flex: 1;
+  min-width: 0;
   margin-left: 20rpx;
   overflow: hidden;
-}
-
-.list__detail-top {
-  display: flex;
-  align-items: center;
-  gap: 14rpx;
-  height: 30rpx;
 }
 
 .list__nickname {
@@ -303,20 +294,6 @@
   color: #1f2114;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-
-.list__badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 58rpx;
-  height: 29rpx;
-  padding: 0 10rpx;
-  border-radius: 16rpx;
-  background: #e8f59e;
-  font-size: 18rpx;
-  font-weight: 600;
-  color: #548005;
 }
 
 .list__club {
@@ -346,33 +323,31 @@
 
 /* ---------- 展开与我的排名 ---------- */
 
-/* 设计值是 169rpx 宽，收起态文案更短，用 min-width 兼容两种文案 */
+/**
+ * V5「查看全部 20 家俱乐部」是顶部分割线 + 灰字 + 青绿箭头，
+ * 不是球员排行那种绿色药丸。收起态文案换成「收起」。
+ */
 .show-more {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8rpx;
-  min-width: 169rpx;
-  height: 28rpx;
-  margin: 8rpx auto 0;
-  padding: 0 20rpx;
-  border-radius: 82rpx;
-  background: #7ee7a3;
-  font-size: 20rpx;
-  color: #79815c;
+  width: 690rpx;
+  height: 64rpx;
+  margin: 8rpx 30rpx 0;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #e5e8e0;
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #101214;
 }
 
 .show-more__arrow {
   font-size: 22rpx;
+  font-weight: 700;
+  color: #83d414;
 }
 
-/**
- * 为底部固定的「我的排名」卡片留出空间。
- *
- * 那张卡片是 fixed 悬浮的，不占文档流，所以要放一个占位块把内容顶上去，
- * 否则展开列表滚到底时最后一行会被卡片盖住。
- * 高度 = 卡片高 94 + 上下留白 40 = 134rpx，再加手机底部安全区。
- */
 .my-rank-spacer {
   height: calc(134rpx + env(safe-area-inset-bottom));
 }

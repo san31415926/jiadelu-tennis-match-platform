@@ -16,7 +16,11 @@
     "pages/business/index",
     "pages/about/index",
     "pages/service/index",
-    "pages/club-home/index"
+    "pages/club-home/index",
+    "pages/event-detail/index",
+    "pages/records/index",
+    "pages/signup/index",
+    "pages/venue/index"
   ],
   "window": {
     "navigationStyle": "custom",

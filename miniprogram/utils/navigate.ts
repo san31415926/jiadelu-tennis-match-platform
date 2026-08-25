@@ -38,7 +38,19 @@ const IMPLEMENTED_PAGES = new Set<string>([
   '/pages/about/index',
   '/pages/service/index',
   '/pages/club-home/index',
+  '/pages/event-detail/index',
+  '/pages/records/index',
+  '/pages/signup/index',
+  '/pages/venue/index',
 ]);
+
+/** 点赛事卡片跳详情。id 空就不跳，避免落到错误的一场 */
+export function navigateToEventDetail(id?: string): void {
+  if (!id) {
+    return;
+  }
+  navigateToPage(`/pages/event-detail/index?id=${id}`);
+}
 
 function pagePath(url: string): string {
   return url.split('?')[0];

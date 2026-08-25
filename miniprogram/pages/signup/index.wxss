@@ -1,0 +1,321 @@
+/**
+ * ============================================================================
+ * 报名页样式
+ * ============================================================================
+ * 视觉刷新草稿：选方式 369:359 / 369:559 / 369:770，报名详情 370:359 / 371:371。
+ * 设计稿 1px = 1rpx。选方式页底 #f7f9f7，详情页底 #fbf6f0。
+ *
+ * 去支付按钮是橙色 #e59b16，和详情页青柠 CTA 区分开：这边已经进入结算。
+ * 波浪 fill 要跟当前页底色一致，详情态换成米色。
+ */
+
+.signup {
+  min-height: 100vh;
+  background: #f7f9f7;
+}
+
+.signup--detail {
+  background: #fbf6f0;
+}
+
+.sub-header {
+  position: relative;
+  background: linear-gradient(180deg, #abe514 0%, #c7f038 62%, #f0fab8 100%);
+}
+
+.sub-header__inner--compact {
+  height: 150rpx;
+  overflow: hidden;
+}
+
+.sub-header__wave {
+  position: absolute;
+  left: 0;
+  top: 45rpx;
+  width: 100%;
+  height: 105rpx;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105.289' viewBox='0 0 750 105.289' preserveAspectRatio='none'%3E%3Cpath d='M0 51.3173C92 15.0413 166 78.7455 263 62.8194C343 49.5477 373 24.7739 448 49.5477C546 80.515 628 31.8521 750 0V105.289H0V51.3173Z' fill='%23F7F9F7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+
+.signup--detail .sub-header__wave {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105.289' viewBox='0 0 750 105.289' preserveAspectRatio='none'%3E%3Cpath d='M0 51.3173C92 15.0413 166 78.7455 263 62.8194C343 49.5477 373 24.7739 448 49.5477C546 80.515 628 31.8521 750 0V105.289H0V51.3173Z' fill='%23FBF6F0'/%3E%3C/svg%3E");
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 12rpx 28rpx 0;
+}
+
+.status {
+  flex-shrink: 0;
+  padding: 4rpx 12rpx;
+  border-radius: 18rpx;
+  background: #f65c94;
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.title {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #101214;
+}
+
+.sheet {
+  width: 694rpx;
+  margin: 20rpx 28rpx 0;
+  padding: 16rpx 28rpx 28rpx;
+  border-radius: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 6rpx 12rpx rgba(38, 56, 20, 0.08);
+}
+
+.sheet__handle {
+  width: 64rpx;
+  height: 6rpx;
+  margin: 0 auto 16rpx;
+  border-radius: 3rpx;
+  background: #d2d6c8;
+}
+
+.sheet__title {
+  font-size: 32rpx;
+  font-weight: 700;
+  text-align: center;
+  color: #101214;
+}
+
+.sheet__desc {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  line-height: 32rpx;
+  color: #777b80;
+}
+
+.modes {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 24rpx;
+}
+
+.mode {
+  flex: 1;
+  padding: 22rpx 0;
+  border: 2rpx solid #e8e8e5;
+  border-radius: 20rpx;
+  background: #f7faf0;
+  font-size: 28rpx;
+  font-weight: 700;
+  text-align: center;
+  color: #777b80;
+}
+
+.mode.is-on {
+  border-color: #83d414;
+  background: #f3fbe0;
+  color: #101214;
+}
+
+.who {
+  margin-top: 24rpx;
+}
+
+.who--in {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 16rpx;
+  padding: 8rpx 0 16rpx;
+}
+
+.who__row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 16rpx 0;
+  border-top: 1rpx solid #e5edd6;
+}
+
+.who__av {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.who__av--sm {
+  width: 56rpx;
+  height: 56rpx;
+}
+
+.who__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.who__name {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #1c1f21;
+}
+
+.who__meta {
+  margin-top: 4rpx;
+  font-size: 20rpx;
+  color: #738078;
+}
+
+.who__clear {
+  flex-shrink: 0;
+  font-size: 20rpx;
+  color: #467010;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32rpx 12rpx 8rpx;
+}
+
+.empty__plus {
+  width: 88rpx;
+  height: 88rpx;
+  border: 3rpx dashed #83d414;
+  border-radius: 50%;
+  font-size: 40rpx;
+  font-weight: 700;
+  line-height: 82rpx;
+  text-align: center;
+  color: #83d414;
+}
+
+.empty__title {
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #101214;
+}
+
+.empty__desc {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  line-height: 32rpx;
+  text-align: center;
+  color: #777b80;
+}
+
+.empty__link {
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  color: #467010;
+}
+
+.empty__btn {
+  margin-top: 16rpx;
+  padding: 14rpx 36rpx;
+  border-radius: 28rpx;
+  background: #83d414;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: #101214;
+}
+
+.card {
+  width: 694rpx;
+  margin: 16rpx 28rpx 0;
+  padding: 20rpx 28rpx 8rpx;
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-shadow: 0 8rpx 24rpx rgba(31, 20, 10, 0.08);
+}
+
+.card__h {
+  margin-bottom: 8rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #1c1f21;
+}
+
+.kv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22rpx 0;
+}
+
+.kv__val {
+  flex: 1;
+  min-width: 0;
+  padding-right: 16rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #1a2744;
+}
+
+.kv__val--fee {
+  font-size: 28rpx;
+}
+
+.kv__key {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  color: #9aa0a6;
+}
+
+.pay-tip {
+  margin: 20rpx 28rpx 0;
+  font-size: 20rpx;
+  text-align: center;
+  color: #9aa0a6;
+}
+
+.cta-spacer {
+  height: calc(160rpx + env(safe-area-inset-bottom));
+}
+
+.cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: 16rpx 28rpx calc(16rpx + env(safe-area-inset-bottom));
+  background: #ffffff;
+}
+
+.cta--warm {
+  background: #fbf6f0;
+}
+
+.cta__btn {
+  padding: 22rpx 0;
+  border-radius: 20rpx;
+  background: #83d414;
+  font-size: 28rpx;
+  font-weight: 700;
+  text-align: center;
+  color: #101214;
+}
+
+.cta__btn.is-mute {
+  background: #d6d8d2;
+}
+
+.cta__btn--gold {
+  background: #e59b16;
+  color: #ffffff;
+}
+
+.cta__agree {
+  margin-top: 8rpx;
+  font-size: 18rpx;
+  text-align: center;
+  color: #738078;
+}

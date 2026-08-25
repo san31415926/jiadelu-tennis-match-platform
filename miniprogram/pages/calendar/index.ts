@@ -6,11 +6,14 @@ import {
   toDateKey,
 } from '../../utils/calendar';
 import type { CalendarCell } from '../../utils/calendar';
+import { venueIdByEventId } from '../../mock/venue';
+import { navigateToEventDetail, navigateToPage } from '../../utils/navigate';
 
 /**
  * ============================================================================
  * 赛事日历页逻辑
  * ============================================================================
+ * V5 草稿 228:954 与现页（原节点 17:92）几乎一样，未换皮。
  *
  * 【核心是一个 render 方法】
  * 翻月、点日期、点今日，最终都归结为"用新的年月和选中日期重画一次"，
@@ -97,11 +100,15 @@ Page({
     this.render(year, month, key);
   },
 
-  onEventTap() {
-    wx.showToast({ title: '赛事详情页待设计', icon: 'none' });
+  onEventTap(event: WechatMiniprogram.CustomEvent<{ id?: string }>) {
+    navigateToEventDetail(event.detail.id);
   },
 
   onSignupTap() {
     wx.showToast({ title: '报名流程待接入云开发', icon: 'none' });
+  },
+
+  onVenueTap(event: WechatMiniprogram.CustomEvent<{ id?: string }>) {
+    navigateToPage(`/pages/venue/index?id=${venueIdByEventId(event.detail.id)}`);
   },
 });

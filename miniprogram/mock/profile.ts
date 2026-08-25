@@ -1,163 +1,125 @@
 /**
  * ============================================================================
- * 我的页数据 —— 球员卡与功能菜单
+ * 我的页数据 —— 视觉刷新草稿 V5（Figma 302:103 / 401:359）
  * ============================================================================
  *
  * 【两套数据的作用】
- * MOCK_PROFILE  = 已登录的示例资料，用来预览设计稿的完整效果
- * GUEST_PROFILE = 未登录/未评级状态，所有数值是占位符
- *
- * 设计稿只画了已登录的样子，但功能清单要求「未评级显示 --」「默认昵称微信用户」，
- * 所以补了 GUEST_PROFILE。两套数据字段完全一样，页面布局不用改，只是换数据。
+ * MOCK_PROFILE  = 已登录的示例资料
+ * GUEST_PROFILE = 未登录占位，数值是 --
+ * 页面布局只有一套，靠换数据切换。
  *
  * 【常见改动】
- * 想改菜单项名字/顺序 → 改 PROFILE_MENU，数组顺序就是显示顺序
- * 想加菜单项           → 往 PROFILE_MENU 里加，列表会自动变长（不是固定高度）
- * 想改示例资料         → 改 MOCK_PROFILE
- * 想改未登录时的文案   → 改 GUEST_PROFILE
- * 想改分享卡片标题     → 改 pages/profile/index.ts 的 onShareAppMessage
+ * 想改示例资料     → 改 MOCK_PROFILE
+ * 想改未登录文案   → 改 GUEST_PROFILE
+ * 想改封面候选图   → 改 PROFILE_COVERS
+ * 想改背景色色板   → 改 PROFILE_THEMES（页面用 theme 字段换 CSS class）
+ * 想改战力六个分   → 改 MOCK_PROFILE.radar
  */
-
-/** 我的页功能菜单的一项 */
-export interface ProfileMenuItem {
-  key: string;
-  /** 菜单文字，36rpx */
-  label: string;
-  /** 左侧的 3D 图标，显示为 88×88 */
-  icon: string;
-  /**
-   * 点击跳转的页面。分享项没有页面，可以不填。
-   * 这些二级页点了会跳转；参赛记录还没做，见 utils/navigate.ts。
-   */
-  path?: string;
-  /**
-   * 点击行为。不填就按 path 跳转。
-   *
-   * share   = 调起微信「转发给好友」。必须用 wxml 里 button 的 open-type="share"。
-   * contact = 打开微信小程序客服会话。必须用 button 的 open-type="contact"，
-   *           后台还要在公众平台开通客服。现在还没接，点了仍走 path 弹提示。
-   */
-  action?: 'share' | 'contact';
-  /**
-   * 是否需要水平翻转图标。
-   *
-   * 设计稿里「商务合作」的握手图标和「关于我们」的头像图标做了水平镜像
-   * （Figma 里叫 scale-y -100 + rotate 180，效果等于左右翻转）。
-   * 导出的图片是翻转前的原图，所以要靠 CSS 的 transform: scaleX(-1) 补回来。
-   *
-   * 想看翻转前后的区别，把这个字段改成 false 对比一下就知道了。
-   */
-  mirrored?: boolean;
+export interface ProfileRadar {
+  overall: number;
+  axes: { label: string; value: number }[];
 }
 
-/** 球员卡上的各项数值。注意都是字符串，因为要能显示 -- 这种占位符 */
 export interface ProfileSummary {
-  /** 昵称。设计只给了 99rpx 宽（示例昵称是一个字「帆」），过长会截断成省略号 */
   nickname: string;
-  /**
-   * 头像图路径。我的页金框组件用它。
-   * 现在是示例图；接微信登录后改成用户 avatarUrl，金圈不用换。
-   */
   avatar: string;
-  /** 评分胶囊里的文字，如「评分 5.0」或「未评级」 */
-  rating: string;
-  /** 等级胶囊，如「Lv.18」或「Lv.--」 */
-  level: string;
-  /** 身价，如「¥12,800」或「--」 */
+  uid: string;
+  bio: string;
+  cover: string;
+  theme: string;
   marketValue: string;
-  /** 身价涨幅，如「↑ 6.7%」。留空字符串则整个涨幅文字不显示 */
-  marketValueTrend: string;
-  /** 积分 */
   points: string;
-  /** 进度条上方的提示，如「距 Lv.19 还差 320 XP」 */
-  xpHint: string;
-  /**
-   * 经验进度百分比，0~100。
-   *
-   * 设计稿里进度条填充 377rpx、总长 690rpx，换算出来约 54.6%。
-   * 页面会用它算出填充宽度，并把那个小网球放在填充的末端。
-   * 改成 0 → 进度条全空，小球贴在最左边
-   * 改成 100 → 进度条全满，小球到最右边
-   */
-  xpPercent: number;
+  wins: string;
+  hand: string;
+  profileComplete: string;
+  clubRank: string;
+  clubMembers: string;
+  recordSummary: string;
+  lastEvent: string;
+  radar: ProfileRadar;
 }
 
-/**
- * 未登录 / 未评级状态。设计稿只画了已登录态，这里沿用同一套布局，
- * 只把数值换成占位符，符合功能清单「未评级显示 --」「默认昵称微信用户」的要求。
- */
+export interface ProfileTheme {
+  key: string;
+  label: string;
+  /** 色点本身的颜色 */
+  swatch: string;
+}
+
+export interface ProfileCover {
+  id: string;
+  image: string;
+}
+
+export const PROFILE_THEMES: ProfileTheme[] = [
+  { key: 'mint', label: '薄荷', swatch: '#66c4b4' },
+  { key: 'lime', label: '青柠', swatch: '#83d414' },
+  { key: 'gold', label: '暖金', swatch: '#e2b15a' },
+  { key: 'sky', label: '天空', swatch: '#6eb4e0' },
+  { key: 'dusk', label: '暮粉', swatch: '#e08aaa' },
+  { key: 'photo', label: '原图', swatch: '' },
+];
+
+export const PROFILE_COVERS: ProfileCover[] = [
+  { id: 'cover-1', image: '/assets/images/banners/banner-01-club-union.jpg' },
+  { id: 'cover-2', image: '/assets/images/banners/banner-04-super-cup.jpg' },
+  { id: 'cover-3', image: '/assets/images/banners/banner-05-night-court.jpg' },
+];
+
 export const GUEST_PROFILE: ProfileSummary = {
-  nickname: '微信用户',
+  nickname: '登录',
   avatar: '/assets/images/ranking/avatar-demo.jpg',
-  rating: '未评级',
-  level: 'Lv.--',
+  uid: 'UID --',
+  bio: '登录后编辑介绍',
+  cover: PROFILE_COVERS[0].image,
+  theme: 'mint',
   marketValue: '--',
-  marketValueTrend: '',
   points: '--',
-  xpHint: '完成首场比赛后开启等级',
-  xpPercent: 0,
+  wins: '--',
+  hand: '--',
+  profileComplete: '--',
+  clubRank: '--',
+  clubMembers: '--',
+  recordSummary: '登录后查看参赛记录',
+  lastEvent: '',
+  radar: {
+    overall: 0,
+    axes: [
+      { label: '发球', value: 0 },
+      { label: '正手', value: 0 },
+      { label: '反手', value: 0 },
+      { label: '网前', value: 0 },
+      { label: '步伐', value: 0 },
+      { label: '体能', value: 0 },
+    ],
+  },
 };
 
 export const MOCK_PROFILE: ProfileSummary = {
   nickname: '帆',
   avatar: '/assets/images/ranking/avatar-demo.jpg',
-  rating: '评分 5.0',
-  level: 'Lv.18',
+  uid: 'UID 10008652',
+  bio: '',
+  cover: PROFILE_COVERS[0].image,
+  theme: 'mint',
   marketValue: '¥12,800',
-  marketValueTrend: '↑ 6.7%',
   points: '1650',
-  xpHint: '距 Lv.19 还差 320 XP',
-  xpPercent: 54.6,
+  wins: '8',
+  hand: '右手',
+  profileComplete: '80%',
+  clubRank: '第5',
+  clubMembers: '26人',
+  recordSummary: '12 场比赛   8 胜  4 负',
+  lastEvent: '7.0混双评级赛',
+  radar: {
+    overall: 73,
+    axes: [
+      { label: '发球', value: 78 },
+      { label: '正手', value: 86 },
+      { label: '反手', value: 64 },
+      { label: '网前', value: 58 },
+      { label: '步伐', value: 80 },
+      { label: '体能', value: 72 },
+    ],
+  },
 };
-
-export const PROFILE_MENU: ProfileMenuItem[] = [
-  {
-    key: 'profile',
-    label: '我的资料',
-    icon: '/assets/icons/profile/profile-info.png',
-    path: '/pages/profile-edit/index',
-  },
-  {
-    key: 'business',
-    label: '商务合作',
-    icon: '/assets/icons/profile/business-handshake.png',
-    path: '/pages/business/index',
-    mirrored: true,
-  },
-  {
-    key: 'about',
-    label: '关于我们',
-    icon: '/assets/icons/profile/about-us.png',
-    path: '/pages/about/index',
-    mirrored: true,
-  },
-  {
-    key: 'club',
-    label: '我的俱乐部',
-    icon: '/assets/icons/profile/my-club-flag.png',
-    path: '/pages/clubs/index',
-  },
-  {
-    key: 'records',
-    label: '参赛记录',
-    icon: '/assets/icons/profile/records-trophy.png',
-    path: '/pages/records/index',
-  },
-  {
-    key: 'share',
-    label: '分享好友',
-    icon: '/assets/icons/profile/share-friends.png',
-    action: 'share',
-  },
-  {
-    key: 'service',
-    label: '联系客服',
-    icon: '/assets/icons/profile/customer-service.png',
-    path: '/pages/service/index',
-    /**
-     * 目标效果：点这一行直接打开微信客服对话框，不必再进二级页。
-     * 接上时把 action 改成 'contact'，并在 pages/profile/index.wxml
-     * 给这一项加 button open-type="contact"（写法同分享好友）。
-     */
-  },
-];

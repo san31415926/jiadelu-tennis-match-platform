@@ -1,79 +1,360 @@
 /**
  * ============================================================================
- * 超级杯页样式
+ * 超级杯页样式 —— 视觉刷新草稿 V5
  * ============================================================================
- * 数值来自 Figma node 1:307 及其子节点。
+ * 数值来自 Figma node 230:158（信息架构默认态）。设计稿 1px = 1rpx。
  *
- * 【和首页宫格的关键区别】
- * 首页七宫格的图标是逐个手调位置尺寸的（每项带 iconStyle），
- * 超级杯八宫格在设计里是规整的两行四列，图标统一 110×105，
- * 所以这里用 flex 居中统一控制，不需要逐项坐标——写法比首页简单得多。
+ * 【这一页的块】
+ *   1. 顶栏 —— 绿渐变 + 居中字标「超级杯」。稿上汉堡 hidden，不要做侧栏
+ *   2. 头图 321rpx —— 图 + 叠字 + 指示点 + 底部白浪
+ *   3. 内容白底区 —— 两组 Cover Flow、俱乐部中心按钮、胶囊筛选、赛事卡
  *
- * 结构是：容器（纵向）→ 两行（横向）→ 每格（纵向：图标在上、文字在下）
- *
- * 【想改成一行三个（共两行剩两个）】
- * 改 pages/super-cup/index.ts 里 toRows(SUPER_CUP_FEATURES) 的第二个参数
- * （默认 4），页面会自动重排。但格子宽度 158rpx 也要相应调大，
- * 否则一行会留很多空白。
+ * Cover Flow 中间卡 280×248、两侧 168×176。swiper 的 previous/next-margin
+ * 各 235，让当前项正好 280 宽居中；两侧卡靠 prev/next 把 168 卡贴向中间。
  */
 
-/* 宫格容器渐变与首页不同：自上而下 #fcfff8 -> #f0ffd3 */
-.feature-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 10rpx;
-  height: var(--grid-height);
-  padding: 12rpx 0;
-  overflow: hidden;
-  background: linear-gradient(180deg, #fcfff8 0%, #f0ffd3 100%);
+.super-cup {
+  min-height: 100vh;
+  background: #ffffff;
 }
 
-.feature-grid__row {
-  display: flex;
-  gap: 16rpx;
-  height: 158rpx;
-  padding: 0 32rpx 0 38rpx;
-  overflow: hidden;
+/**
+ * 顶栏绿渐变。稿上整条 176（含假状态栏），字标高 72 贴在底边。
+ * 真机状态栏用 padding-top 接上，导航行只留字标那 72。
+ */
+.topbar {
+  background: var(--header-gradient);
 }
 
-.feature {
+.topbar__row {
+  position: relative;
+  height: 72rpx;
+}
+
+.wordmark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 72rpx;
   display: flex;
-  flex-direction: column;
-  gap: 4rpx;
   align-items: center;
   justify-content: center;
-  width: 158rpx;
-  height: 154rpx;
+  font-size: 40rpx;
+  font-weight: 900;
+  letter-spacing: 1.6rpx;
+  color: #1a1f16;
+  text-shadow: 0 3rpx 4rpx rgba(13, 20, 5, 0.16);
+}
+
+/* ---------- 头图 ---------- */
+
+.hero {
+  position: relative;
+  width: 100%;
+  height: 321rpx;
   overflow: hidden;
+  background: var(--header-gradient);
 }
 
-.feature--pressed {
-  opacity: 0.75;
+.hero__swiper,
+.hero__slide {
+  width: 100%;
+  height: 321rpx;
 }
 
-.feature__icon {
-  flex-shrink: 0;
-  width: 110rpx;
-  height: 105rpx;
+.hero__image {
+  width: 100%;
+  height: 321rpx;
 }
 
-.feature__label {
-  font-size: 20rpx;
+.hero__scrim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(13, 18, 13, 0.42) 0%,
+    rgba(13, 18, 13, 0.12) 52%,
+    rgba(13, 18, 13, 0.05) 100%
+  );
+}
+
+.hero__copy {
+  position: absolute;
+  left: 48rpx;
+  right: 48rpx;
+  top: 36rpx;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero__eyebrow {
+  font-size: 13rpx;
   font-weight: 600;
+  line-height: 18rpx;
+  color: #d4f34a;
+}
+
+/**
+ * 小标签下方那根 28×3 的青绿短条（node 230:193）。
+ * 圆角 1.5，颜色跟 eyebrow 同一支 #d4f34a。
+ */
+.hero__accent {
+  width: 28rpx;
+  height: 3rpx;
+  margin-top: 8rpx;
+  border-radius: 1.5rpx;
+  background: #d4f34a;
+}
+
+.hero__title {
+  margin-top: 10rpx;
+  width: 408rpx;
+  font-size: 36rpx;
+  font-weight: 700;
+  line-height: 46rpx;
+  color: #ffffff;
+}
+
+.hero__sub {
+  margin-top: 8rpx;
+  width: 330rpx;
+  font-size: 19rpx;
+  line-height: 26rpx;
+  color: rgba(244, 247, 234, 0.9);
+}
+
+.hero__dots {
+  position: absolute;
+  left: 55rpx;
+  top: 192rpx;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  pointer-events: none;
+}
+
+.hero__dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.hero__dot--on {
+  width: 18rpx;
+  border-radius: 4rpx;
+  background: #d4f34a;
+}
+
+/**
+ * 头图底部白浪，接到内容区。路径仿首页轮播下缘，fill 必须和 .sheet 起点色
+ * #fcfff8 一致，否则接头会有一条色差。
+ */
+.hero__wave {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 100%;
+  height: 72rpx;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='72' viewBox='0 0 750 72' preserveAspectRatio='none'%3E%3Cpath d='M0 28C120 62 230 62 350 22C500 -18 600 48 750 16V72H0V28Z' fill='%23FCFFF8'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+
+/**
+ * 内容区。稿上从 #fcfff8 过渡到白，左右 32，块与块 gap 24。
+ */
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  padding: 24rpx 32rpx 8rpx;
+  background: linear-gradient(180deg, #fcfff8 0%, #ffffff 100%);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section__title {
+  font-size: 30rpx;
+  font-weight: 900;
+  color: #1f211c;
+}
+
+.section__more {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  font-size: 22rpx;
+  color: #73786b;
+}
+
+.section__chevron {
+  font-size: 24rpx;
+}
+
+/* ---------- Cover Flow ---------- */
+
+.cover-flow {
+  width: 100%;
+  height: 248rpx;
+}
+
+.cover-slide {
+  display: flex;
+  align-items: center;
+  height: 248rpx;
+}
+
+/**
+ * 当前项居中铺满 280 槽。
+ * 上一张靠右贴着中间卡（槽宽 280，卡宽 168，右侧留 12 的 gap）。
+ * 下一张靠左对称。更远的 side 卡也居中，滑过去时不会乱跳。
+ */
+.cover-slide--current {
+  justify-content: center;
+}
+
+.cover-slide--prev {
+  justify-content: flex-end;
+  padding-right: 12rpx;
+}
+
+.cover-slide--next {
+  justify-content: flex-start;
+  padding-left: 12rpx;
+}
+
+.cover-slide--side {
+  justify-content: center;
+}
+
+.cover-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  width: 168rpx;
+  height: 176rpx;
+  padding: 14rpx 8rpx 12rpx;
+  border: 3rpx solid transparent;
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-shadow: 0 6rpx 8rpx rgba(0, 0, 0, 0.1);
+  opacity: 0.7;
+}
+
+.cover-card.is-current {
+  gap: 10rpx;
+  width: 280rpx;
+  height: 248rpx;
+  padding: 22rpx 8rpx 18rpx;
+  border-color: #83d414;
+  opacity: 1;
+}
+
+.cover-card--pressed {
+  opacity: 0.85;
+}
+
+.cover-card__icon {
+  width: 92rpx;
+  height: 88rpx;
+}
+
+.cover-card.is-current .cover-card__icon {
+  width: 156rpx;
+  height: 148rpx;
+}
+
+.cover-card__label {
+  width: 100%;
+  font-size: 18rpx;
+  font-weight: 500;
+  line-height: 24rpx;
   text-align: center;
-  color: var(--text-grid-label);
+  color: #1f211c;
+}
+
+.cover-card.is-current .cover-card__label {
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 32rpx;
+}
+
+.cover-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  height: 10rpx;
+}
+
+.cover-dots__item {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: #d9d9d4;
+}
+
+.cover-dots__item.is-on {
+  width: 18rpx;
+  border-radius: 4rpx;
+  background: #83d414;
+}
+
+/**
+ * 进入俱乐部中心。稿上整条 96 高、圆角 20、青绿底黑字。
+ */
+.club-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  height: 96rpx;
+  border-radius: 20rpx;
+  background: #83d414;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #1a1f16;
+}
+
+.club-cta--pressed {
+  opacity: 0.85;
+}
+
+.club-cta__arrow {
+  font-size: 30rpx;
 }
 
 .feed {
   display: flex;
   flex-direction: column;
-  padding: 16rpx 26rpx 24rpx;
-  border-radius: var(--radius-feed);
-  background: var(--feed-gradient);
+  gap: 16rpx;
 }
 
-.feed__card + .feed__card {
-  margin-top: 16rpx;
+.feed__title {
+  font-size: 26rpx;
+  font-weight: 900;
+  color: #1f211c;
 }
 
 .feed__empty {

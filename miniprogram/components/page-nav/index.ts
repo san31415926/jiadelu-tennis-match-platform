@@ -16,15 +16,19 @@ import { headerMetrics } from '../../utils/header';
  * 【怎么用】
  *   <page-nav title="相册" />
  *   <page-nav title="{{page.title}}" variant="gold" />
+ *   <page-nav title="参赛记录" variant="mint" />
+ *   <page-nav title="我的资料" variant="mint" occupy="{{true}}" />
  *   <page-nav title="积分兑换" variant="plain" occupy="{{true}}" />
  *
  * variant：
  *   默认     青柠绿，盖在各页绿头上，滚过内容区时字仍然清楚
  *   gold     关于我们那种金头
+ *   mint     参赛记录 / 我的资料那种薄荷头
  *   plain    白底，积分兑换 / 海报页
  *
- * occupy 为 true 时，组件会占掉自己那一截高度（白底页没有装饰头垫在下面，
- * 不占位的话黄条和海报会被挡住）。绿头/金头页不要开，否则会把装饰顶下去。
+ * occupy 为 true 时，组件会占掉自己那一截高度（白底页、我的资料 V5 薄荷底
+ * 没有装饰头垫在下面，不占位的话标题会盖住内容）。绿头/金头页不要开，
+ * 否则会把装饰顶下去。
  */
 Component({
   options: {

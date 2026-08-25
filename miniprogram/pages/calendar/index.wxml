@@ -57,6 +57,7 @@
       event="{{item}}"
       bind:cardtap="onEventTap"
       bind:actiontap="onSignupTap"
+      bind:venuetap="onVenueTap"
     />
     <view class="feed__empty" wx:if="{{events.length === 0}}">这一天没有安排赛事</view>
   </view>

@@ -1,0 +1,115 @@
+<view class="signup {{step === 'detail' ? 'signup--detail' : ''}}">
+  <page-nav title="{{step === 'mode' ? '选择参赛方式' : '报名详情'}}" />
+  <view class="sub-header" style="padding-top:{{statusBarHeight}}px">
+    <view class="sub-header__inner sub-header__inner--compact">
+      <view class="sub-header__wave"></view>
+    </view>
+  </view>
+
+  <view class="title-row">
+    <view class="status">{{event.status}}</view>
+    <view class="title">{{event.grade}}{{event.title}}</view>
+  </view>
+
+  <block wx:if="{{step === 'mode'}}">
+    <view class="sheet">
+      <view class="sheet__handle"></view>
+      <view class="sheet__title">选择参赛方式</view>
+      <view class="sheet__desc">单人报名后由赛事组分配搭档；组队报名需先有搭档，不是约球匹配。</view>
+      <view class="modes">
+        <view class="mode {{mode === '单人' ? 'is-on' : ''}}" data-mode="单人" bindtap="onPickMode">单人</view>
+        <view class="mode {{mode === '组队' ? 'is-on' : ''}}" data-mode="组队" bindtap="onPickMode">组队</view>
+      </view>
+
+      <view class="who" wx:if="{{mode === '单人' || hasTeam}}">
+        <view class="who__row">
+          <image class="who__av" src="{{self.avatar}}" mode="aspectFill" />
+          <view class="who__body">
+            <view class="who__name">{{self.name}}</view>
+            <view class="who__meta">UID {{self.uid}}  ·  {{self.hand}}</view>
+          </view>
+        </view>
+        <view class="who__row" wx:if="{{mode === '组队' && hasTeam}}">
+          <image class="who__av" src="{{partner.avatar}}" mode="aspectFill" />
+          <view class="who__body">
+            <view class="who__name">{{partner.name}}</view>
+            <view class="who__meta">UID {{partner.uid}}  ·  {{partner.hand}}</view>
+          </view>
+          <view class="who__clear" bindtap="onClearTeam">暂无队伍</view>
+        </view>
+      </view>
+
+      <view class="empty" wx:if="{{mode === '组队' && !hasTeam}}">
+        <view class="empty__plus">+</view>
+        <view class="empty__title">还没有队伍</view>
+        <view class="empty__desc">去赛事组队招募里发布或加入，组好后再回来报名</view>
+        <view class="empty__link" bindtap="onRestoreTeam">我已有搭档</view>
+        <view class="empty__btn" bindtap="onGoTeam">去组队招募</view>
+      </view>
+    </view>
+
+    <view class="cta-spacer"></view>
+    <view class="cta">
+      <view class="cta__btn {{mode === '组队' && !hasTeam ? 'is-mute' : ''}}" bindtap="onConfirmMode">确认报名</view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="card">
+      <view class="card__h">报名信息</view>
+      <view class="kv">
+        <view class="kv__val">{{mode}}</view>
+        <view class="kv__key">参赛方式</view>
+      </view>
+      <view class="kv">
+        <view class="kv__val">{{event.eventType}}</view>
+        <view class="kv__key">参赛项目</view>
+      </view>
+      <view class="who who--in">
+        <image class="who__av who__av--sm" src="{{self.avatar}}" mode="aspectFill" />
+        <view class="who__body">
+          <view class="who__name">{{self.name}}</view>
+          <view class="who__meta">UID {{self.uid}}  ·  {{self.hand}}</view>
+        </view>
+      </view>
+      <view class="who who--in" wx:if="{{mode === '组队'}}">
+        <image class="who__av who__av--sm" src="{{partner.avatar}}" mode="aspectFill" />
+        <view class="who__body">
+          <view class="who__name">{{partner.name}}</view>
+          <view class="who__meta">UID {{partner.uid}}  ·  {{partner.hand}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card__h">关于赛事</view>
+      <view class="kv">
+        <view class="kv__val">{{event.grade}}{{event.title}}</view>
+        <view class="kv__key">赛事</view>
+      </view>
+      <view class="kv">
+        <view class="kv__val">{{event.signupTime}}</view>
+        <view class="kv__key">报名时间</view>
+      </view>
+      <view class="kv">
+        <view class="kv__val">{{event.matchTime}}</view>
+        <view class="kv__key">比赛时间</view>
+      </view>
+      <view class="kv">
+        <view class="kv__val">{{event.venueName}}</view>
+        <view class="kv__key">比赛地点</view>
+      </view>
+      <view class="kv">
+        <view class="kv__val kv__val--fee">{{event.fee}}</view>
+        <view class="kv__key">报名费用</view>
+      </view>
+    </view>
+    <view class="pay-tip">支付完成后即完成报名，可在「我的报名」查看</view>
+
+    <view class="cta-spacer"></view>
+    <view class="cta cta--warm">
+      <view class="cta__btn cta__btn--gold" bindtap="onPay">{{payLabel}}</view>
+      <view class="cta__agree">报名即表示同意《赛事报名规则》</view>
+    </view>
+  </block>
+</view>

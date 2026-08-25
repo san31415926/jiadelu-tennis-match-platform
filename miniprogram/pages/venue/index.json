@@ -1,0 +1,7 @@
+{
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "page-nav": "../../components/page-nav/index",
+    "event-card": "../../components/event-card/index"
+  }
+}

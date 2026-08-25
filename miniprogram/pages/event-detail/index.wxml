@@ -1,0 +1,362 @@
+<view class="detail">
+  <page-nav title="{{displayTitle}}" />
+  <view class="sub-header" style="padding-top:{{statusBarHeight}}px">
+    <view class="sub-header__inner sub-header__inner--compact">
+      <view class="sub-header__wave"></view>
+    </view>
+  </view>
+
+  <view class="title-row">
+    <view class="status">{{event.status}}</view>
+    <view class="title">{{event.grade}}{{event.title}}</view>
+  </view>
+
+  <view class="nav-card">
+    <view
+      class="nav-cell {{activeTab === item.key ? 'nav-cell--on' : ''}}"
+      wx:for="{{nav}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="onNavTap"
+    >
+      <image class="nav-cell__icon" src="{{item.icon}}" mode="aspectFit" />
+      <view class="nav-cell__label">{{item.label}}</view>
+    </view>
+  </view>
+
+  <block wx:if="{{activeTab === 'home'}}">
+    <view class="card">
+      <view class="series">{{event.series}}</view>
+    </view>
+    <view class="card">
+      <view class="card__heading">赛事资讯</view>
+      <view class="news" bindtap="onNewsTap">
+        <view class="news__title">{{event.news.title}}</view>
+        <view class="news__date">{{event.news.date}}</view>
+      </view>
+    </view>
+    <view class="card">
+      <view class="card__heading">赛事概览</view>
+      <view class="row">
+        <view class="row__label">报名时间</view>
+        <view class="row__value">{{event.signupTime}}</view>
+      </view>
+      <view class="row">
+        <view class="row__label">比赛时间</view>
+        <view class="row__value">{{event.matchTime}}</view>
+      </view>
+      <view class="venue" bindtap="onVenueTap" hover-class="venue--pressed" hover-stay-time="60">
+        <image class="venue__thumb" src="{{event.venueThumb}}" mode="aspectFill" />
+        <view class="venue__name">{{event.venueName}}</view>
+        <view class="venue__arrow">›</view>
+      </view>
+      <view class="row">
+        <view class="row__label">赛事类型</view>
+        <view class="row__value">{{event.eventType}}</view>
+      </view>
+      <view class="row">
+        <view class="row__label">报名费用</view>
+        <view class="row__value">{{event.fee}}</view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:if="{{activeTab === 'info'}}">
+    <view class="card">
+      <view class="card__heading">赛事资讯</view>
+      <view class="news" bindtap="onNewsTap">
+        <view class="news__title">{{event.news.title}}</view>
+        <view class="news__date">{{event.news.date}}</view>
+      </view>
+    </view>
+    <view class="card">
+      <view class="card__heading card__heading--lg">赛事奖励</view>
+      <view class="reward__lead">{{event.rewards.headline}}</view>
+      <view class="reward__p">{{event.rewards.champion}}</view>
+      <view class="reward__p">{{event.rewards.runnerUp}}</view>
+      <view class="reward__gift">
+        <text>🎁</text>
+        <text class="reward__gift-text">{{event.rewards.gift}}</text>
+      </view>
+      <block wx:if="{{rewardsOpen}}">
+        <view class="reward__rule">
+          <view class="warn">!</view>
+          <view class="reward__p reward__p--inline">{{event.rewards.rules[0]}}</view>
+        </view>
+        <block wx:for="{{event.rewards.rules}}" wx:key="*this">
+          <view class="reward__p" wx:if="{{index > 0}}">{{item}}</view>
+        </block>
+      </block>
+      <view class="fold" bindtap="onToggleRewards">{{rewardsOpen ? '收起' : '展开'}}</view>
+    </view>
+    <view class="card card--tight">
+      <view class="files__head" bindtap="onToggleFiles">
+        <view class="card__heading card__heading--lg">赛事文件</view>
+        <view class="files__caret">{{filesOpen ? '▲' : '▼'}}</view>
+      </view>
+      <block wx:if="{{filesOpen}}">
+        <view
+          class="file"
+          wx:for="{{event.files}}"
+          wx:key="name"
+          bindtap="onFileTap"
+        >
+          <view class="file__icon">{{item.kind === 'doc' ? '📄' : '📎'}}</view>
+          <view class="file__name">{{item.name}}</view>
+        </view>
+      </block>
+    </view>
+  </block>
+
+  <block wx:if="{{activeTab === 'signup'}}">
+    <view class="card card--signup">
+      <view class="signup-head">
+        <view class="signup-head__left">
+          <text class="signup-head__title">报名球员</text>
+          <text class="signup-head__count">{{event.signupPreview.signed}}</text>
+          <text class="signup-head__lock">🔒 {{event.signupPreview.waitlist}}</text>
+        </view>
+        <view class="signup-head__due">
+          <text>报名截止</text>
+          <text class="signup-head__pink">{{event.signupPreview.deadline}}</text>
+        </view>
+      </view>
+      <view class="signup-sub">
+        <view class="signup-sub__hint">{{event.signupPreview.slotHint}}</view>
+        <view class="signup-sub__max">{{event.signupPreview.maxHint}}</view>
+      </view>
+      <view class="signup-link">查看按积分报名</view>
+    </view>
+    <view class="notice">{{event.signupPreview.notice}}</view>
+    <view class="pair" wx:for="{{event.signupPreview.pairs}}" wx:for-index="pairIndex" wx:key="index">
+      <view class="player" wx:for="{{item.players}}" wx:for-item="player" wx:for-index="pIndex" wx:key="name">
+        <view class="player__no">{{event.signupPreview.format === 'doubles' ? pairIndex * 2 + pIndex + 1 : pairIndex + 1}}</view>
+        <view class="player__avatar">
+          <image class="player__photo" src="{{player.avatar}}" mode="aspectFill" />
+          <view class="sex {{player.gender === 'female' ? 'sex--f' : 'sex--m'}}">{{player.gender === 'female' ? '♀' : '♂'}}</view>
+        </view>
+        <view class="player__body">
+          <view class="player__name">{{player.name}}</view>
+          <view class="player__rating">{{player.rating}}</view>
+        </view>
+        <view class="player__meta">
+          <view class="player__time">{{player.time}}</view>
+          <view class="player__tag" wx:if="{{player.groupTag}}">{{player.groupTag}}</view>
+          <view class="player__pts">{{player.points}}</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:if="{{activeTab === 'team'}}">
+    <view class="empty" wx:if="{{event.teamRecruits.length === 0}}">
+      <view class="empty__cluster">
+        <gold-avatar class="empty__av empty__av--1" src="{{emptyAvatars[0]}}" size="small" />
+        <gold-avatar class="empty__av empty__av--2" src="{{emptyAvatars[1]}}" size="small" />
+        <view class="empty__plus">+</view>
+      </view>
+      <view class="empty__title">组队安排中...</view>
+      <view class="empty__desc">暂时还没有球员发布招募，有搭档需求时会出现在这里</view>
+    </view>
+    <block wx:else>
+      <view class="team-head">
+        <view class="team-head__title">正在招募队友</view>
+        <view class="team-head__num">{{event.teamRecruits.length}}</view>
+        <view class="team-head__sort">按积分排序</view>
+      </view>
+      <view class="recruit" wx:for="{{event.teamRecruits}}" wx:key="id">
+        <gold-avatar src="{{item.avatar}}" size="small" />
+        <view class="recruit__body">
+          <view class="recruit__name-row">
+            <view class="recruit__name">{{item.name}}</view>
+            <view class="recruit__cap">队长</view>
+          </view>
+          <view class="recruit__need">{{item.need}}</view>
+        </view>
+        <view class="recruit__side">
+          <view class="recruit__pts">{{item.points}}</view>
+          <view class="recruit__join" data-name="{{item.name}}" bindtap="onJoinTeam">申请加入</view>
+        </view>
+      </view>
+    </block>
+  </block>
+
+  <block wx:if="{{activeTab === 'photos'}}">
+    <view class="feat-mark">精选</view>
+    <view class="feat-grid">
+      <image
+        class="feat-grid__img"
+        wx:for="{{event.featuredPhotos}}"
+        wx:for-index="featIndex"
+        wx:key="featIndex"
+        src="{{item}}"
+        mode="aspectFill"
+        data-src="{{item}}"
+        bindtap="onPreviewPhoto"
+      />
+    </view>
+    <view class="album-head">
+      <view class="album-head__title">全部照片</view>
+      <view class="album-head__count">{{event.photoCount}}</view>
+    </view>
+    <view class="album-grid">
+      <image
+        class="album-grid__img"
+        wx:for="{{event.photos}}"
+        wx:for-index="photoIndex"
+        wx:key="photoIndex"
+        src="{{item}}"
+        mode="aspectFill"
+        data-src="{{item}}"
+        bindtap="onPreviewPhoto"
+      />
+    </view>
+  </block>
+
+  <block wx:if="{{activeTab === 'bracket'}}">
+    <scroll-view class="chips" scroll-x show-scrollbar="{{false}}">
+      <view
+        class="chip {{bracketTab === item ? 'is-on' : ''}}"
+        wx:for="{{event.bracketTabs}}"
+        wx:key="*this"
+        data-name="{{item}}"
+        bindtap="onBracketTab"
+      >{{item}}</view>
+    </scroll-view>
+    <view class="notice">{{event.bracketHint}}</view>
+    <view class="group" wx:for="{{event.bracketGroups}}" wx:key="name">
+      <view class="group__head">
+        <view class="group__name">{{item.name}}</view>
+        <view class="group__full" bindtap="onFullscreen">全屏</view>
+      </view>
+      <scroll-view class="matrix" scroll-x show-scrollbar="{{false}}">
+        <view class="matrix__inner">
+          <view class="matrix__codes">
+            <view class="matrix__stub"></view>
+            <view class="matrix__code" wx:for="{{item.codes}}" wx:key="*this">{{item}}</view>
+          </view>
+          <view class="matrix__row" wx:for="{{item.teams}}" wx:for-item="team" wx:key="code">
+            <view class="matrix__team">
+              <view class="matrix__avs">
+                <image class="matrix__av" src="{{team.avatars[0]}}" mode="aspectFill" />
+                <image class="matrix__av matrix__av--2" src="{{team.avatars[1]}}" mode="aspectFill" />
+              </view>
+              <view class="matrix__info">
+                <view class="matrix__line">
+                  <text class="matrix__code-lg">{{team.code}}</text>
+                  <text class="seed" wx:if="{{team.seed}}">种子</text>
+                  <text class="matrix__comb">{{team.combined}}</text>
+                </view>
+                <view class="matrix__names">{{team.names}}</view>
+              </view>
+            </view>
+            <view
+              class="matrix__cell {{cell === '—' ? 'is-self' : ''}}"
+              wx:for="{{team.scores}}"
+              wx:for-item="cell"
+              wx:key="*this"
+            >{{cell}}</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </block>
+
+  <block wx:if="{{activeTab === 'schedule'}}">
+    <view class="sched" wx:for="{{event.schedule}}" wx:key="time">
+      <view class="sched__top">
+        <view class="sched__time">{{item.time}}</view>
+        <view class="sched__court">{{item.court}}</view>
+        <view class="sched__round">{{item.round}}</view>
+        <view class="sched__st sched__st--{{item.status}}">{{item.status}}</view>
+      </view>
+      <view class="sched__vs">
+        <view class="sched__side">{{item.left}}</view>
+        <view class="sched__mid">VS</view>
+        <view class="sched__side">{{item.right}}</view>
+      </view>
+      <view class="sched__score" wx:if="{{item.score}}">{{item.score}}</view>
+    </view>
+  </block>
+
+  <block wx:if="{{activeTab === 'results'}}">
+    <view class="res-head">
+      <view class="res-head__rank">名次</view>
+      <view class="res-head__player">选手</view>
+      <view class="res-head__pts">赛事积分</view>
+      <view class="res-head__cup">超级杯</view>
+    </view>
+    <view class="res res--{{item.rank}}" wx:for="{{event.results}}" wx:key="rank">
+      <view class="res__rank">
+        <view class="res__badge" wx:if="{{item.rank < 3}}">{{item.rank}}</view>
+        <view class="res__nth" wx:else>第{{item.rank}}名</view>
+      </view>
+      <view class="res__players">
+        <view class="res-p" wx:for="{{item.players}}" wx:for-item="player" wx:key="name">
+          <view class="player__avatar player__avatar--sm">
+            <image class="player__photo" src="{{player.avatar}}" mode="aspectFill" />
+            <view class="sex sex--sm {{player.gender === 'female' ? 'sex--f' : 'sex--m'}}">{{player.gender === 'female' ? '♀' : '♂'}}</view>
+          </view>
+          <view class="res-p__name">{{player.name}}</view>
+          <view class="res-p__rating">{{player.rating}}</view>
+          <view class="res-p__delta" wx:if="{{player.ratingDelta}}">{{player.ratingDelta}}</view>
+        </view>
+      </view>
+      <view class="res__nums">
+        <view class="res__pts">{{item.eventPoints}}</view>
+        <view class="res__cup">{{item.superCup}}</view>
+      </view>
+    </view>
+  </block>
+
+  <view class="cta-spacer" wx:if="{{showCta}}"></view>
+  <view class="cta" wx:if="{{showCta}}">
+    <view class="cta__btn {{ctaLime ? '' : 'cta__btn--mute'}}" bindtap="onCta">{{ctaLabel}}</view>
+    <view class="cta__hint {{ctaHintGray ? 'cta__hint--gray' : ''}}" wx:if="{{ctaHint}}">{{ctaHint}}</view>
+  </view>
+
+  <view class="dim" wx:if="{{showRecruitSheet}}" catchtap="onCloseRecruit"></view>
+  <view class="sheet" wx:if="{{showRecruitSheet}}">
+    <view class="sheet__handle"></view>
+    <view class="sheet__bar">
+      <view class="sheet__cancel" bindtap="onCloseRecruit">取消</view>
+      <view class="sheet__title">发布招募</view>
+      <view class="sheet__ghost"></view>
+    </view>
+    <view class="field">
+      <view class="field__label">寻找搭档</view>
+      <view class="pills">
+        <view class="pill {{recruitNeed === '女搭档' ? 'is-on' : ''}}" data-value="女搭档" bindtap="onPickNeed">女搭档</view>
+        <view class="pill {{recruitNeed === '男搭档' ? 'is-on' : ''}}" data-value="男搭档" bindtap="onPickNeed">男搭档</view>
+        <view class="pill {{recruitNeed === '不限' ? 'is-on' : ''}}" data-value="不限" bindtap="onPickNeed">不限</view>
+      </view>
+    </view>
+    <view class="field">
+      <view class="field__label">希望等级</view>
+      <view class="pills">
+        <view class="pill {{recruitLevel === '不限' ? 'is-on' : ''}}" data-value="不限" bindtap="onPickLevel">不限</view>
+        <view class="pill {{recruitLevel === '同级优先' ? 'is-on' : ''}}" data-value="同级优先" bindtap="onPickLevel">同级优先</view>
+        <view class="pill {{recruitLevel === '3.5 以上' ? 'is-on' : ''}}" data-value="3.5 以上" bindtap="onPickLevel">3.5 以上</view>
+      </view>
+    </view>
+    <view class="field">
+      <view class="field__label">组队截止</view>
+      <view class="date-row" bindtap="onPickDeadline">
+        <view>{{recruitDeadline}}</view>
+        <view class="date-row__arrow">›</view>
+      </view>
+    </view>
+    <view class="field">
+      <view class="field__label">备注</view>
+      <textarea
+        class="note"
+        placeholder="例如：周末白天有空，希望沟通顺畅、能提前约场地"
+        placeholder-class="note__ph"
+        maxlength="80"
+        value="{{recruitNote}}"
+        bindinput="onNoteInput"
+      />
+    </view>
+    <view class="sheet__btn" bindtap="onPublishRecruit">发布招募</view>
+  </view>
+</view>

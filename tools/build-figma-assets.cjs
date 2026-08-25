@@ -98,6 +98,10 @@ const PHOTO_TASKS = [
   ['gl-p4.png', 'images/gallery/photo-4.jpg', 380, null],
   ['gl-p5.png', 'images/gallery/photo-5.jpg', 380, null],
   ['gl-p6.png', 'images/gallery/photo-6.jpg', 380, null],
+
+  // 店铺页头图 750×420、店徽 96×96（Figma 325:360 / 325:373）
+  ['venue-hero.png', 'images/venue/hero.jpg', 1200, null],
+  ['venue-avatar.png', 'images/venue/avatar.jpg', 212, null],
 ];
 
 async function run() {

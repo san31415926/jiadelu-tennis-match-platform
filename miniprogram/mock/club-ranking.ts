@@ -1,15 +1,16 @@
 /**
  * ============================================================================
- * 俱乐部榜单数据
+ * 俱乐部榜单数据 —— 视觉刷新草稿 V5（Figma 287:292）
  * ============================================================================
  *
- * 仿球员排行，但没有城市榜/全国榜——只排小程序里已经注册的俱乐部。
- * 指标目前是「战力」和「积分」两项（俱乐部没有身价）。
+ * 和球员排行同一套领奖台 + 列表，但没有城市榜 / 全国榜。
+ * V5 多了「本月 / 累计」时间范围，指标仍是战力、积分。
  *
  * 【常见改动】
  * 加俱乐部     → 往 RAW_CLUBS 加一条，logo 可以复用已有的 club/logo-*.jpg
  * 改指标名称   → 改 CLUB_RANKING_METRICS，同时改 valueOf()
- * 改底部文案   → 改 MY_CLUB_RANKING
+ * 改时间范围   → 改 CLUB_RANKING_PERIODS
+ * 改「我的俱乐部」是哪一家 → 改 MY_CLUB_ID
  */
 import { COLLAPSED_ROW_COUNT } from './ranking';
 import type { PodiumPlayer, RankingRow } from './ranking';
@@ -20,60 +21,117 @@ export interface RankedClub {
   city: string;
   logo: string;
   members: number;
+  /** 本月积分，对应「本月 × 积分」 */
+  monthPoints: number;
+  /** 本月战力，对应「本月 × 战力」 */
+  monthPower: number;
+  /** 累计积分 */
   points: number;
+  /** 累计 / 总战力 */
   power: number;
 }
 
-export const CLUB_RANKING_METRICS = ['战力', '积分'];
+export interface ClubPodiumPlayer extends PodiumPlayer {
+  id: string;
+}
+
+export interface ClubRankingRow extends RankingRow {
+  id: string;
+}
+
+export const CLUB_RANKING_PERIODS = ['本月', '累计'];
+export const CLUB_RANKING_METRICS = ['积分', '战力'];
+
+/** 底部「我的俱乐部」条对应的那一家，和 mock/club.ts 里 joined: true 的 club-5 对齐 */
+export const MY_CLUB_ID = 'club-5';
 
 const RAW_CLUBS: RankedClub[] = [
-  { id: 'club-1', name: '菜菜才不菜', city: '广州', logo: '/assets/images/club/logo-1.jpg', members: 24, points: 1860, power: 1980 },
-  { id: 'club-2', name: 'GagaTennis Club', city: '佛山', logo: '/assets/images/club/logo-2.jpg', members: 31, points: 1790, power: 1910 },
-  { id: 'club-3', name: '椒个鹏友', city: '广州', logo: '/assets/images/club/logo-3.jpg', members: 18, points: 1640, power: 1840 },
-  { id: 'club-4', name: 'Volt Court 颜技社', city: '深圳', logo: '/assets/images/club/logo-4.jpg', members: 26, points: 1580, power: 1760 },
-  { id: 'club-5', name: 'inininAlive Club', city: '广州', logo: '/assets/images/club/logo-5.jpg', members: 22, points: 1520, power: 1680 },
-  { id: 'club-6', name: 'RisingAce 网球社', city: '东莞', logo: '/assets/images/club/logo-6.jpg', members: 29, points: 1470, power: 1620 },
-  { id: 'club-7', name: '广州嘻哈', city: '广州', logo: '/assets/images/club/logo-1.jpg', members: 20, points: 1400, power: 1540 },
-  { id: 'club-8', name: '深圳ACE网球俱乐部', city: '深圳', logo: '/assets/images/club/logo-4.jpg', members: 33, points: 1320, power: 1470 },
-  { id: 'club-9', name: '佛山飞跃队', city: '佛山', logo: '/assets/images/club/logo-2.jpg', members: 16, points: 1210, power: 1400 },
-  { id: 'club-10', name: '东莞松山湖TC', city: '东莞', logo: '/assets/images/club/logo-6.jpg', members: 28, points: 1100, power: 1320 },
+  { id: 'club-1', name: '菜菜才不菜', city: '广州', logo: '/assets/images/club/logo-1.jpg', members: 24, monthPoints: 1860, monthPower: 1980, points: 4200, power: 5100 },
+  { id: 'club-2', name: 'GagaTennis Club', city: '佛山', logo: '/assets/images/club/logo-2.jpg', members: 31, monthPoints: 1790, monthPower: 1910, points: 4680, power: 4900 },
+  { id: 'club-3', name: '椒个鹏友', city: '广州', logo: '/assets/images/club/logo-3.jpg', members: 18, monthPoints: 1640, monthPower: 1840, points: 3900, power: 4720 },
+  { id: 'club-4', name: 'Volt Court 颜技社', city: '深圳', logo: '/assets/images/club/logo-4.jpg', members: 26, monthPoints: 1580, monthPower: 1760, points: 3520, power: 4480 },
+  { id: 'club-5', name: 'inininAlive Club', city: '广州', logo: '/assets/images/club/logo-5.jpg', members: 22, monthPoints: 1520, monthPower: 1680, points: 3380, power: 4210 },
+  { id: 'club-6', name: 'RisingAce 网球社', city: '东莞', logo: '/assets/images/club/logo-6.jpg', members: 29, monthPoints: 1470, monthPower: 1620, points: 3210, power: 4050 },
+  { id: 'club-7', name: '广州嘻哈', city: '广州', logo: '/assets/images/club/logo-1.jpg', members: 20, monthPoints: 1400, monthPower: 1540, points: 2980, power: 3860 },
+  { id: 'club-8', name: '深圳ACE网球俱乐部', city: '深圳', logo: '/assets/images/club/logo-4.jpg', members: 33, monthPoints: 1320, monthPower: 1470, points: 3600, power: 3990 },
+  { id: 'club-9', name: '佛山飞跃队', city: '佛山', logo: '/assets/images/club/logo-2.jpg', members: 16, monthPoints: 1210, monthPower: 1400, points: 2740, power: 3520 },
+  { id: 'club-10', name: '东莞松山湖TC', city: '东莞', logo: '/assets/images/club/logo-6.jpg', members: 28, monthPoints: 1100, monthPower: 1320, points: 2560, power: 3380 },
 ];
 
-function valueOf(club: RankedClub, metric: string): number {
-  if (metric === '积分') return club.points;
-  return club.power;
+function valueOf(club: RankedClub, metric: string, period: string): number {
+  const cumulative = period === '累计';
+  if (metric === '积分') {
+    return cumulative ? club.points : club.monthPoints;
+  }
+  return cumulative ? club.power : club.monthPower;
 }
 
-export function rankClubs(metric: string): RankedClub[] {
-  return [...RAW_CLUBS].sort((a, b) => valueOf(b, metric) - valueOf(a, metric));
+export function rankClubs(metric: string, period = '本月'): RankedClub[] {
+  return [...RAW_CLUBS].sort((a, b) => valueOf(b, metric, period) - valueOf(a, metric, period));
 }
 
-export function toClubPodium(clubs: RankedClub[], metric: string): PodiumPlayer[] {
+export function toClubPodium(
+  clubs: RankedClub[],
+  metric: string,
+  period = '本月',
+): ClubPodiumPlayer[] {
   const [first, second, third] = clubs;
-  const build = (club: RankedClub | undefined, rank: 1 | 2 | 3): PodiumPlayer => ({
+  const build = (club: RankedClub | undefined, rank: 1 | 2 | 3): ClubPodiumPlayer => ({
+    id: club?.id ?? '',
     rank,
     nickname: club?.name ?? '虚位以待',
-    club: club?.city ?? '--',
-    score: club ? String(valueOf(club, metric)) : '--',
+    club: club ? `${club.city} · ${club.members}人` : '--',
+    score: club ? String(valueOf(club, metric, period)) : '--',
     avatar: club?.logo ?? '/assets/images/club/logo-1.jpg',
   });
   return [build(second, 2), build(first, 1), build(third, 3)];
 }
 
-export function toClubRows(clubs: RankedClub[], metric: string): RankingRow[] {
+export function toClubRows(
+  clubs: RankedClub[],
+  metric: string,
+  period = '本月',
+): ClubRankingRow[] {
   return clubs.slice(3).map((club, index) => ({
+    id: club.id,
     rank: index + 4,
     nickname: club.name,
-    club: `成员 ${club.members} 人`,
-    score: String(valueOf(club, metric)),
-    badge: club.city,
+    club: `${club.city} · ${club.members}人`,
+    score: String(valueOf(club, metric, period)),
+    badge: '',
     avatar: club.logo,
   }));
 }
 
-export const MY_CLUB_RANKING = {
-  summary: '我的俱乐部  第5  •  战力 1680',
-  actionText: '去查看',
-};
+export function myClubRanking(metric: string, period = '本月') {
+  const clubs = rankClubs(metric, period);
+  const index = clubs.findIndex((club) => club.id === MY_CLUB_ID);
+  const club = index >= 0 ? clubs[index] : undefined;
+  const rank = index >= 0 ? index + 1 : '--';
+  const score = club ? valueOf(club, metric, period) : '--';
+  return {
+    summary: `我的俱乐部  第${rank}  •  ${metric} ${score}`,
+    actionText: '去查看',
+    clubId: MY_CLUB_ID,
+  };
+}
+
+/**
+ * 超级杯版俱乐部主页那四个数字：本月积分、总战力、积分榜、战力榜。
+ * 名次按「本月积分」和「累计战力」分别排，和稿上 本月积分 / 总战力 两套口径对齐。
+ */
+export function clubSuperCupStats(id: string) {
+  const byPoints = rankClubs('积分', '本月');
+  const byPower = rankClubs('战力', '累计');
+  const club = RAW_CLUBS.find((item) => item.id === id) ?? RAW_CLUBS[0];
+  const pointsRank = byPoints.findIndex((item) => item.id === club.id) + 1;
+  const powerRank = byPower.findIndex((item) => item.id === club.id) + 1;
+  return {
+    monthPoints: club.monthPoints,
+    power: club.power,
+    pointsRank,
+    powerRank,
+  };
+}
 
 export { COLLAPSED_ROW_COUNT };

@@ -1,6 +1,4 @@
 {
   "navigationStyle": "custom",
-  "usingComponents": {
-    "gold-avatar": "../../components/gold-avatar/index"
-  }
+  "usingComponents": {}
 }

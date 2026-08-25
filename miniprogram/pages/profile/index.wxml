@@ -1,92 +1,225 @@
-<view class="profile">
-  <!-- 球员卡头部，Figma node 10:213 -->
+<view class="profile profile--{{profile.theme}}">
   <view class="hero" style="padding-top:{{statusBarHeight}}px">
+    <image class="hero__cover" src="{{profile.cover}}" mode="aspectFill" />
+    <view class="hero__frost"></view>
+    <view class="hero__fade"></view>
+
     <view class="hero__inner">
-      <view class="hero__wave"></view>
-
-      <view class="hero__title">我的</view>
-
-      <!--
-        金框 + 头像 + 相机。金圈是独立透明 PNG，头像从圆孔露出来，
-        以后换真实微信头像只改 profile.avatar。点头像走 onAvatarTap。
-      -->
-      <view class="hero__avatar">
-        <gold-avatar
+      <view class="identity">
+        <image
+          class="identity__avatar"
           src="{{profile.avatar}}"
-          size="large"
-          show-badge="{{false}}"
-          bind:avatartap="onAvatarTap"
+          mode="aspectFill"
+          bindtap="onAvatarTap"
         />
+        <view class="identity__info">
+          <view
+            class="identity__name {{isLoggedIn ? '' : 'identity__name--guest'}}"
+            bindtap="onLogin"
+          >{{profile.nickname}}</view>
+          <view class="identity__uid">{{profile.uid}}</view>
+        </view>
+        <view
+          class="identity__cover-btn"
+          bindtap="onOpenCoverSheet"
+          hover-class="identity__cover-btn--pressed"
+          hover-stay-time="60"
+        >更换背景</view>
       </view>
-      <image class="hero__ball" src="/assets/images/hero-tennis-ball.png" mode="aspectFit" />
 
-      <view
-        class="hero__nickname {{isLoggedIn ? '' : 'hero__nickname--guest'}}"
-        bindtap="onLogin"
-      >{{isLoggedIn ? profile.nickname : '登录'}}</view>
-      <view class="hero__chip hero__chip--rating">{{profile.rating}}</view>
-      <view class="hero__chip hero__chip--level">{{profile.level}}</view>
-
-      <view class="hero__label hero__label--value">身价</view>
-      <view class="hero__number hero__number--value">{{profile.marketValue}}</view>
-      <view class="hero__trend" wx:if="{{profile.marketValueTrend}}">
-        {{profile.marketValueTrend}}
+      <view class="bio" bindtap="onEditBio">
+        {{profile.bio || '点此添加介绍...'}}
       </view>
 
-      <view class="hero__label hero__label--points">积分</view>
-      <view class="hero__number hero__number--points">{{profile.points}}</view>
+      <view class="tags">
+        <view class="tag" wx:for="{{tags}}" wx:key="*this">{{item}}</view>
+        <view class="tag tag--add" bindtap="onAddTag">+ 添加个性标签</view>
+      </view>
 
-      <view class="hero__xp-hint">{{profile.xpHint}}</view>
-      <view class="hero__xp-track"></view>
-      <view class="hero__xp-fill" style="width:{{xpFillWidth}}rpx"></view>
-      <view class="hero__xp-ball" style="left:{{xpBallLeft}}rpx"></view>
+      <view class="stats">
+        <view class="stat">
+          <view class="stat__num">{{profile.marketValue}}</view>
+          <view class="stat__label">身价</view>
+        </view>
+        <view class="stat">
+          <view class="stat__num">{{profile.points}}</view>
+          <view class="stat__label">积分</view>
+        </view>
+        <view class="stat">
+          <view class="stat__num">{{profile.wins}}</view>
+          <view class="stat__label">胜场</view>
+        </view>
+        <view class="stat">
+          <view class="stat__num">{{profile.hand}}</view>
+          <view class="stat__label">惯用手</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="vip" bindtap="onOpenMembership" hover-class="vip--pressed" hover-stay-time="60">
+      <image
+        class="vip__crown"
+        src="/assets/icons/profile/vip-wheat-tennis.png"
+        mode="aspectFit"
+      />
+      <view class="vip__copy">
+        <view class="vip__title">开通会员</view>
+        <view class="vip__sub">享 10+ 项会员权益</view>
+      </view>
+      <view class="vip__cta">立即开通</view>
     </view>
   </view>
 
-  <!-- 会员横幅，功能清单 3.2。点「开通会员」进 pages/membership -->
-  <view class="vip-bar">
-    <image
-      class="vip-bar__emblem"
-      src="/assets/icons/profile/vip-wheat-tennis.png"
-      mode="aspectFit"
-    />
-    <view class="vip-bar__text">注册后可享超值权益</view>
-    <view class="vip-bar__btn" bindtap="onOpenMembership">开通会员</view>
-  </view>
+  <view class="body">
+    <view class="block">
+      <view class="block__head">
+        <text class="block__title">战力图</text>
+        <view class="block__chip">综合 {{profile.radar.overall}}</view>
+      </view>
+      <view class="radar-card">
+        <view class="radar">
+          <canvas type="2d" id="radarCanvas" class="radar__canvas"></canvas>
+          <view class="radar-label radar-label--n">
+            <text>发球</text>
+            <text class="radar-label__num">{{profile.radar.axes[0].value}}</text>
+          </view>
+          <view class="radar-label radar-label--ne">
+            <text>正手</text>
+            <text class="radar-label__num">{{profile.radar.axes[1].value}}</text>
+          </view>
+          <view class="radar-label radar-label--se">
+            <text>反手</text>
+            <text class="radar-label__num">{{profile.radar.axes[2].value}}</text>
+          </view>
+          <view class="radar-label radar-label--s">
+            <text>网前</text>
+            <text class="radar-label__num">{{profile.radar.axes[3].value}}</text>
+          </view>
+          <view class="radar-label radar-label--sw">
+            <text>步伐</text>
+            <text class="radar-label__num">{{profile.radar.axes[4].value}}</text>
+          </view>
+          <view class="radar-label radar-label--nw">
+            <text>体能</text>
+            <text class="radar-label__num">{{profile.radar.axes[5].value}}</text>
+          </view>
+        </view>
+        <view class="radar-card__hint">根据近 12 场比赛生成，可随赛绩更新</view>
+      </view>
+    </view>
 
-  <!-- 功能菜单，Figma node 10:234。分享好友必须用 button + open-type="share"，微信不让 JS 直接弹出转发面板 -->
-  <view class="menu">
-    <block wx:for="{{menu}}" wx:key="key">
-      <view wx:if="{{item.action === 'share'}}" class="menu__item">
-        <image class="menu__icon" src="{{item.icon}}" mode="aspectFit" />
-        <text class="menu__label">{{item.label}}</text>
-        <text class="menu__arrow">›</text>
-        <!-- 透明热区：open-type="share" 只能写在 button 上，视觉仍走上面那一行 -->
+    <view class="block">
+      <view class="block__title">我的生涯</view>
+      <view class="career">
+        <view class="career-row">
+          <view class="career-card" bindtap="onOpenEdit" hover-class="career-card--pressed" hover-stay-time="60">
+            <view class="career-card__head">
+              <image class="career-card__icon" src="/assets/icons/profile/profile-info.png" mode="aspectFit" />
+              <text class="career-card__name">我的资料</text>
+            </view>
+            <view class="career-card__meta">资料完成度 {{profile.profileComplete}}</view>
+            <view class="career-card__link">编辑资料  →</view>
+          </view>
+          <view class="career-card" bindtap="onOpenClub" hover-class="career-card--pressed" hover-stay-time="60">
+            <view class="career-card__head">
+              <image class="career-card__icon" src="/assets/icons/profile/my-club-flag.png" mode="aspectFit" />
+              <text class="career-card__name">我的俱乐部</text>
+            </view>
+            <view class="career-card__meta">俱乐部排名 {{profile.clubRank}}</view>
+            <view class="career-card__meta">成员 {{profile.clubMembers}}</view>
+          </view>
+        </view>
+        <view class="career-card career-card--wide" bindtap="onOpenRecords" hover-class="career-card--pressed" hover-stay-time="60">
+          <view class="career-card__head">
+            <image class="career-card__icon" src="/assets/icons/profile/records-trophy.png" mode="aspectFit" />
+            <text class="career-card__name">参赛记录</text>
+          </view>
+          <view class="career-card__meta">{{profile.recordSummary}}</view>
+          <view class="career-card__link" wx:if="{{profile.lastEvent}}">最近：{{profile.lastEvent}}  →</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="block">
+      <view class="block__title">更多服务</view>
+      <view class="services">
+        <view class="service" bindtap="onOpenBusiness" hover-class="service--pressed" hover-stay-time="60">
+          <image class="service__icon service__icon--flip" src="/assets/icons/profile/business-handshake.png" mode="aspectFit" />
+          <text class="service__label">商务合作</text>
+        </view>
+        <view class="service" bindtap="onOpenAbout" hover-class="service--pressed" hover-stay-time="60">
+          <image class="service__icon service__icon--flip" src="/assets/icons/profile/about-us.png" mode="aspectFit" />
+          <text class="service__label">关于我们</text>
+        </view>
+        <view class="service" bindtap="onOpenService" hover-class="service--pressed" hover-stay-time="60">
+          <image class="service__icon" src="/assets/icons/profile/customer-service.png" mode="aspectFit" />
+          <text class="service__label">联系客服</text>
+        </view>
+      </view>
+      <!-- 分享必须用 button open-type="share"，设计没单独格子，叠在生涯区下面一行 -->
+      <view class="share-row">
+        <image class="share-row__icon" src="/assets/icons/profile/share-friends.png" mode="aspectFit" />
+        <text>分享好友</text>
         <button
-          class="menu__share-hit"
+          wx:if="{{isLoggedIn}}"
+          class="share-row__hit"
           open-type="share"
-          hover-class="menu__item--pressed"
+          hover-class="share-row--pressed"
           hover-stay-time="60"
         ></button>
+        <view wx:else class="share-row__hit" bindtap="onNeedLogin"></view>
       </view>
-      <view
-        wx:else
-        class="menu__item"
-        data-path="{{item.path}}"
-        bindtap="onMenuTap"
-        hover-class="menu__item--pressed"
-        hover-stay-time="60"
-      >
-        <image
-          class="menu__icon {{item.mirrored ? 'menu__icon--mirrored' : ''}}"
-          src="{{item.icon}}"
-          mode="aspectFit"
-        />
-        <text class="menu__label">{{item.label}}</text>
-        <text class="menu__arrow">›</text>
-      </view>
-    </block>
+    </view>
   </view>
 
   <view class="tabbar-spacer"></view>
+
+  <!-- 更换背景抽屉，Figma 401:359。蒙层点空白关闭 -->
+  <view class="sheet" wx:if="{{showCoverSheet}}">
+    <view class="sheet__dim" bindtap="onCloseCoverSheet"></view>
+    <view class="sheet__panel" catchtouchmove="onPreventMove">
+      <view class="sheet__handle"></view>
+      <view class="sheet__title">更换背景</view>
+      <view class="sheet__sub">先选颜色，也可以再换一张封面图</view>
+      <view class="sheet__label">背景色</view>
+      <view class="swatches">
+        <view
+          class="swatch {{profile.theme === item.key ? 'swatch--on' : ''}}"
+          wx:for="{{themes}}"
+          wx:key="key"
+          data-key="{{item.key}}"
+          bindtap="onPickTheme"
+        >
+          <view class="swatch__dot {{item.key === 'photo' ? 'swatch__dot--photo' : ''}}">
+            <view
+              wx:if="{{item.swatch}}"
+              class="swatch__fill"
+              style="background:{{item.swatch}}"
+            ></view>
+            <image
+              wx:else
+              class="swatch__fill"
+              src="{{profile.cover}}"
+              mode="aspectFill"
+            />
+          </view>
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+      <view class="sheet__label">背景图</view>
+      <view class="covers">
+        <view
+          class="cover-pick {{profile.cover === item.image ? 'cover-pick--on' : ''}}"
+          wx:for="{{covers}}"
+          wx:key="id"
+          data-image="{{item.image}}"
+          bindtap="onPickCover"
+        >
+          <image class="cover-pick__img" src="{{item.image}}" mode="aspectFill" />
+        </view>
+        <view class="cover-pick cover-pick--album" bindtap="onPickAlbumCover">+ 相册</view>
+      </view>
+      <view class="sheet__done" bindtap="onCloseCoverSheet">完成</view>
+    </view>
+  </view>
 </view>

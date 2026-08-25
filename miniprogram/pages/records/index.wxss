@@ -1,0 +1,222 @@
+@import '../../styles/subpage-header.wxss';
+
+/**
+ * ============================================================================
+ * 参赛记录页样式
+ * ============================================================================
+ * 草稿 Figma「参赛记录 / V5」(419:359)。
+ * 薄荷底沿用「我的 / V5 / 薄荷资料头」：#B8EDDC → #D6F5E8 → #F0FCF7。
+ * 矮页头 150rpx，对齐报名详情 (370:359)，不要用 300rpx 的通用绿头。
+ *
+ * 波浪 fill 必须和页面底色 #F0FCF7 一致，否则接头会有一条色差。
+ * 吸顶返回栏用 page-nav 的 mint，滚过白卡片时字才不会糊进去。
+ *
+ * 【想改顶卡数字】改 mock/records.ts 的 RECORDS_SUMMARY，样式不用动。
+ * 【想加高头部】同时改 .sub-header__inner--compact 的 height 和波浪 top。
+ */
+
+.records {
+  min-height: 100vh;
+  padding-bottom: 48rpx;
+  background: #f0fcf7;
+}
+
+.sub-header--mint {
+  background: linear-gradient(180deg, #b8eddc 0%, #d6f5e8 58%, #f0fcf7 100%);
+}
+
+.sub-header__inner--compact {
+  height: 150rpx;
+}
+
+.sub-header--mint .sub-header__wave {
+  top: 45rpx;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105.289' viewBox='0 0 750 105.289' preserveAspectRatio='none'%3E%3Cpath d='M0 51.3173C92 15.0413 166 78.7455 263 62.8194C343 49.5477 373 24.7739 448 49.5477C546 80.515 628 31.8521 750 0V105.289H0V51.3173Z' fill='%23F0FCF7'/%3E%3C/svg%3E");
+}
+
+.summary {
+  position: relative;
+  z-index: 1;
+  margin: -8rpx 28rpx 0;
+  padding: 24rpx 28rpx;
+  border-radius: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 6rpx 12rpx rgba(38, 56, 20, 0.08);
+}
+
+.summary__title-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.summary__trophy {
+  width: 56rpx;
+  height: 56rpx;
+  flex-shrink: 0;
+}
+
+.summary__title-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.summary__title {
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 36rpx;
+  color: #1c1f21;
+}
+
+.summary__recent {
+  font-size: 22rpx;
+  line-height: 29rpx;
+  color: #1a7a5c;
+}
+
+.summary__stats {
+  display: flex;
+  margin-top: 20rpx;
+}
+
+.stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rpx;
+}
+
+.stat__num {
+  font-size: 40rpx;
+  font-weight: 700;
+  line-height: 52rpx;
+  color: #1c1f21;
+}
+
+.stat__num--win {
+  color: #54b50a;
+}
+
+.stat__label {
+  font-size: 22rpx;
+  line-height: 29rpx;
+  color: #7d8583;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 16rpx 28rpx 0;
+}
+
+.filters__chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52rpx;
+  padding: 0 24rpx;
+  border: 1rpx solid #e0e3d9;
+  border-radius: 26rpx;
+  background: #ffffff;
+  font-size: 22rpx;
+  color: #1c1f21;
+}
+
+.filters__chip.is-active {
+  border-color: #83d414;
+  background: #83d414;
+  font-weight: 700;
+}
+
+.list {
+  padding: 16rpx 28rpx 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+  padding: 22rpx 24rpx 22rpx 28rpx;
+  border-radius: 28rpx;
+  background: #ffffff;
+  box-shadow: 0 6rpx 12rpx rgba(38, 56, 20, 0.08);
+}
+
+.row--pressed {
+  opacity: 0.86;
+}
+
+.row__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.row__title {
+  overflow: hidden;
+  font-size: 26rpx;
+  font-weight: 700;
+  line-height: 34rpx;
+  color: #1c1f21;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.row__meta {
+  margin-top: 8rpx;
+  overflow: hidden;
+  font-size: 20rpx;
+  line-height: 26rpx;
+  color: #7d8583;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.row__result {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4rpx;
+  margin-left: 16rpx;
+  flex-shrink: 0;
+}
+
+.badge {
+  padding: 4rpx 14rpx;
+  border-radius: 18rpx;
+  font-size: 20rpx;
+  font-weight: 700;
+  line-height: 26rpx;
+}
+
+.badge--win {
+  background: #83d414;
+  color: #10140e;
+}
+
+.badge--loss {
+  background: #e8ece0;
+  color: #7d8583;
+}
+
+.row__score {
+  font-size: 20rpx;
+  line-height: 26rpx;
+  color: #7d8583;
+}
+
+.row__arrow {
+  margin-left: 10rpx;
+  font-size: 32rpx;
+  line-height: 32rpx;
+  color: #7d8583;
+}
+
+.list__empty {
+  padding: 80rpx 0;
+  font-size: 24rpx;
+  text-align: center;
+  color: #7d8583;
+}

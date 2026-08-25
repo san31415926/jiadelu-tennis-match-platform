@@ -1,154 +1,159 @@
-@import '../../styles/subpage-header.wxss';
-
 /**
  * ============================================================================
- * 我的资料页样式
+ * 我的资料页样式 —— 视觉刷新草稿 V5
  * ============================================================================
- * 数值来自终稿 Figma node 64:377。
+ * 数值来自 Figma node 389:359。设计稿 1px = 1rpx。
  *
- * 头像用 gold-avatar 大号（圈 192、头像 150、相机 58），居中叠在头部波浪上。
- * 三张卡片是流式的，加字段不用改总高。
+ * 【和旧版的差别】
+ * 旧绿波浪头 + 金圈头像已经删掉。吸顶返回用 page-nav mint + occupy，
+ * 页面自己是薄荷渐变底，白卡片圆角 28。头像是 140 的圆图，设计里没有金框。
  *
- * 卡片渐变 from #abd7a7 to rgba(126,224,117,0.6)，圆角 28，和设计变量 radius/card 一致。
+ * 想改选中胶囊颜色 → 改 .pill--on 的 background / border-color
+ * 想改保存按钮     → 改 .save 的 background
  */
 
 .edit {
   min-height: 100vh;
   padding-bottom: 48rpx;
-  background: #f0ffd5;
+  background: linear-gradient(180deg, #b8eddc 0%, #d6f5e8 55%, #f0fcf7 100%);
 }
 
 .avatar-block {
-  position: relative;
-  z-index: 2;
   display: flex;
-  justify-content: center;
-  /* 头部 inner 300，金圈 top 165，向上叠 135 */
-  margin-top: -135rpx;
+  flex-direction: column;
+  gap: 12rpx;
+  align-items: center;
+  padding: 8rpx 0 12rpx;
 }
 
-.avatar-hint {
-  margin-top: 10rpx;
-  height: 26rpx;
+.avatar-block__photo {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 70rpx;
+  background: #ffffff;
+}
+
+.avatar-block__hint {
   font-size: 22rpx;
   line-height: 26rpx;
-  text-align: center;
-  color: #7d8583;
+  color: #738078;
 }
 
 .card {
-  position: relative;
-  z-index: 1;
-  margin: 18rpx 28rpx 0;
+  margin: 0 32rpx 20rpx;
+  padding: 24rpx 24rpx 8rpx;
   overflow: hidden;
   border-radius: 28rpx;
-  background: linear-gradient(180deg, #abd7a7 0%, rgba(126, 224, 117, 0.6) 100%);
-  box-shadow: 0 10rpx 12rpx rgba(31, 46, 31, 0.12);
+  background: #ffffff;
 }
 
 .card__title {
-  padding: 22rpx 36rpx 8rpx;
-  font-size: 22rpx;
+  margin-bottom: 8rpx;
+  font-size: 24rpx;
   font-weight: 700;
-  line-height: 28rpx;
-  color: #42385f;
+  line-height: 32rpx;
+  color: #1c1f21;
 }
 
-.row,
-.stat {
-  position: relative;
+.row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 80rpx;
-  padding: 0 24rpx 0 28rpx;
+  min-height: 72rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #e5ebe5;
 }
 
-.stat {
-  height: 72rpx;
-  padding-right: 28rpx;
+.row--last {
+  border-bottom: none;
 }
 
-.row::after,
-.stat::after {
-  content: '';
-  position: absolute;
-  left: 28rpx;
-  right: 28rpx;
-  bottom: 0;
-  height: 1rpx;
-  background: #e8ece0;
-}
-
-.row--last::after,
-.stat--last::after {
-  display: none;
+.row--readonly {
+  padding: 22rpx 0;
 }
 
 .row__label {
-  font-size: 28rpx;
-  color: #1b201d;
+  flex-shrink: 0;
+  font-size: 26rpx;
+  line-height: 34rpx;
+  color: #738078;
 }
 
 .row__right {
   display: flex;
+  gap: 8rpx;
   align-items: center;
-  gap: 6rpx;
+  min-width: 0;
+  margin-left: 16rpx;
 }
 
 .row__value {
-  font-size: 28rpx;
+  overflow: hidden;
+  font-size: 26rpx;
   font-weight: 500;
-  color: #202c29;
+  line-height: 34rpx;
+  color: #1c1f21;
+  text-align: right;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.row__value--placeholder {
+  font-weight: 500;
+  color: #738078;
 }
 
 .row__arrow {
+  flex-shrink: 0;
   font-size: 32rpx;
   line-height: 40rpx;
-  color: #202c29;
+  color: #738078;
 }
 
 .pills {
   display: flex;
+  flex-wrap: wrap;
   gap: 12rpx;
+  justify-content: flex-end;
 }
 
 .pill {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 50rpx;
-  padding: 0 28rpx;
-  border: 1rpx solid #e8ece0;
-  border-radius: 23rpx;
+  padding: 10rpx 28rpx;
+  border: 1rpx solid #e5ebe5;
+  border-radius: 24rpx;
   background: #ffffff;
   font-size: 24rpx;
-  font-weight: 600;
-  color: #7d8583;
+  font-weight: 500;
+  color: #738078;
 }
 
-.pill--gender {
-  border-color: transparent;
-  background: #8098ee;
-  color: #1b201d;
-}
-
-.pill--hand {
-  border-color: transparent;
-  background: #d4a414;
-  color: #1b201d;
+.pill--on {
+  border-color: #83d414;
+  background: #83d414;
+  color: #1c1f21;
 }
 
 .save {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 694rpx;
-  height: 88rpx;
-  margin: 28rpx 28rpx 0;
-  border-radius: 44rpx;
-  background: #54b50a;
-  font-size: 32rpx;
+  height: 72rpx;
+  margin: 0 32rpx;
+  border-radius: 16rpx;
+  background: #83d414;
+  font-size: 28rpx;
   font-weight: 700;
-  color: #ffffff;
+  color: #1c1f21;
+}
+
+.footnote {
+  margin-top: 16rpx;
+  padding: 0 32rpx;
+  font-size: 20rpx;
+  line-height: 28rpx;
+  color: #738078;
+  text-align: center;
 }

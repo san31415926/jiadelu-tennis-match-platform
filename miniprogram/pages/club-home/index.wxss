@@ -5,7 +5,11 @@
  * 俱乐部主页样式
  * ============================================================================
  * 草稿 Figma「俱乐部主页 / Prototype Screen / Editable」(444:36)。
- * 头部复用 subpage-header（青柠渐变 + 波浪 + 返回 + 网球）。
+ * V5 页沿用原节点：228:397 / 228:669 / 287:374 为 Prototype 拷贝，未换皮。
+ * 超级杯版差异来自 V5 287:374，用根节点 .club-home--super 切换，不要复制一页。
+ *
+ * 头部复用 subpage-header（青柠渐变 + 波浪 + 返回）。
+ * 默认右上角是网球；超级杯版换成会所插画，波浪 fill 改成 #f7f9f7。
  *
  * 金圈 logo 160 / 成员头像 72，尺寸写在 gold-avatar 组件里。
  * 想改总战力颜色 → .stats__value--lime
@@ -15,6 +19,27 @@
 .club-home {
   min-height: 100vh;
   background: #f0ffd5;
+}
+
+.club-home--super {
+  background: #f7f9f7;
+}
+
+/**
+ * 超级杯版头部波浪要接到浅灰画布，不能沿用默认的 #f0ffd5。
+ * 会所插画 156×199，贴在头部右上（node 287:382）。
+ */
+.sub-header--canvas .sub-header__wave {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105.289' viewBox='0 0 750 105.289' preserveAspectRatio='none'%3E%3Cpath d='M0 51.3173C92 15.0413 166 78.7455 263 62.8194C343 49.5477 373 24.7739 448 49.5477C546 80.515 628 31.8521 750 0V105.289H0V51.3173Z' fill='%23F7F9F7'/%3E%3C/svg%3E");
+}
+
+.sub-header__pavilion {
+  position: absolute;
+  left: 574rpx;
+  top: 18rpx;
+  z-index: 1;
+  width: 156rpx;
+  height: 199rpx;
 }
 
 /**
@@ -89,6 +114,13 @@
 .stats__value--lime {
   font-size: 44rpx;
   color: #83d414;
+}
+
+/**
+ * 四列时数字更容易挤，青绿字改回和黑字一样的 36，和稿上 287:393 对齐。
+ */
+.stats--quad .stats__value--lime {
+  font-size: 36rpx;
 }
 
 .stats__label {

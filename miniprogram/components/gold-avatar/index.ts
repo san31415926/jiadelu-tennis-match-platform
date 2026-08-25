@@ -12,7 +12,7 @@
  *   <gold-avatar src="{{url}}" size="large" show-badge bind:avatartap="onAvatarTap" />
  *
  * size 四档：
- *   large   我的页头部，圈 192、头像 150、相机 58（Figma node 365:5 / 365:4 / 371:27）
+ *   large   旧「我的 / 我的资料」绿头用过，圈 192、头像 150、相机 58。V5 这两页已改圆图，这档暂时闲置
  *   club    俱乐部主页 logo，圈 160、头像 118（草稿 445:37）
  *   small   榜单列表，圈 86、头像 68，不带相机，才能放进 94rpx 高的行里
  *   member  俱乐部主页成员行，圈 72、头像 52（草稿 446:40）

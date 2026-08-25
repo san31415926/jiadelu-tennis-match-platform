@@ -1,0 +1,500 @@
+/**
+ * ============================================================================
+ * 店铺页样式
+ * ============================================================================
+ * 赛事 325:359、球员榜 326:359 共用头图 + 资料卡；相册 326:463 是白底独立版式。
+ * 三个画板收成一页 Tab，数值 1px = 1rpx，不要加系数。
+ *
+ * 【头图高度】
+ * 稿上 Hero 420。返回钮叠在图上，状态栏用 padding-top 躲开，不要把 420 再加高。
+ *
+ * 【球员榜行】
+ * 榜单页列表是 86 金圈头像 + 94 行高。这里按稿缩小：64 圆头像、14 上下内边距。
+ * 前三名底色 #fff7ed / #f2f7ff / #f2fae5，数据仍走 ranking mock。
+ *
+ * 【想换店徽 / 头图】
+ * 改 mock/venue.ts。头图三张胶囊对应 hero.cover / featured / events。
+ */
+
+.venue {
+  min-height: 100vh;
+  padding-bottom: 48rpx;
+  background: #f1f1f1;
+}
+
+/* 叠在头图左上。相册 Tab 改用 page-nav，这条会藏掉 */
+.venue-back {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+}
+
+.venue-back__hit {
+  width: 88rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  line-height: 52rpx;
+  color: #ffffff;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.45);
+}
+
+.hero {
+  position: relative;
+  width: 750rpx;
+  height: 420rpx;
+  overflow: hidden;
+  background: #1c1f21;
+}
+
+.hero__img {
+  width: 750rpx;
+  height: 420rpx;
+}
+
+.hero__pills {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  width: 750rpx;
+  height: 68rpx;
+  padding: 10rpx 16rpx;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.34);
+}
+
+.hero__pill {
+  flex: 1;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24rpx;
+  background: rgba(0, 0, 0, 0.28);
+  font-size: 22rpx;
+  font-weight: 500;
+  line-height: 29rpx;
+  color: #ffffff;
+}
+
+.hero__pill.is-on {
+  background: #83d414;
+}
+
+.hero__more {
+  flex-shrink: 0;
+  width: 45rpx;
+  height: 45rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 23rpx;
+  background: rgba(0, 0, 0, 0.28);
+  font-size: 28rpx;
+  line-height: 36rpx;
+  color: #ffffff;
+}
+
+.shop {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 24rpx 28rpx;
+  background: #ffffff;
+  border-radius: 28rpx 28rpx 0 0;
+}
+
+.shop__row {
+  display: flex;
+  gap: 18rpx;
+  align-items: flex-start;
+}
+
+.shop__avatar {
+  flex-shrink: 0;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 16rpx;
+}
+
+.shop__copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.shop__name {
+  font-size: 32rpx;
+  font-weight: 700;
+  line-height: 42rpx;
+  color: #1c1f21;
+}
+
+.shop__slogan {
+  font-size: 22rpx;
+  line-height: 29rpx;
+  color: #7a8080;
+}
+
+.shop__more {
+  font-size: 22rpx;
+  font-weight: 500;
+  line-height: 29rpx;
+  color: #666b6b;
+}
+
+.shop__stats {
+  display: flex;
+  align-items: center;
+}
+
+.shop__stat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.shop__num {
+  font-size: 26rpx;
+  font-weight: 700;
+  line-height: 34rpx;
+  color: #1c1f21;
+}
+
+.shop__label {
+  font-size: 22rpx;
+  line-height: 29rpx;
+  color: #7a8080;
+}
+
+.shop__divider {
+  width: 1rpx;
+  height: 28rpx;
+  background: #e5e8e5;
+}
+
+.tabs {
+  display: flex;
+  background: #ffffff;
+  padding-top: 8rpx;
+}
+
+.tabs__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  padding-bottom: 10rpx;
+}
+
+.tabs__label {
+  font-size: 32rpx;
+  font-weight: 400;
+  line-height: 42rpx;
+  color: #7a8080;
+}
+
+.tabs__item.is-on .tabs__label {
+  font-weight: 700;
+  color: #1c1f21;
+}
+
+.tabs__bar {
+  width: 64rpx;
+  height: 6rpx;
+  border-radius: 3rpx;
+  background: #83d414;
+}
+
+.tabs__item.is-on:nth-child(2) .tabs__bar,
+.tabs__item.is-on:nth-child(3) .tabs__bar {
+  width: 96rpx;
+}
+
+.pane {
+  background: #ffffff;
+}
+
+.pane--events {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 16rpx 24rpx 74rpx;
+}
+
+.pane__empty {
+  padding: 72rpx 0;
+  text-align: center;
+  font-size: 22rpx;
+  color: #7a8080;
+}
+
+.pane--ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  padding: 8rpx 24rpx 32rpx;
+}
+
+.boards {
+  display: flex;
+  gap: 12rpx;
+}
+
+.boards__item {
+  flex: 1;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 28rpx;
+  background: #ededed;
+  font-size: 22rpx;
+  font-weight: 500;
+  line-height: 29rpx;
+  color: #7a8080;
+}
+
+.boards__item.is-on {
+  background: #83d414;
+  color: #1c1f21;
+}
+
+.filters {
+  display: flex;
+  gap: 12rpx;
+  justify-content: center;
+}
+
+.filter {
+  width: 210rpx;
+  height: 52rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 0 18rpx 0 22rpx;
+  box-sizing: border-box;
+  border: 1rpx solid #e5e8e0;
+  border-radius: 22rpx;
+  background: #f4f6ef;
+  font-size: 22rpx;
+  font-weight: 500;
+  color: #1c1f21;
+}
+
+.filter__caret {
+  width: 0;
+  height: 0;
+  border-left: 6rpx solid transparent;
+  border-right: 6rpx solid transparent;
+  border-top: 7rpx solid #1c1f21;
+}
+
+.rank-head {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 0 20rpx 0 16rpx;
+  font-size: 20rpx;
+  line-height: 26rpx;
+  color: #7a8080;
+}
+
+.rank-head__rank {
+  width: 52rpx;
+  text-align: center;
+}
+
+.rank-head__spacer {
+  width: 64rpx;
+  height: 8rpx;
+}
+
+.rank-head__name {
+  flex: 1;
+}
+
+.rank-head__score {
+  text-align: right;
+}
+
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 14rpx 20rpx 14rpx 16rpx;
+  border-radius: 16rpx;
+  background: #ffffff;
+}
+
+.rank-row--1 {
+  background: #fff7ed;
+}
+
+.rank-row--2 {
+  background: #f2f7ff;
+}
+
+.rank-row--3 {
+  background: #f2fae5;
+}
+
+.rank-row__rank {
+  width: 36rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 36rpx;
+  color: #1c1f21;
+}
+
+.rank-row--1 .rank-row__rank,
+.rank-row--2 .rank-row__rank,
+.rank-row--3 .rank-row__rank {
+  color: #83d414;
+}
+
+.rank-row__avatar {
+  flex-shrink: 0;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+}
+
+.rank-row__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 26rpx;
+  font-weight: 500;
+  line-height: 34rpx;
+  color: #1c1f21;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rank-row__score {
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 36rpx;
+  color: #1c1f21;
+}
+
+.rank-row--1 .rank-row__score {
+  color: #d9731a;
+}
+
+.album {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  padding: 16rpx 24rpx 32rpx;
+  background: #ffffff;
+}
+
+.album__head {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.album__head--row {
+  justify-content: space-between;
+}
+
+.album__head-left {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.album__mark {
+  width: 6rpx;
+  height: 28rpx;
+  border-radius: 3rpx;
+  background: #83d414;
+}
+
+.album__title {
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 36rpx;
+  color: #1c1f21;
+}
+
+.album__more {
+  font-size: 22rpx;
+  line-height: 29rpx;
+  color: #7a8080;
+}
+
+.album__cover {
+  width: 702rpx;
+  height: 320rpx;
+  border-radius: 16rpx;
+}
+
+.album__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.album__cell {
+  flex: 1;
+  min-width: 0;
+  border-radius: 12rpx;
+}
+
+.album__cell--lg {
+  width: calc((100% - 20rpx) / 3);
+  flex: none;
+  height: 220rpx;
+}
+
+.album__cell--sm {
+  width: calc((100% - 20rpx) / 3);
+  flex: none;
+  height: 160rpx;
+  border-radius: 10rpx;
+}
+
+.album__group {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.album__event {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12rpx 16rpx;
+  border-radius: 8rpx;
+  background: #f5f2eb;
+}
+
+.album__event-title {
+  font-size: 22rpx;
+  font-weight: 500;
+  line-height: 29rpx;
+  color: #1c1f21;
+}
+
+.album__event-date {
+  font-size: 20rpx;
+  line-height: 26rpx;
+  color: #7a8080;
+}

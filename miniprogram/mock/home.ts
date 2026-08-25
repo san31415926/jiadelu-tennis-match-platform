@@ -4,8 +4,8 @@
  * ============================================================================
  *
  * 【这个文件是干什么的】
- * 首页上所有的文字内容都在这里：轮播标题、七个宫格入口的名字、赛事卡片的
- * 名称地点时间。页面只负责渲染，不含任何文案。
+ * 首页上所有的文字内容都在这里：轮播标题、侧栏七个入口的名字、热门活动卡、
+ * 赛事卡片的名称地点时间。页面只负责渲染，不含任何文案。
  *
  * 【接云开发后怎么办】
  * 这个文件会被云函数返回的真实数据替换，但下面这些 interface（数据结构）
@@ -17,8 +17,7 @@
  * 想改轮播文案         → 文案已经画进 jpg（主标题 36、副标题 19，对齐 Figma）
  *                        换图才改得了字；title/subtitle 只是对照用
  * 想加一张轮播         → 往 HOME_BANNERS 加一项，指示点会自动变多
- * 想加一个宫格入口     → 往 HOME_FEATURES 里加一项，注意同时要加大
- *                        tokens.wxss 里的 --grid-height，否则新增的会被裁掉
+ * 想加一个侧栏入口     → 往 HOME_FEATURES 里加一项，侧栏会自动变长
  * 想改赛事卡片内容     → 改 MOCK_EVENTS
  * 想改筛选项名字       → 改 EVENT_FILTERS，但要同步改 MOCK_EVENTS 的键名，
  *                        两者必须一致，否则切过去是空列表
@@ -38,7 +37,7 @@ export interface HomeBanner {
   target: string;
 }
 
-/** 首页七宫格的一个入口 */
+/** 首页侧栏（汉堡菜单）的一个入口。原来在七宫格里，V5 收进左侧栏 */
 export interface HomeFeature {
   /** 唯一标识。注意 'registrations' 这个值有特殊逻辑：点它是切筛选而不是跳页 */
   key: string;
@@ -49,40 +48,108 @@ export interface HomeFeature {
   /**
    * 图标的位置和尺寸，写成 CSS 内联样式字符串。
    *
-   * 【为什么每个都不一样】
-   * 这七个 3D 图标外形差别很大（领奖台是横的、礼盒是方的、香槟是竖的），
-   * 设计师在 Figma（node 1:239）里给每个都单独调了位置和大小，
-   * 套用统一尺寸会让画面参差不齐。
-   *
-   * 【坐标基准】
-   * left/top 相对每一格（158rpx 宽 × 154rpx 高）的左上角。
-   * 有些 top 是负数（如 -6rpx），表示图标顶部故意超出格子被裁掉一点，
-   * 这是设计稿的效果，不是错误。
-   *
-   * 【想让某个图标大一点】
-   * 加大 width/height，同时把 left 减掉宽度增量的一半，保持水平居中。
-   * 例如从 width:100rpx;left:29rpx 放大到 width:120rpx，left 就改成 19rpx。
+   * 侧栏现在按 96×96 显示图标，这段坐标是给旧七宫格留的，侧栏用不到。
+   * 先别删，万一哪页还要还原宫格能接着用。
    */
   iconStyle: string;
   /** 点击后跳转的页面路径 */
   path: string;
 }
 
-/** 一张赛事卡片。首页、超级杯、日历三个页面共用这个结构 */
+/** 卡片上那一排彩色小标签的配色。改样式去 event-card 的 `.event-tag--*` */
+export type EventTagTone = 'realname' | 'court' | 'newbie';
+
+export interface EventTag {
+  label: string;
+  tone: EventTagTone;
+}
+
+/**
+ * 一张赛事卡片。首页、超级杯、日历三个页面共用这个结构。
+ *
+ * 版式来自视觉刷新草稿「赛事列表 / 参考卡」(180:215)：左海报 + 右信息，右下是价格
+ * 而不是报名按钮。点整张卡进详情；有 venueLink 的那一行再点进店铺页。
+ */
 export interface EventItem {
   id: string;
-  /** 赛事名称，24rpx 加粗，太长会换行把卡片撑高，建议控制在 12 个字内 */
+  /**
+   * 赛事名称，不含前面的等级块（等级用 grade）。
+   * 26rpx 加粗，太长会单行省略，建议控制在 10 个字内。
+   */
   title: string;
-  /** 左侧那张图，286×238 显示，图片本身建议 2 倍尺寸以上 */
+  /** 左侧海报，188×210 显示，图片本身建议 2 倍尺寸以上 */
   poster: string;
-  /** 地点，配一个圆点图标 */
+  /** 地点，配一个定位图标 */
   venue: string;
   /** 时间，配一个时钟图标 */
   time: string;
-  /** 签位，如 8/16（个人赛按人）或 12/16 队（俱乐部赛按队），配一个人形图标 */
+  /** 签位原文，如 8/16。海报底条真正显示的是 slotCaption */
   slots: string;
-  /** 右下角按钮上的字。报名中写「立即报名」，已结束写「查看成绩」等 */
+  /**
+   * 点价格或详情页报名时用的动作文案。
+   * 列表卡上不再画按钮，但详情页和 toast 还读它。
+   */
   actionText: string;
+  /** 标题左侧色块，如 7.0 / 6.5 / 团体 */
+  grade: string;
+  /** 等级块颜色。orange=#f57a29，green=#73bf40 */
+  gradeTone: 'orange' | 'green';
+  /** 海报左上角状态，如 报名中 / 进行中 / 已结束 */
+  statusLabel: string;
+  /** 海报底部半透明条，如 混双·8/16签 */
+  slotCaption: string;
+  /** 标题下方的属性标签。没有就给空数组，不要省略这个字段 */
+  tags: EventTag[];
+  /** 右下角价格，如 ¥158。纯展示，点它和点卡片一样进详情 */
+  price: string;
+  /**
+   * 「项目」筛选项的值，必须能对上 EVENT_LIST_FILTERS 里项目的 options。
+   * 例如 混双 / 男双 / 团体 / 女单。
+   */
+  category: string;
+  /**
+   * 「区域」筛选项的值，必须能对上 EVENT_LIST_FILTERS 里区域的 options。
+   * 例如 广州 / 佛山 / 东莞。
+   */
+  area: string;
+  /** 桃底推荐卡。为 true 时卡片背景换成 #fff5ed，并画出底部三点 */
+  featured?: boolean;
+  /** 海报右上角「推荐」角标 */
+  recommended?: boolean;
+  /** 卡片底部那一行场馆入口（logo + 名称 + ›） */
+  venueLink?: boolean;
+}
+
+/** 属性标签的现成配色。新增标签优先复用，不要随手写一组新颜色 */
+export const EVENT_TAGS = {
+  realname: { label: '实名', tone: 'realname' as const },
+  indoor: { label: '室内场', tone: 'court' as const },
+  weather: { label: '风雨场', tone: 'court' as const },
+  newbie: { label: '萌新最爱', tone: 'newbie' as const },
+};
+
+/**
+ * 状态筛选下面那一行：项目 / 区域 / 日期 / 更多。
+ *
+ * 日期的选项是根据当前列表现场算的，不写在这里。
+ * 改了 options 文案，赛事的 category / area / tags.label 也要能对得上，
+ * 否则点下去会筛成空列表。
+ */
+export const EVENT_LIST_FILTERS = [
+  { key: 'category', label: '项目', options: ['全部', '混双', '男双', '团体', '女单'] },
+  { key: 'area', label: '区域', options: ['全部', '广州', '佛山', '东莞'] },
+  { key: 'more', label: '更多', options: ['全部', '室内场', '风雨场', '实名', '推荐'] },
+] as const;
+
+export type EventListFilterKey = 'category' | 'area' | 'date' | 'more';
+
+/**
+ * 从 time 文案里抽出「08月29日」这种日期，给「日期」筛选当选项。
+ * time 不是标准日期格式，所以用正则抠，改了 time 写法这里可能抠不到。
+ */
+export function eventDateLabel(time: string): string {
+  const matched = time.match(/\d+月\d+日/);
+  return matched ? matched[0] : time;
 }
 
 export const HOME_BANNERS: HomeBanner[] = [
@@ -129,6 +196,48 @@ export const HOME_BANNERS: HomeBanner[] = [
     target: '/pages/gallery/index',
   },
 ];
+
+/**
+ * 首页「热门活动」横滑卡。内容和前四张轮播一致，点进去走同一条跳转。
+ * 序号角标 1～4 是稿上画的，不是排名。
+ */
+export const HOME_HOT_EVENTS = [
+  {
+    id: 'hot-club-union',
+    rank: '1',
+    title: '广佛俱乐部联名赛',
+    subtitle: '球员精彩瞬间',
+    image: '/assets/images/banners/banner-01-club-union.jpg',
+    target: '/pages/gallery/index',
+  },
+  {
+    id: 'hot-rookie-cup',
+    rank: '2',
+    title: '俱乐部新秀杯',
+    subtitle: '第二届 · 12 支球队',
+    image: '/assets/images/banners/banner-02-rookie-cup.jpg',
+    target: '/pages/super-cup/index',
+  },
+  {
+    id: 'hot-annual',
+    rank: '3',
+    title: '年度颁奖典礼',
+    subtitle: '11 月 15 日 · 广州',
+    image: '/assets/images/banners/banner-03-ceremony.jpg',
+    target: '/pages/poster/index?id=ceremony',
+  },
+  {
+    id: 'hot-super-cup',
+    rank: '4',
+    title: '超级杯冠军之夜',
+    subtitle: '俱乐部荣耀时刻',
+    image: '/assets/images/banners/banner-04-super-cup.jpg',
+    target: '/pages/super-cup/index',
+  },
+];
+
+/** 搜索条左侧城市。选项要和 EVENT_LIST_FILTERS 的区域对得上 */
+export const HOME_CITIES = ['全部', '广州', '佛山', '东莞'];
 
 export const HOME_FEATURES: HomeFeature[] = [
   {
@@ -212,32 +321,59 @@ export const MOCK_EVENTS: Record<string, EventItem[]> = {
   我的报名: [
     {
       id: 'e-mine-1',
-      title: '7.0混双评级赛',
+      title: '混双评级赛',
       poster: COURT_PHOTO,
       venue: '佛山球球热网球禅城店',
       time: '08月29日 16:00-21:00',
       slots: '8/16',
       actionText: '查看详情',
+      grade: '7.0',
+      gradeTone: 'green',
+      statusLabel: '报名中',
+      slotCaption: '混双·8/16签',
+      tags: [EVENT_TAGS.realname, EVENT_TAGS.indoor, EVENT_TAGS.newbie],
+      price: '¥158',
+      category: '混双',
+      area: '佛山',
     },
   ],
   报名中: [
     {
       id: 'e-open-1',
-      title: '7.0混双评级赛',
+      title: '混双评级赛',
       poster: COURT_PHOTO,
       venue: '佛山球球热网球禅城店',
       time: '08月29日 16:00-21:00',
       slots: '8/16',
       actionText: '立即报名',
+      grade: '7.0',
+      gradeTone: 'green',
+      statusLabel: '报名中',
+      slotCaption: '混双·8/16签',
+      tags: [EVENT_TAGS.realname, EVENT_TAGS.indoor, EVENT_TAGS.newbie],
+      price: '¥158',
+      category: '混双',
+      area: '佛山',
+      recommended: true,
+      venueLink: true,
     },
     {
       id: 'e-open-2',
-      title: '6.5男双积分赛',
+      title: '男双积分赛',
       poster: COURT_PHOTO,
       venue: '广州润盈网球中心',
       time: '09月06日 09:00-18:00',
       slots: '12/16',
       actionText: '立即报名',
+      grade: '6.5',
+      gradeTone: 'green',
+      statusLabel: '报名中',
+      slotCaption: '男双·12/16签',
+      tags: [EVENT_TAGS.realname, EVENT_TAGS.weather],
+      price: '¥138',
+      category: '男双',
+      area: '广州',
+      venueLink: true,
     },
   ],
   进行中: [
@@ -249,17 +385,33 @@ export const MOCK_EVENTS: Record<string, EventItem[]> = {
       time: '08月20日 14:00-20:00',
       slots: '16/16',
       actionText: '查看对阵',
+      grade: '团体',
+      gradeTone: 'green',
+      statusLabel: '进行中',
+      slotCaption: '团体·16/16签',
+      tags: [EVENT_TAGS.realname, EVENT_TAGS.weather],
+      price: '¥188',
+      category: '团体',
+      area: '东莞',
     },
   ],
   已结束: [
     {
       id: 'e-done-1',
-      title: '7.0混双评级赛',
+      title: '混双评级赛',
       poster: COURT_PHOTO,
       venue: '佛山球球热网球禅城店',
       time: '08月29日 16:00-21:00',
       slots: '8/16',
       actionText: '查看成绩',
+      grade: '7.0',
+      gradeTone: 'green',
+      statusLabel: '已结束',
+      slotCaption: '混双·8/16签',
+      tags: [EVENT_TAGS.realname, EVENT_TAGS.indoor],
+      price: '¥158',
+      category: '混双',
+      area: '佛山',
     },
   ],
 };

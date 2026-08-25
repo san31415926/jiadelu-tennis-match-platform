@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * 状态筛选条样式（首页与超级杯共用）
+ * 状态筛选条样式（首页 / 超级杯共用；V5 走 capsule）
  * ============================================================================
  * 数值来自 Figma node 1:261 / 1:367。
  */
@@ -48,11 +48,41 @@
  * 选中态。
  *
  * 【背景色不在这里】
- * 因为首页用 #83d414、超级杯用 #76d709（设计稿里两页不同），
- * 所以背景色由页面通过 active-color 属性传入，在 wxml 里以内联样式生效。
+ * 背景色由页面通过 active-color 属性传入，在 wxml 里以内联样式生效。
  * 这里只负责文字加粗和变深。
  */
 .filters__item.is-active {
   font-weight: 600;
   color: var(--text-tab-active);
+}
+
+/**
+ * V5 胶囊条（Figma 148:199）。四项均分，选中态白字。
+ * 外层圆角 999、内边距 10，单项高 58（14+30+14）。
+ */
+.filters--capsule {
+  gap: 8rpx;
+  height: auto;
+  padding: 10rpx;
+  border: 1rpx solid #e5e5e0;
+  border-radius: 999rpx;
+  background: transparent;
+}
+
+.filters--capsule .filters__item {
+  flex: 1;
+  width: auto;
+  height: auto;
+  padding: 14rpx 8rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  line-height: 30rpx;
+  letter-spacing: 0.44rpx;
+  color: #73786b;
+  background: #f1f1f0;
+}
+
+.filters--capsule .filters__item.is-active {
+  font-weight: 500;
+  color: #ffffff;
 }

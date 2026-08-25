@@ -1,48 +1,152 @@
 <view class="super-cup">
-  <hero-carousel
-    title="超级杯"
-    banners="{{banners}}"
-    status-bar-height="{{statusBarHeight}}"
-    nav-bar-height="{{navBarHeight}}"
-    menu-inset-right="{{menuInsetRight}}"
-    bind:bannertap="onBannerTap"
-  />
-
-  <!-- 功能宫格，Figma node 1:340：两行四列 Auto Layout，图标统一 110x105 -->
-  <view class="feature-grid">
-    <view class="feature-grid__row" wx:for="{{featureRows}}" wx:for-item="row" wx:key="index">
-      <view
-        class="feature"
-        wx:for="{{row}}"
-        wx:key="key"
-        data-path="{{item.path}}"
-        bindtap="onFeatureTap"
-        hover-class="feature--pressed"
-        hover-stay-time="60"
-      >
-        <image style="width: 91rpx; display: block; box-sizing: border-box" class="feature__icon" src="{{item.icon}}" mode="aspectFit" />
-        <view class="feature__label">{{item.label}}</view>
-      </view>
+  <!-- 顶栏：居中字标。汉堡在稿上 hidden，不要做侧栏。状态栏用 padding-top 躲开 -->
+  <view class="topbar" style="padding-top:{{statusBarHeight}}px">
+    <view class="topbar__row">
+      <view class="wordmark">超级杯</view>
     </view>
   </view>
 
-  <filter-tabs
-    tabs="{{filters}}"
-    active="{{activeFilter}}"
-    active-color="#76d709"
-    bind:change="onFilterChange"
-  />
+  <!-- 头图 321rpx。标题叠在图上，底部白浪接到内容区 -->
+  <view class="hero">
+    <swiper
+      class="hero__swiper"
+      circular
+      autoplay
+      interval="5000"
+      duration="400"
+      bindchange="onSwiperChange"
+    >
+      <swiper-item wx:for="{{banners}}" wx:key="id">
+        <view class="hero__slide" data-index="{{index}}" bindtap="onBannerTap">
+          <image class="hero__image" src="{{item.image}}" mode="aspectFill" />
+          <view class="hero__scrim"></view>
+          <view class="hero__copy">
+            <view class="hero__eyebrow" wx:if="{{item.eyebrow}}">{{item.eyebrow}}</view>
+            <view class="hero__accent" wx:if="{{item.eyebrow}}"></view>
+            <view class="hero__title">{{item.title}}</view>
+            <view class="hero__sub">{{item.subtitle}}</view>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+    <view class="hero__dots">
+      <view
+        wx:for="{{banners}}"
+        wx:key="id"
+        class="hero__dot {{index === currentBanner ? 'hero__dot--on' : ''}}"
+      ></view>
+    </view>
+    <view class="hero__wave"></view>
+  </view>
 
-  <view class="feed">
-    <event-card
-      class="feed__card"
-      wx:for="{{events}}"
-      wx:key="id"
-      event="{{item}}"
-      bind:cardtap="onEventTap"
-      bind:actiontap="onSignupTap"
+  <view class="sheet">
+    <!-- 赛事类型 Cover Flow：常青杯 / 超级杯 / 新秀杯 / 女俱乐部赛 -->
+    <view class="section">
+      <view class="section__head">
+        <view class="section__title">赛事类型</view>
+        <view class="section__more" bindtap="onViewAllEventTypes">
+          <text>查看全部</text>
+          <text class="section__chevron">›</text>
+        </view>
+      </view>
+      <swiper
+        class="cover-flow"
+        previous-margin="235rpx"
+        next-margin="235rpx"
+        current="{{eventTypeIndex}}"
+        circular
+        bindchange="onEventTypeChange"
+      >
+        <swiper-item wx:for="{{eventTypes}}" wx:key="key">
+          <view class="cover-slide cover-slide--{{item.role}}">
+            <view
+              class="cover-card {{item.role === 'current' ? 'is-current' : ''}}"
+              data-path="{{item.path}}"
+              bindtap="onCoverTap"
+              hover-class="cover-card--pressed"
+              hover-stay-time="60"
+            >
+              <image class="cover-card__icon" src="{{item.icon}}" mode="aspectFit" />
+              <view class="cover-card__label">{{item.label}}</view>
+            </view>
+          </view>
+        </swiper-item>
+      </swiper>
+      <view class="cover-dots">
+        <view
+          wx:for="{{eventTypes}}"
+          wx:key="key"
+          class="cover-dots__item {{index === eventTypeIndex ? 'is-on' : ''}}"
+        ></view>
+      </view>
+    </view>
+
+    <!-- 荣誉与榜单 Cover Flow：年度最佳 / 俱乐部榜单 / 历届冠军 -->
+    <view class="section">
+      <view class="section__head">
+        <view class="section__title">荣誉与榜单</view>
+        <view class="section__more" bindtap="onViewAllHonors">
+          <text>查看全部</text>
+          <text class="section__chevron">›</text>
+        </view>
+      </view>
+      <swiper
+        class="cover-flow"
+        previous-margin="235rpx"
+        next-margin="235rpx"
+        current="{{honorIndex}}"
+        circular
+        bindchange="onHonorChange"
+      >
+        <swiper-item wx:for="{{honors}}" wx:key="key">
+          <view class="cover-slide cover-slide--{{item.role}}">
+            <view
+              class="cover-card {{item.role === 'current' ? 'is-current' : ''}}"
+              data-path="{{item.path}}"
+              bindtap="onCoverTap"
+              hover-class="cover-card--pressed"
+              hover-stay-time="60"
+            >
+              <image class="cover-card__icon" src="{{item.icon}}" mode="aspectFit" />
+              <view class="cover-card__label">{{item.label}}</view>
+            </view>
+          </view>
+        </swiper-item>
+      </swiper>
+      <view class="cover-dots">
+        <view
+          wx:for="{{honors}}"
+          wx:key="key"
+          class="cover-dots__item {{index === honorIndex ? 'is-on' : ''}}"
+        ></view>
+      </view>
+    </view>
+
+    <view class="club-cta" bindtap="onClubCenterTap" hover-class="club-cta--pressed" hover-stay-time="60">
+      <text>进入俱乐部中心</text>
+      <text class="club-cta__arrow">→</text>
+    </view>
+
+    <filter-tabs
+      tabs="{{filters}}"
+      active="{{activeFilter}}"
+      active-color="#83d414"
+      variant="capsule"
+      bind:change="onFilterChange"
     />
-    <view class="feed__empty" wx:if="{{events.length === 0}}">{{emptyHint}}</view>
+
+    <view class="feed">
+      <view class="feed__title">{{feedTitle}}</view>
+      <event-card
+        class="feed__card"
+        wx:for="{{events}}"
+        wx:key="id"
+        event="{{item}}"
+        bind:cardtap="onEventTap"
+        bind:venuetap="onVenueTap"
+      />
+      <view class="feed__empty" wx:if="{{events.length === 0}}">{{emptyHint}}</view>
+    </view>
   </view>
 
   <view class="tabbar-spacer"></view>

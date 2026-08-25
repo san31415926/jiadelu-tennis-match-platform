@@ -1,7 +1,6 @@
 {
   "navigationStyle": "custom",
   "usingComponents": {
-    "hero-carousel": "../../components/hero-carousel/index",
     "filter-tabs": "../../components/filter-tabs/index",
     "event-card": "../../components/event-card/index"
   }

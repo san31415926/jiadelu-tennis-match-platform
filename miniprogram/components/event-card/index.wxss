@@ -1,190 +1,288 @@
 /**
  * ============================================================================
- * 赛事卡片样式（首页、超级杯、赛事日历三个页面共用）
+ * 赛事卡片样式（首页、超级杯、日历三个页面共用）
  * ============================================================================
- * 数值来自 Figma node 1:272 / 1:378，两个页面的卡片结构完全一致。
+ * 数值来自 Figma node 180:199（赛事列表 / 参考卡）。
+ * 设计稿 1px = 1rpx，下面的 188、210、20 都是稿上的原始标注。
  *
  * 【改这里会影响三个页面】
  * 首页、超级杯、日历都引用这个组件。如果只想改某一个页面的卡片，
  * 不要动这里，去那个页面的 wxss 里给 .feed__card 加规则覆盖。
  *
- * 【卡片的横向空间是怎么分配的】
- *   照片 286rpx + 间距 28rpx + 详情 376rpx = 690rpx
- * 卡片总宽由外层页面的 padding 决定（首页是 750 - 26×2 = 698rpx），
- * 所以右边会剩 8rpx 余量。这是设计稿的原始数值，不是算错了。
- *
- * 如果想让照片更大，加大 .event-card__photo 的 width 后，
- * 必须把 .event-card__body 的 width 减掉同样的数值，否则会挤出卡片。
+ * 【卡片内部怎么分配宽度】
+ * 外层页面左右各留 26rpx，卡片可用宽 698rpx。
+ * 卡片内边距 16×2 + 海报 188 + 间距 14 = 234，剩下约 464rpx 给右侧信息。
+ * 海报加宽时，右侧会自动变窄（flex: 1），不用再手写死宽度。
  */
 
 /**
- * 卡片外框。
- *
- * height: 274rpx 是固定高度。这意味着赛事名称太长换行时会被裁掉，
- * 想让卡片能自适应高度，把 height 改成 min-height。
- *
- * padding: 18rpx 0 表示上下各 18rpx 内边距、左右为 0，
- * 所以照片是贴着卡片左边缘的（设计稿如此）。
+ * 普通卡：白底 + 浅灰描边。推荐卡用 .event-card--featured 换成桃底。
+ * 圆角 20 来自稿上 rounded-[20px]，不是全站 --radius-card（28）。
  */
 .event-card {
   display: flex;
-  gap: 28rpx;
-  height: 274rpx;
-  padding: 18rpx 0;
-  border-radius: var(--radius-card);
-  background: var(--card-bg);
-  box-shadow: var(--shadow-card);
-}
-
-/**
- * 左侧的赛事照片。
- *
- * flex-shrink: 0 很关键——不加的话，当右侧文字很长时，flex 布局会把
- * 照片压窄变形。
- *
- * 图片的显示模式在 wxml 里用 mode="aspectFill" 指定，意思是保持比例
- * 填满这个框、超出部分裁掉（不会变形）。想让图片完整显示不裁切就改成
- * aspectFit，但会在框内留白。
- */
-.event-card__photo {
-  flex-shrink: 0;
-  width: 286rpx;
-  height: 238rpx;
-  border-radius: var(--radius-photo);
-}
-
-/**
- * 右侧的信息区。
- *
- * position: relative 是给底部按钮做定位基准的（按钮是绝对定位）。
- * gap: 10rpx 是标题和三行信息之间的统一间距。
- */
-.event-card__body {
-  position: relative;
-  display: flex;
   flex-direction: column;
-  gap: 10rpx;
-  width: 376rpx;
-  height: 238rpx;
-  padding-top: 2rpx;
+  gap: 12rpx;
+  padding: 16rpx 16rpx 12rpx;
+  border-radius: 20rpx;
+  background: #ffffff;
+  border: 1rpx solid #e5e5e3;
 }
 
-/**
- * 赛事名称。
- * 24rpx 在手机上约 12pt，是设计稿原值，偏小。如果决定整体放大字号，
- * 这里和下面 .event-card__meta-text 的 17rpx 是最该调的两处。
- */
-.event-card__title {
-  height: 34rpx;
-  font-size: 24rpx;
-  font-weight: 700;
-  color: var(--text-card-title);
+.event-card--featured {
+  padding-bottom: 16rpx;
+  background: #fff5ed;
+  border-color: #fff5ed;
 }
 
-/** 地点/时间/人数每一行的容器，图标和文字横向排列 */
-.event-card__meta {
+.event-card__main {
   display: flex;
-  gap: 10rpx;
-  height: 24rpx;
+  gap: 14rpx;
+  align-items: flex-start;
 }
 
 /**
- * 信息文字。
- *
- * flex: 1 让它占满剩余宽度，配合 overflow + text-overflow: ellipsis，
- * 地点名称过长时会显示成「佛山球球热网球禅...」而不是溢出卡片。
- *
- * white-space: nowrap 强制不换行，这是省略号生效的前提。
+ * 左侧海报。overflow: hidden 让圆角裁切照片，也裁切底条两端。
+ * 宽高不要只改一个，比例是按 188×210 排的。
  */
-.event-card__meta-text {
-  flex: 1;
+.event-card__poster {
+  position: relative;
+  flex-shrink: 0;
+  width: 188rpx;
+  height: 210rpx;
   overflow: hidden;
-  font-size: 17rpx;
-  line-height: 24rpx;
-  color: var(--text-muted);
+  border-radius: 16rpx;
+}
+
+.event-card__photo {
+  width: 188rpx;
+  height: 210rpx;
+}
+
+.event-card__status {
+  position: absolute;
+  top: 8rpx;
+  left: 8rpx;
+  padding: 4rpx 8rpx;
+  border-radius: 6rpx;
+  background: #83d414;
+  font-size: 16rpx;
+  font-weight: 500;
+  line-height: 21rpx;
+  color: #1a1f16;
+}
+
+.event-card__recommend {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  padding: 4rpx 8rpx;
+  border-radius: 6rpx;
+  background: #f57a29;
+  font-size: 16rpx;
+  font-weight: 500;
+  line-height: 21rpx;
+  color: #ffffff;
+}
+
+/**
+ * 海报底条。高度 34、半透明黑，贴在海报底部。
+ * 用 bottom: 0 而不是稿上的 top: 176，海报高度改了时底条还会粘在底下。
+ */
+.event-card__slots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 34rpx;
+  padding: 0 10rpx;
+  background: rgba(0, 0, 0, 0.55);
+  font-size: 16rpx;
+  font-weight: 500;
+  line-height: 34rpx;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-card__body {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.event-card__title-row {
+  display: flex;
+  gap: 8rpx;
+  align-items: center;
+  min-width: 0;
+}
+
+.event-card__grade {
+  flex-shrink: 0;
+  padding: 4rpx 8rpx;
+  border-radius: 6rpx;
+  font-size: 16rpx;
+  font-weight: 500;
+  line-height: 21rpx;
+  color: #ffffff;
+}
+
+.event-card__grade--orange {
+  background: #f57a29;
+}
+
+.event-card__grade--green {
+  background: #73bf40;
+}
+
+.event-card__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 26rpx;
+  font-weight: 700;
+  line-height: 31rpx;
+  color: #1f211c;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-/**
- * ----------------------------------------------------------------------------
- * 三个信息图标
- * ----------------------------------------------------------------------------
- *
- * 【为什么不用图片】
- * 这三个图标是纯几何形状：一个实心圆、一个圆环加两根指针、两个圆加一条圆角条。
- * 用 SVG 内联成背景图，总共只占几百字节，而三张 PNG 至少要几 KB，
- * 而且矢量在任何屏幕密度下都清晰。
- *
- * 【想换颜色怎么办】
- * 改下面 SVG 里的 %237D8583。%23 就是 # 号（URL 里必须这样转义），
- * 所以 %237D8583 表示 #7D8583。三个图标要分别改。
- *
- * 【想换成自己的图标】
- * 把 background-image 换成 url('/assets/icons/xxx.png') 即可，
- * 但要注意 24×24 的显示尺寸下 PNG 需要至少 72×72 才够清晰。
- */
+.event-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6rpx;
+}
+
+.event-tag {
+  padding: 4rpx 8rpx;
+  border-radius: 6rpx;
+  font-size: 16rpx;
+  font-weight: 500;
+  line-height: 21rpx;
+}
+
+.event-tag--realname {
+  background: #ffebb2;
+  color: #f57a29;
+}
+
+.event-tag--court {
+  background: #e8f1ff;
+  color: #3373d9;
+}
+
+.event-tag--newbie {
+  background: #ffe4e8;
+  color: #e54d59;
+}
+
+.event-card__meta {
+  display: flex;
+  gap: 8rpx;
+  align-items: center;
+  min-width: 0;
+}
+
+.event-card__meta-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 18rpx;
+  line-height: 23rpx;
+  color: #73786b;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .meta-icon {
   flex-shrink: 0;
-  width: 24rpx;
-  height: 24rpx;
+  width: 22rpx;
+  height: 22rpx;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% 100%;
 }
 
-/* 地点：一个实心圆点（Figma node 1:277） */
+/* 地点：定位针。颜色跟稿上信息文字 #73786b 一致 */
 .meta-icon--location {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4' fill='%237D8583'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Cpath fill='%2373786b' d='M11 2.2c-3.4 0-6.2 2.7-6.2 6.1 0 4.6 6.2 11.5 6.2 11.5s6.2-6.9 6.2-11.5c0-3.4-2.8-6.1-6.2-6.1zm0 8.3a2.2 2.2 0 1 1 0-4.4 2.2 2.2 0 0 1 0 4.4z'/%3E%3C/svg%3E");
 }
 
-/* 时间：圆环 + 时针分针（Figma node 1:281） */
+/* 时间：圆环 + 指针 */
 .meta-icon--time {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8.1' fill='none' stroke='%237D8583' stroke-width='1.8'/%3E%3Crect x='11' y='5' width='1.8' height='8' rx='0.9' fill='%237D8583'/%3E%3Crect x='11' y='11' width='7' height='1.8' rx='0.9' fill='%237D8583'/%3E%3C/svg%3E");
-}
-
-/* 人数：两个头 + 一条肩线（Figma node 1:287） */
-.meta-icon--participants {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='6.5' cy='10.5' r='3.5' fill='%237D8583'/%3E%3Ccircle cx='17.5' cy='10.5' r='3.5' fill='%237D8583'/%3E%3Crect x='3' y='15' width='18' height='4' rx='2' fill='%237D8583'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Ccircle cx='11' cy='11' r='7.2' fill='none' stroke='%2373786b' stroke-width='1.6'/%3E%3Crect x='10.2' y='5.5' width='1.6' height='6.2' rx='0.8' fill='%2373786b'/%3E%3Crect x='10.2' y='10.4' width='5.4' height='1.6' rx='0.8' fill='%2373786b'/%3E%3C/svg%3E");
 }
 
 /**
- * 按钮所在的那一行。
- *
- * 用绝对定位固定在 top: 184rpx，而不是跟着上面的内容流排布——这样即使
- * 某张卡片的信息行少一行，按钮位置也不会跳动，多张卡片能对齐。
- *
- * justify-content: flex-end 让按钮靠右。right: 4rpx 是设计稿给的右边距。
+ * 价格。颜色 #0dadad 是稿上的青绿，不是品牌青柠。
+ * margin-top: auto 把它推到信息区底部，跟海报下沿齐平。
  */
-.event-card__footer {
-  position: absolute;
-  left: 0;
-  right: 4rpx;
-  top: 184rpx;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  height: 54rpx;
+.event-card__price {
+  align-self: flex-end;
+  margin-top: auto;
+  font-size: 34rpx;
+  font-weight: 800;
+  line-height: 42rpx;
+  color: #0dadad;
 }
 
-/**
- * 报名按钮。
- *
- * border-radius 用 --radius-button（27rpx），正好是高度 54rpx 的一半，
- * 所以两端是完美的半圆。改了高度记得同步改圆角，否则会变成圆角矩形。
- *
- * 按钮上的文字由数据里的 actionText 决定（立即报名/团队报名/查看成绩…），
- * 见 mock/home.ts 的 EventItem。
- */
-.event-card__action {
+.event-card__dots {
   display: flex;
-  align-items: center;
+  gap: 6rpx;
   justify-content: center;
-  width: 150rpx;
-  height: 54rpx;
-  border-radius: var(--radius-button);
-  background: var(--brand-green-deep);
+}
+
+.dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: #d8d8d4;
+}
+
+.dot--on {
+  background: #83d414;
+}
+
+.event-card__divider {
+  height: 1rpx;
+  background: #ebebe8;
+}
+
+/**
+ * 场馆行。catchtap 不会冒泡到卡片，所以点这里进俱乐部列表，
+ * 不会同时跳赛事详情。chevron 是文字 ›，不是图片。
+ */
+.event-card__venue {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.event-card__venue-logo {
+  flex-shrink: 0;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 8rpx;
+}
+
+.event-card__venue-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
   font-size: 20rpx;
-  font-weight: 600;
-  color: var(--text-inverse);
+  line-height: 26rpx;
+  color: #73786b;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.event-card__chevron {
+  flex-shrink: 0;
+  font-size: 28rpx;
+  line-height: 36rpx;
+  color: #73786b;
 }

@@ -1,0 +1,180 @@
+<view class="venue">
+  <!-- 相册 Tab 换成白底导航，和稿 326:463 一致 -->
+  <page-nav wx:if="{{activeTab === 'album'}}" title="品牌相册" variant="plain" occupy="{{true}}" />
+
+  <!-- 头图上的返回。fixed，滚过赛事列表时还能点。相册 Tab 用上面那条，这里藏掉 -->
+  <view
+    wx:if="{{activeTab !== 'album'}}"
+    class="venue-back"
+    style="padding-top:{{statusBarHeight}}px"
+    bindtap="onBack"
+  >
+    <view class="venue-back__hit">‹</view>
+  </view>
+
+  <block wx:if="{{activeTab !== 'album'}}">
+    <view class="hero">
+      <image class="hero__img" src="{{heroSrc}}" mode="aspectFill" />
+      <view class="hero__pills">
+        <view
+          class="hero__pill {{activePill === item.key ? 'is-on' : ''}}"
+          wx:for="{{pills}}"
+          wx:key="key"
+          data-key="{{item.key}}"
+          bindtap="onPillTap"
+        >{{item.label}}</view>
+        <view class="hero__more" bindtap="onOpenAlbum">›</view>
+      </view>
+    </view>
+
+    <view class="shop">
+      <view class="shop__row">
+        <image class="shop__avatar" src="{{venue.avatar}}" mode="aspectFill" />
+        <view class="shop__copy">
+          <view class="shop__name">{{venue.name}}</view>
+          <view class="shop__slogan">{{expanded ? venue.bio : venue.slogan}}</view>
+          <view class="shop__more" bindtap="onToggleBio">{{expanded ? '收起' : '展开'}} ›</view>
+        </view>
+      </view>
+      <view class="shop__stats">
+        <view class="shop__stat">
+          <text class="shop__num">{{venue.eventCount}}</text>
+          <text class="shop__label">场赛事</text>
+        </view>
+        <view class="shop__divider"></view>
+        <view class="shop__stat">
+          <text class="shop__num">{{venue.playerCount}}</text>
+          <text class="shop__label">球员</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="tabs">
+      <view
+        class="tabs__item {{activeTab === item.key ? 'is-on' : ''}}"
+        wx:for="{{tabs}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="onTabTap"
+      >
+        <view class="tabs__label">{{item.label}}</view>
+        <view class="tabs__bar" wx:if="{{activeTab === item.key}}"></view>
+      </view>
+    </view>
+  </block>
+
+  <view class="pane pane--events" wx:if="{{activeTab === 'events'}}">
+    <event-card
+      class="pane__card"
+      wx:for="{{events}}"
+      wx:key="id"
+      event="{{item}}"
+      bind:cardtap="onEventTap"
+    />
+    <view class="pane__empty" wx:if="{{events.length === 0}}">这家店暂无赛事</view>
+  </view>
+
+  <view class="pane pane--ranking" wx:if="{{activeTab === 'ranking'}}">
+    <view class="boards">
+      <view
+        class="boards__item {{activeBoard === item.key ? 'is-on' : ''}}"
+        wx:for="{{boards}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="onBoardTap"
+      >{{item.label}}</view>
+    </view>
+    <view class="filters">
+      <view class="filter" bindtap="onYearTap">
+        <text>{{yearLabel}}</text>
+        <view class="filter__caret"></view>
+      </view>
+      <view class="filter" bindtap="onCategoryTap">
+        <text>{{categoryLabel}}</text>
+        <view class="filter__caret"></view>
+      </view>
+    </view>
+    <view class="rank-head">
+      <text class="rank-head__rank">排名</text>
+      <view class="rank-head__spacer"></view>
+      <text class="rank-head__name">球员</text>
+      <text class="rank-head__score">{{scoreHeader}}</text>
+    </view>
+    <view
+      class="rank-row rank-row--{{item.rank}}"
+      wx:for="{{ranking}}"
+      wx:key="rank"
+    >
+      <text class="rank-row__rank">{{item.rank}}</text>
+      <image class="rank-row__avatar" src="{{item.avatar}}" mode="aspectFill" />
+      <text class="rank-row__name">{{item.nickname}}</text>
+      <text class="rank-row__score">{{item.score}}</text>
+    </view>
+  </view>
+
+  <view class="album" wx:if="{{activeTab === 'album'}}">
+    <view class="album__head">
+      <view class="album__mark"></view>
+      <view class="album__title">品牌封面</view>
+    </view>
+    <image
+      class="album__cover"
+      src="{{album.cover}}"
+      mode="aspectFill"
+      data-src="{{album.cover}}"
+      data-urls="{{album.coverUrls}}"
+      bindtap="onPreview"
+    />
+
+    <view class="album__head album__head--row">
+      <view class="album__head-left">
+        <view class="album__mark"></view>
+        <view class="album__title">精选合辑</view>
+      </view>
+      <view class="album__more" bindtap="onViewGallery">查看全部 ›</view>
+    </view>
+    <view class="album__grid">
+      <image
+        class="album__cell album__cell--lg"
+        wx:for="{{album.featured}}"
+        wx:key="*this"
+        src="{{item}}"
+        mode="aspectFill"
+        data-src="{{item}}"
+        data-urls="{{album.featured}}"
+        bindtap="onPreview"
+      />
+    </view>
+
+    <view class="album__head album__head--row">
+      <view class="album__head-left">
+        <view class="album__mark"></view>
+        <view class="album__title">赛事相册</view>
+      </view>
+      <view class="album__more" bindtap="onViewGallery">查看全部 ›</view>
+    </view>
+    <view class="album__group" wx:for="{{album.events}}" wx:key="id">
+      <view
+        class="album__event"
+        data-album-id="{{item.albumId}}"
+        bindtap="onAlbumGroup"
+      >
+        <text class="album__event-title">{{item.title}}</text>
+        <text class="album__event-date">{{item.date}}  ›</text>
+      </view>
+      <view class="album__grid">
+        <image
+          class="album__cell album__cell--sm"
+          wx:for="{{item.photos}}"
+          wx:for-item="photo"
+          wx:key="*this"
+          src="{{photo}}"
+          mode="aspectFill"
+          data-src="{{photo}}"
+          data-urls="{{item.photos}}"
+          bindtap="onPreview"
+        />
+      </view>
+    </view>
+  </view>
+</view>

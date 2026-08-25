@@ -1,21 +1,11 @@
 <view class="edit">
-  <page-nav title="我的资料" />
-  <view class="sub-header" style="padding-top:{{statusBarHeight}}px">
-    <view class="sub-header__inner">
-      <view class="sub-header__wave"></view>
-      <image class="sub-header__ball" src="/assets/images/hero-tennis-ball.png" mode="aspectFit" />
-    </view>
-  </view>
+  <!-- occupy 把吸顶栏高度垫进文档流，下面不再画旧绿波浪头 -->
+  <page-nav title="我的资料" variant="mint" occupy="{{true}}" />
 
-  <view class="avatar-block">
-    <gold-avatar
-      src="{{form.avatar}}"
-      size="large"
-      show-badge="{{true}}"
-      bind:avatartap="onPickAvatar"
-    />
+  <view class="avatar-block" bindtap="onPickAvatar">
+    <image class="avatar-block__photo" src="{{form.avatar}}" mode="aspectFill" />
+    <view class="avatar-block__hint">点击更换头像</view>
   </view>
-  <view class="avatar-hint">点击更换头像</view>
 
   <view class="card">
     <view class="card__title">账号信息</view>
@@ -57,7 +47,7 @@
         <view
           wx:for="{{genders}}"
           wx:key="*this"
-          class="pill {{form.gender === item ? 'pill--gender' : ''}}"
+          class="pill {{form.gender === item ? 'pill--on' : ''}}"
           data-value="{{item}}"
           bindtap="onGenderTap"
         >{{item}}</view>
@@ -69,7 +59,7 @@
         <view
           wx:for="{{hands}}"
           wx:key="*this"
-          class="pill {{form.hand === item ? 'pill--hand' : ''}}"
+          class="pill {{form.hand === item ? 'pill--on' : ''}}"
           data-value="{{item}}"
           bindtap="onHandTap"
         >{{item}}</view>
@@ -92,24 +82,66 @@
   </view>
 
   <view class="card">
-    <view class="card__title">球员档案（比赛成绩自动生成，不可手动修改）</view>
-    <view class="stat">
+    <view class="card__title">网球档案</view>
+    <view class="row">
+      <text class="row__label">常打项目</text>
+      <view class="pills">
+        <view
+          wx:for="{{plays}}"
+          wx:key="*this"
+          class="pill {{form.play === item ? 'pill--on' : ''}}"
+          data-value="{{item}}"
+          bindtap="onPlayTap"
+        >{{item}}</view>
+      </view>
+    </view>
+    <view class="row" bindtap="onEditYears">
+      <text class="row__label">球龄</text>
+      <view class="row__right">
+        <text class="row__value">{{form.years}}</text>
+        <text class="row__arrow">›</text>
+      </view>
+    </view>
+    <view class="row" bindtap="onEditTags">
+      <text class="row__label">个性标签</text>
+      <view class="row__right">
+        <text class="row__value">{{form.tags}}</text>
+        <text class="row__arrow">›</text>
+      </view>
+    </view>
+    <view class="row row--last" bindtap="onEditBio">
+      <text class="row__label">个人简介</text>
+      <view class="row__right">
+        <text class="row__value {{form.bio ? '' : 'row__value--placeholder'}}">{{form.bio ? form.bio : '点此添加介绍…'}}</text>
+        <text class="row__arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card__title">球员数据（比赛自动生成，不可手改）</view>
+    <view class="row row--readonly">
       <text class="row__label">评分</text>
       <text class="row__value">{{form.rating}}</text>
     </view>
-    <view class="stat">
+    <view class="row row--readonly">
       <text class="row__label">等级</text>
       <text class="row__value">{{form.level}}</text>
     </view>
-    <view class="stat">
+    <view class="row row--readonly">
       <text class="row__label">积分</text>
       <text class="row__value">{{form.points}}</text>
     </view>
-    <view class="stat stat--last">
+    <view class="row row--readonly">
       <text class="row__label">身价</text>
       <text class="row__value">{{form.marketValue}}</text>
+    </view>
+    <view class="row row--readonly row--last">
+      <text class="row__label">胜场</text>
+      <text class="row__value">{{form.wins}}</text>
     </view>
   </view>
 
   <view class="save" bindtap="onSave">保存资料</view>
+  <view class="footnote">评分 / 积分 / 身价由赛绩更新，其余项均可编辑</view>
 </view>

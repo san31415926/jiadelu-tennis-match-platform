@@ -24,6 +24,8 @@ $downloads = @(
   @{ name = 'tab-super-cup.png';        url = 'https://www.figma.com/api/mcp/asset/27135f86-1ae3-419d-8396-72a5c7418da4.png' }
   @{ name = 'tab-profile.png';          url = 'https://www.figma.com/api/mcp/asset/590697b1-19ac-4315-b08c-044746efd789.png' }
   @{ name = 'wave-home.svg';            url = 'https://www.figma.com/api/mcp/asset/5098bee0-849c-40b3-9813-082c4371cb4d.svg' }
+  @{ name = 'venue-hero.png';           url = 'https://www.figma.com/api/mcp/asset/2b7e0ede-0f39-4b94-85a5-ea6cebee21c7.png' }
+  @{ name = 'venue-avatar.png';         url = 'https://www.figma.com/api/mcp/asset/20c25790-34b0-4d34-bb87-02ccd99422e4.png' }
   @{ name = 'carousel-dots.svg';        url = 'https://www.figma.com/api/mcp/asset/7180160c-fe81-4ba0-93cf-0e4ee0e577ca.svg' }
   @{ name = 'icon-location.svg';        url = 'https://www.figma.com/api/mcp/asset/b9ca2bcb-413c-44d2-bf35-ab10e4bfdbd0.svg' }
   @{ name = 'icon-time.svg';            url = 'https://www.figma.com/api/mcp/asset/d9b5a3a0-318d-4e12-8f70-4b2a5f675d45.svg' }

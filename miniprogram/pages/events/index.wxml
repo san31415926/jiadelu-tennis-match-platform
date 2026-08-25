@@ -1,48 +1,171 @@
 <view class="home">
-  <hero-carousel
-    title="LTJIMMY赛事"
-    banners="{{banners}}"
-    status-bar-height="{{statusBarHeight}}"
-    nav-bar-height="{{navBarHeight}}"
-    menu-inset-right="{{menuInsetRight}}"
-    bind:bannertap="onBannerTap"
-  />
+  <!-- 顶栏：汉堡 + 居中字标。状态栏用 padding-top 躲开，不画假时间和胶囊 -->
+  <view class="topbar" style="padding-top:{{statusBarHeight}}px">
+    <view class="topbar__row">
+      <view class="hamburger" bindtap="onOpenDrawer" hover-class="hamburger--pressed" hover-stay-time="60">
+        <view class="hamburger__line"></view>
+        <view class="hamburger__line"></view>
+        <view class="hamburger__line"></view>
+      </view>
+      <view class="wordmark">
+        <text class="wordmark__title">LTJIMMY赛事</text>
+        <view class="wordmark__speed">
+          <view class="wordmark__dash wordmark__dash--1"></view>
+          <view class="wordmark__dash wordmark__dash--2"></view>
+          <view class="wordmark__dash wordmark__dash--3"></view>
+        </view>
+      </view>
+    </view>
+  </view>
 
-  <!-- 功能宫格，Figma node 1:239：绝对定位，七个图标尺寸各不相同 -->
-  <view class="feature-grid">
+  <!-- 轮播 320rpx。标题叠在图上，不再画进 jpg -->
+  <view class="hero">
+    <swiper
+      class="hero__swiper"
+      circular
+      autoplay
+      interval="5000"
+      duration="400"
+      bindchange="onSwiperChange"
+    >
+      <swiper-item wx:for="{{banners}}" wx:key="id">
+        <view class="hero__slide" data-index="{{index}}" bindtap="onBannerTap">
+          <image class="hero__image" src="{{item.image}}" mode="aspectFill" />
+          <view class="hero__scrim"></view>
+          <view class="hero__copy">
+            <view class="hero__title">{{item.title}}</view>
+            <view class="hero__sub">{{item.subtitle}}</view>
+          </view>
+        </view>
+      </swiper-item>
+    </swiper>
+    <view class="hero__dots">
+      <view
+        wx:for="{{banners}}"
+        wx:key="id"
+        class="hero__dot {{index === currentBanner ? 'hero__dot--on' : ''}}"
+      ></view>
+    </view>
+  </view>
+
+  <view class="sheet">
+    <view class="hot">
+      <view class="hot__head">
+        <view class="hot-mark">
+          <view class="hot-mark__dot hot-mark__dot--tl"></view>
+          <text class="hot-mark__title">热门活动</text>
+          <view class="hot-mark__dot hot-mark__dot--br"></view>
+          <view class="hot-mark__speed">
+            <view class="hot-mark__bar" style="width:14rpx"></view>
+            <view class="hot-mark__bar" style="width:26rpx"></view>
+            <view class="hot-mark__bar" style="width:18rpx"></view>
+            <view class="hot-mark__bar" style="width:10rpx"></view>
+          </view>
+        </view>
+      </view>
+      <scroll-view class="hot__scroller" scroll-x show-scrollbar="{{false}}">
+        <view
+          class="hot-card"
+          wx:for="{{hotEvents}}"
+          wx:key="id"
+          data-target="{{item.target}}"
+          bindtap="onHotTap"
+        >
+          <view class="hot-card__photo">
+            <image class="hot-card__image" src="{{item.image}}" mode="aspectFill" />
+            <view class="hot-card__rank">{{item.rank}}</view>
+          </view>
+          <view class="hot-card__title">{{item.title}}</view>
+          <view class="hot-card__sub">{{item.subtitle}}</view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view class="search">
+      <view class="search__city" bindtap="onCityTap">
+        <view class="search__pin"></view>
+        <text class="search__city-name">{{cityLabel}}</text>
+        <text class="search__caret">▾</text>
+      </view>
+      <view class="search__field">
+        <input
+          class="search__input"
+          value="{{keyword}}"
+          placeholder="室内"
+          placeholder-class="search__placeholder"
+          confirm-type="search"
+          bindinput="onKeywordInput"
+        />
+        <view class="search__icon"></view>
+      </view>
+    </view>
+
+    <filter-tabs
+      tabs="{{filters}}"
+      active="{{activeFilter}}"
+      active-color="#83d414"
+      variant="capsule"
+      bind:change="onFilterChange"
+    />
+
+    <view class="feed">
+      <view class="list-filters">
+        <view class="list-filters__row">
+          <view
+            class="list-filters__item {{item.on ? 'is-on' : ''}}"
+            wx:for="{{listFilters}}"
+            wx:key="key"
+            data-key="{{item.key}}"
+            bindtap="onListFilterTap"
+          >
+            <text>{{item.label}}</text>
+            <text class="list-filters__caret">▾</text>
+          </view>
+        </view>
+        <view class="list-filters__reset" bindtap="onResetListFilters">↺</view>
+      </view>
+
+      <event-card
+        class="feed__card"
+        wx:for="{{events}}"
+        wx:key="id"
+        event="{{item}}"
+        bind:cardtap="onEventTap"
+        bind:venuetap="onVenueTap"
+      />
+      <view class="feed__empty" wx:if="{{events.length === 0}}">{{emptyHint}}</view>
+    </view>
+  </view>
+
+  <view class="tabbar-spacer"></view>
+
+  <!-- 侧栏：七个宫格入口搬到这里。点蒙层或「收起」关上 -->
+  <view
+    class="drawer-mask {{drawerOpen ? 'is-open' : ''}}"
+    bindtap="onCloseDrawer"
+    catchtouchmove="onPreventMove"
+  ></view>
+  <view class="drawer {{drawerOpen ? 'is-open' : ''}}" catchtouchmove="onPreventMove">
     <view
-      class="feature"
+      class="drawer__item"
       wx:for="{{features}}"
       wx:key="key"
       data-key="{{item.key}}"
       data-path="{{item.path}}"
       bindtap="onFeatureTap"
-      hover-class="feature--pressed"
-      hover-stay-time="60"
     >
-      <image class="feature__icon" src="{{item.icon}}" mode="aspectFit" style="{{item.iconStyle}}" />
-      <view class="feature__label">{{item.label}}</view>
+      <image class="drawer__icon" src="{{item.icon}}" mode="aspectFit" />
+      <text class="drawer__label">{{item.label}}</text>
+    </view>
+    <view class="drawer__spacer"></view>
+    <view class="drawer__line"></view>
+    <view class="drawer__foot" bindtap="onDarkModeTap">
+      <text class="drawer__foot-icon">☾</text>
+      <text class="drawer__foot-text">深色模式</text>
+    </view>
+    <view class="drawer__foot" bindtap="onCloseDrawer">
+      <text class="drawer__foot-icon">‹‹</text>
+      <text class="drawer__foot-text">收起</text>
     </view>
   </view>
-
-  <filter-tabs
-    tabs="{{filters}}"
-    active="{{activeFilter}}"
-    active-color="#83d414"
-    bind:change="onFilterChange"
-  />
-
-  <view class="feed">
-    <event-card style="height: 274rpx; display: block; box-sizing: border-box"
-      class="feed__card"
-      wx:for="{{events}}"
-      wx:key="id"
-      event="{{item}}"
-      bind:cardtap="onEventTap"
-      bind:actiontap="onSignupTap"
-    />
-    <view class="feed__empty" wx:if="{{events.length === 0}}">{{emptyHint}}</view>
-  </view>
-
-  <view class="tabbar-spacer"></view>
 </view>

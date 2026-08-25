@@ -1,175 +1,121 @@
 /**
  * ============================================================================
- * 会员开通页样式
+ * 会员开通页样式 —— 视觉刷新草稿 V5
  * ============================================================================
  *
- * 没有终稿画板，这一版是按「我的」页金色横幅 + 全站青柠绿自己排的，
- * 给你检查。头部结构仿球员排行（绿头 + 波浪），下面权益和套餐是流式。
+ * 数值来自 Figma node 355:361（Sheet / Checkout）。
+ * 真机里这是独立一页，不是压在「我的」上的抽屉，所以加了吸顶返回。
+ * 设计稿 1px = 1rpx。
  *
- * 想改金色 → 搜 #c4a35a / #f6e7b8
  * 想改开通按钮颜色 → 改 .checkout__btn 的 background
+ * 想改选中套餐描边 → 改 .plan.is-active 的 border-color
  */
 
 .membership {
   min-height: 100vh;
-  padding-bottom: 40rpx;
-  background: #f7faec;
+  background: #f7f7f6;
 }
 
-.header {
-  position: relative;
-  background: linear-gradient(180deg, #abe514 0%, #c7f038 62%, #f0fab8 100%);
+.sheet {
+  padding: 16rpx 0 24rpx;
 }
 
-.header__inner {
-  height: 168rpx;
+.sheet__handle {
+  width: 77rpx;
+  height: 8rpx;
+  margin: 0 auto 16rpx;
+  border-radius: 4rpx;
+  background: #d8d8d4;
 }
 
-.header__wave {
-  top: 70rpx;
-  height: 105rpx;
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105' viewBox='0 0 750 105' preserveAspectRatio='none'%3E%3Cpath d='M0 0C125 70 235 70 350 30C500 -24 585 75 750 8V105H0V0Z' fill='%23F7FAEC'/%3E%3C/svg%3E");
-}
-
-.hero-card {
-  position: relative;
-  z-index: 2;
-  margin: -36rpx 28rpx 0;
-  padding: 36rpx 32rpx 40rpx;
-  border-radius: 28rpx;
-  background: linear-gradient(135deg, #3a3428 0%, #1f1c16 100%);
-  box-shadow: 0 12rpx 24rpx rgba(41, 56, 20, 0.16);
-}
-
-.vip-mark {
-  display: flex;
-  margin-bottom: 20rpx;
-}
-
-.vip-mark__hex {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 88rpx;
-  height: 76rpx;
-  border: 3rpx solid #e8c56b;
-  color: #e8c56b;
-  font-size: 26rpx;
-  font-weight: 800;
-  letter-spacing: 2rpx;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-}
-
-.hero-card__kicker {
+.sheet__kicker {
+  padding: 0 32rpx;
   font-size: 22rpx;
-  font-weight: 600;
-  letter-spacing: 4rpx;
-  color: #e8c56b;
-}
-
-.hero-card__title {
-  margin-top: 12rpx;
-  font-size: 40rpx;
-  font-weight: 700;
-  line-height: 56rpx;
-  color: #fff8e0;
-}
-
-.hero-card__sub {
-  margin-top: 10rpx;
-  font-size: 24rpx;
-  line-height: 36rpx;
-  color: rgba(255, 248, 224, 0.72);
-}
-
-.section-title {
-  margin: 36rpx 32rpx 16rpx;
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #1f2114;
-}
-
-.benefit {
-  display: flex;
-  gap: 20rpx;
-  align-items: flex-start;
-  margin: 0 28rpx 16rpx;
-  padding: 24rpx;
-  border-radius: 20rpx;
-  background: #fcfcfb;
-  box-shadow: 0 4rpx 10rpx rgba(38, 56, 20, 0.08);
-}
-
-.benefit__index {
-  flex-shrink: 0;
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 22rpx;
-  background: #e8f59e;
-  color: #548005;
-  font-size: 24rpx;
-  font-weight: 700;
-  line-height: 44rpx;
-  text-align: center;
-}
-
-.benefit__name {
-  font-size: 28rpx;
-  font-weight: 700;
-  color: #1f2114;
-}
-
-.benefit__desc {
-  margin-top: 6rpx;
-  font-size: 22rpx;
-  line-height: 32rpx;
-  color: #6b7059;
+  line-height: 26rpx;
+  color: #73786b;
 }
 
 .plans {
-  display: flex;
-  gap: 16rpx;
-  margin: 0 28rpx;
+  width: 100%;
+  margin-top: 24rpx;
+  white-space: nowrap;
 }
 
 .plan {
   position: relative;
-  flex: 1;
-  padding: 28rpx 20rpx 24rpx;
-  border: 3rpx solid transparent;
-  border-radius: 24rpx;
-  background: #fcfcfb;
-  box-shadow: 0 4rpx 10rpx rgba(38, 56, 20, 0.08);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200rpx;
+  height: 248rpx;
+  margin-left: 12rpx;
+  padding: 28rpx 12rpx 20rpx;
+  overflow: hidden;
+  vertical-align: top;
+  border: 2rpx solid #e8e8e5;
+  border-radius: 20rpx;
+  background: #ffffff;
+}
+
+.plan:first-child {
+  margin-left: 32rpx;
+}
+
+.plan:last-child {
+  margin-right: 32rpx;
 }
 
 .plan.is-active {
-  border-color: #c4a35a;
-  background: #fffaf0;
+  border-color: #83d414;
+  background: #f7fbe8;
 }
 
-.plan__badge {
+.plan__flag {
   position: absolute;
   top: 0;
-  right: 0;
-  padding: 4rpx 14rpx;
-  border-radius: 0 20rpx 0 16rpx;
-  background: #c4a35a;
-  color: #ffffff;
-  font-size: 18rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4rpx 10rpx;
+  border-radius: 0 0 8rpx 8rpx;
+  background: #83d414;
+  font-size: 16rpx;
   font-weight: 700;
+  line-height: 19rpx;
+  color: #1a1f16;
 }
 
 .plan__name {
-  font-size: 26rpx;
+  margin-top: 36rpx;
+  font-size: 24rpx;
   font-weight: 700;
-  color: #1f2114;
+  line-height: 29rpx;
+  color: #1f211c;
+}
+
+.plan__badge {
+  margin-top: 10rpx;
+  padding: 3rpx 10rpx;
+  border-radius: 6rpx;
+  background: #f3f3f1;
+  font-size: 16rpx;
+  line-height: 19rpx;
+  color: #73786b;
+}
+
+.plan.is-active .plan__badge {
+  background: rgba(131, 212, 20, 0.22);
+  color: #3a6b08;
 }
 
 .plan__price {
   display: flex;
   align-items: flex-end;
-  margin-top: 12rpx;
-  color: #c4a35a;
+  margin-top: 10rpx;
+  color: #1f211c;
+}
+
+.plan.is-active .plan__price {
+  color: #1a1f16;
 }
 
 .plan__yen {
@@ -179,20 +125,93 @@
 }
 
 .plan__num {
-  font-size: 56rpx;
+  font-size: 40rpx;
   font-weight: 800;
-  line-height: 60rpx;
+  line-height: 48rpx;
 }
 
-.plan__unit,
-.plan__hint {
-  margin-top: 6rpx;
+.plan__origin {
+  margin-top: 10rpx;
+  font-size: 18rpx;
+  line-height: 22rpx;
+  color: #9b9e96;
+  text-decoration: line-through;
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 24rpx;
+  padding: 0 32rpx;
   font-size: 20rpx;
-  color: #6b7059;
+  line-height: 24rpx;
+  color: #73786b;
+}
+
+.hint__q {
+  width: 26rpx;
+  height: 26rpx;
+  border: 1rpx solid #c8cbc3;
+  border-radius: 50%;
+  font-size: 18rpx;
+  line-height: 24rpx;
+  color: #9b9e96;
+  text-align: center;
+}
+
+.pay-title {
+  margin-top: 16rpx;
+  padding: 8rpx 32rpx;
+  font-size: 26rpx;
+  font-weight: 700;
+  line-height: 31rpx;
+  color: #1f211c;
+}
+
+.pays {
+  display: flex;
+  gap: 12rpx;
+  padding: 0 32rpx;
+}
+
+.pay {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  height: 68rpx;
+  border: 2rpx solid #e8e8e5;
+  border-radius: 16rpx;
+  background: #ffffff;
+  font-size: 22rpx;
+  color: #1f211c;
+}
+
+.pay.is-active {
+  border-color: #83d414;
+  background: #f7fbe8;
+}
+
+.pay__mark {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 8rpx;
+  background: #07c160;
+  font-size: 18rpx;
+  font-weight: 700;
+  line-height: 36rpx;
+  color: #ffffff;
+  text-align: center;
+}
+
+.pay:last-child .pay__mark {
+  background: #1677ff;
 }
 
 .checkout-spacer {
-  height: calc(140rpx + env(safe-area-inset-bottom));
+  height: calc(200rpx + env(safe-area-inset-bottom));
 }
 
 .checkout {
@@ -201,17 +220,35 @@
   right: 0;
   bottom: 0;
   z-index: 10;
-  padding: 16rpx 28rpx calc(16rpx + env(safe-area-inset-bottom));
-  background: #f7faec;
+  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: #ffffff;
 }
 
 .checkout__btn {
-  height: 88rpx;
-  border-radius: 44rpx;
-  background: #4ec6c8;
-  color: #ffffff;
-  font-size: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  height: 80rpx;
+  border-radius: 16rpx;
+  background: #83d414;
+}
+
+.checkout__label {
+  font-size: 30rpx;
   font-weight: 700;
-  line-height: 88rpx;
+  color: #1a1f16;
+}
+
+.checkout__save {
+  font-size: 20rpx;
+  color: #3a6b08;
+}
+
+.checkout__agree {
+  margin-top: 12rpx;
+  font-size: 18rpx;
+  line-height: 22rpx;
+  color: #9b9e96;
   text-align: center;
 }

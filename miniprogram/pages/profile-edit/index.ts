@@ -1,13 +1,14 @@
 /**
  * ============================================================================
- * 我的资料页逻辑
+ * 我的资料页逻辑 —— 视觉刷新草稿 V5
  * ============================================================================
  *
- * 终稿 Figma node 64:377。两版画板文字完全一样，收成这一页。
+ * Figma node 389:359。旧绿波浪头已经删掉，改成薄荷底 + page-nav occupy。
  *
  * 【哪些能改、哪些不能改】
- * 能改：头像、昵称、手机号、姓名、性别、惯用手、城市、俱乐部
- * 不能改：评分、等级、积分、身价（设计里写了「比赛成绩自动生成」）
+ * 能改：头像、昵称、手机、姓名、性别、惯用手、城市、俱乐部、
+ *       常打项目、球龄、个性标签、个人简介
+ * 不能改：评分、等级、积分、身价、胜场（设计写了「比赛自动生成，不可手改」）
  * UID 点了是复制，不是编辑。
  *
  * 保存目前只 toast，云开发接上后再把 form 提交到云函数。
@@ -16,6 +17,7 @@ import {
   GENDER_OPTIONS,
   HAND_OPTIONS,
   MOCK_PROFILE_EDIT,
+  PLAY_OPTIONS,
 } from '../../mock/profile-edit';
 import type { ProfileEditForm } from '../../mock/profile-edit';
 import { navigateToPage } from '../../utils/navigate';
@@ -26,6 +28,7 @@ Page({
     form: MOCK_PROFILE_EDIT as ProfileEditForm,
     genders: GENDER_OPTIONS,
     hands: HAND_OPTIONS,
+    plays: PLAY_OPTIONS,
   },
 
   onLoad() {
@@ -63,6 +66,18 @@ Page({
     this.promptField('city', '修改所在城市', this.data.form.city);
   },
 
+  onEditYears() {
+    this.promptField('years', '修改球龄', this.data.form.years);
+  },
+
+  onEditTags() {
+    this.promptField('tags', '修改个性标签', this.data.form.tags);
+  },
+
+  onEditBio() {
+    this.promptField('bio', '编辑个人简介', this.data.form.bio);
+  },
+
   onEditClub() {
     navigateToPage('/pages/clubs/index');
   },
@@ -73,6 +88,10 @@ Page({
 
   onHandTap(event: WechatMiniprogram.TouchEvent) {
     this.setData({ 'form.hand': event.currentTarget.dataset.value });
+  },
+
+  onPlayTap(event: WechatMiniprogram.TouchEvent) {
+    this.setData({ 'form.play': event.currentTarget.dataset.value });
   },
 
   onCopyUid() {
@@ -90,14 +109,14 @@ Page({
     wx.showModal({
       title,
       editable: true,
-      placeholderText: value,
+      placeholderText: value || '请输入',
       content: value,
       success: (res) => {
         if (!res.confirm || res.content === undefined) {
           return;
         }
         const next = res.content.trim();
-        if (!next) {
+        if (key !== 'bio' && !next) {
           return;
         }
         this.setData({ [`form.${key}`]: next });

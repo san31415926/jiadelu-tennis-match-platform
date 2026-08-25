@@ -19,6 +19,10 @@
   background: #edc71f;
 }
 
+.page-nav--mint {
+  background: #b8eddc;
+}
+
 .page-nav--plain {
   background: #ffffff;
 }

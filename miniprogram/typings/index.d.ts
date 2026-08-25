@@ -29,4 +29,5 @@ interface IAppOption {
   };
   initSystemMetrics(): void;
   initCloud(): void;
+  onLaunch(): void;
 }

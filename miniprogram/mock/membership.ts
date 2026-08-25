@@ -1,80 +1,60 @@
 /**
  * ============================================================================
- * 会员页数据 —— 「我的」页金色横幅点进去看到的权益和套餐
+ * 会员页数据 —— 「我的」点开通会员后看到的套餐
  * ============================================================================
  *
- * 这一页没有终稿设计稿，是按功能清单 3.2 和品牌绿/金自己排的一版，
- * 给你检查用。文案、价格、权益条数都可以改。
+ * 版式来自视觉刷新草稿「会员开通 / V5 / 选套餐」(355:361) 底部结算抽屉。
+ * 支付还没接，点「立即支付」只弹提示。
  *
  * 【常见改动】
- * 改横幅上的字     → mock/profile.ts 里没有，横幅写在 pages/profile/index.wxml
- * 改权益列表       → 改 BENEFITS
  * 改套餐名字/价格  → 改 PLANS
- * 购买还没接支付，点「立即开通」只弹提示，逻辑在 pages/membership/index.ts
+ * 改默认选中套餐  → pages/membership/index.ts 的 activePlan
+ * 改支付方式文案  → 改 PAY_METHODS
  */
-export interface MemberBenefit {
-  key: string;
-  title: string;
-  desc: string;
-}
-
 export interface MemberPlan {
   key: string;
   name: string;
+  /** 角标，如 推荐 / 首月。没有就留空 */
+  badge: string;
   price: string;
-  unit: string;
-  hint: string;
+  /** 划线原价。没有就留空 */
+  origin: string;
   recommended?: boolean;
 }
 
-export const MEMBER_HERO = {
-  kicker: 'LTJIMMY VIP',
-  title: '开通会员，解锁超值权益',
-  subtitle: '优先报名、积分加速、专属赛事与年会礼遇',
-};
-
-export const BENEFITS: MemberBenefit[] = [
-  {
-    key: 'signup',
-    title: '赛事优先报名',
-    desc: '热门场次先人一步锁定签位，减少满员遗憾',
-  },
-  {
-    key: 'points',
-    title: '积分加速',
-    desc: '参赛积分按 1.2 倍计入兑换，兑奖更快到账',
-  },
-  {
-    key: 'events',
-    title: '专属赛事',
-    desc: '不定期 VIP 内部赛与训练营，仅会员可报',
-  },
-  {
-    key: 'gala',
-    title: '年会礼遇',
-    desc: '典礼席位预留，抽奖额外增加一次机会',
-  },
-  {
-    key: 'service',
-    title: '客服优先',
-    desc: '报名、积分、合作问题走加急通道处理',
-  },
-];
-
 export const PLANS: MemberPlan[] = [
   {
+    key: 'month',
+    name: '连续包月',
+    badge: '首月',
+    price: '29',
+    origin: '39',
+  },
+  {
     key: 'quarter',
-    name: '季卡',
-    price: '99',
-    unit: '元 / 90 天',
-    hint: '先体验一季',
+    name: '连续包季',
+    badge: '首季',
+    price: '79',
+    origin: '99',
   },
   {
     key: 'year',
-    name: '年卡',
-    price: '299',
-    unit: '元 / 365 天',
-    hint: '相当于每月 25 元',
+    name: '连续包年',
+    badge: '超值',
+    price: '199',
+    origin: '299',
     recommended: true,
   },
+  {
+    key: 'yearOnce',
+    name: '12个月',
+    badge: '一次付清',
+    price: '259',
+    origin: '299',
+  },
+];
+
+export const PAY_METHODS = [
+  { key: 'wechat', label: '微信支付', mark: '微' },
+  { key: 'alipay', label: '支付宝', mark: '支' },
 ];

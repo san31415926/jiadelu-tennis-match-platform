@@ -80,22 +80,96 @@ declare namespace WechatMiniprogram {
     errMsg: string;
   }
 
+  interface ShowActionSheetSuccessCallbackResult {
+    tapIndex: number;
+    errMsg: string;
+  }
+
+  interface ShowModalSuccessCallbackResult {
+    confirm: boolean;
+    cancel: boolean;
+    content?: string;
+    errMsg: string;
+  }
+
+  interface ChooseMediaFile {
+    tempFilePath: string;
+    size?: number;
+  }
+
+  interface ChooseMediaSuccessCallbackResult {
+    tempFiles: ChooseMediaFile[];
+    type?: string;
+    errMsg: string;
+  }
+
+  /** 战力图那种 type="2d" 的 canvas 节点，不是旧的 canvas-id 上下文 */
+  interface Canvas {
+    width: number;
+    height: number;
+    getContext(contextType: '2d'): CanvasRenderingContext2D | null;
+  }
+
+  interface NodesRef {
+    fields(fields: { node?: boolean; size?: boolean }): SelectorQuery;
+  }
+
+  interface SelectorQuery {
+    select(selector: string): NodesRef;
+    exec(
+      callback?: (
+        res: Array<{ node?: Canvas; width?: number; height?: number }>,
+      ) => void,
+    ): void;
+  }
+
   interface WxCloud {
     init(options: { env: string; traceUser?: boolean }): void;
   }
 
+  /**
+   * 这里少写一个方法，页面里一调用就会 TS2339。
+   * 开发者工具开了 TypeScript 插件后，类型错误会挡住整包编译，模拟器变成白屏。
+   * 新用了微信 API，先在这个 interface 里补上，再写业务代码。
+   */
   interface Wx {
     cloud?: WxCloud;
     getWindowInfo(): WindowInfo;
     getMenuButtonBoundingClientRect(): Rect;
+    getSystemInfoSync(): WindowInfo;
     showToast(options: {
       title: string;
       icon?: 'success' | 'error' | 'loading' | 'none';
       duration?: number;
       mask?: boolean;
     }): void;
+    showActionSheet(options: {
+      itemList: string[];
+      success?: (res: ShowActionSheetSuccessCallbackResult) => void;
+      fail?: (err: { errMsg: string }) => void;
+    }): void;
+    showModal(options: {
+      title?: string;
+      content?: string;
+      showCancel?: boolean;
+      editable?: boolean;
+      placeholderText?: string;
+      success?: (res: ShowModalSuccessCallbackResult) => void;
+    }): void;
+    chooseMedia(options: {
+      count?: number;
+      mediaType?: Array<'image' | 'video' | 'mix'>;
+      sourceType?: Array<'album' | 'camera'>;
+      success?: (res: ChooseMediaSuccessCallbackResult) => void;
+    }): void;
+    setClipboardData(options: { data: string; success?: () => void }): void;
     navigateTo(options: { url: string }): void;
-    navigateBack(options?: { delta?: number }): void;
+    redirectTo(options: { url: string }): void;
+    navigateBack(options?: {
+      delta?: number;
+      success?: () => void;
+      fail?: () => void;
+    }): void;
     switchTab(options: { url: string }): void;
     previewImage(options: { urls: string[]; current?: string }): void;
     login(options: {
@@ -109,6 +183,7 @@ declare namespace WechatMiniprogram {
     readonly data: D;
     setData(data: Partial<D> | IAnyObject, callback?: () => void): void;
     getTabBar<T = any>(): T;
+    createSelectorQuery(): SelectorQuery;
   }
 
   type PageInstance<T extends IAnyObject> = T &
@@ -131,7 +206,32 @@ declare namespace WechatMiniprogram {
   } & ThisType<ComponentInstance<T>>;
 }
 
+/**
+ * 战力图用 canvas 2d 上下文。tsconfig 的 lib 只有 ES2020，没有 DOM，
+ * 所以这里自己声明用到的那几个方法，避免 CanvasRenderingContext2D 找不到。
+ */
+interface CanvasRenderingContext2D {
+  strokeStyle: string;
+  fillStyle: string;
+  lineWidth: number;
+  scale(x: number, y: number): void;
+  clearRect(x: number, y: number, w: number, h: number): void;
+  beginPath(): void;
+  moveTo(x: number, y: number): void;
+  lineTo(x: number, y: number): void;
+  closePath(): void;
+  stroke(): void;
+  fill(): void;
+  arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void;
+}
+
 declare const wx: WechatMiniprogram.Wx;
+
+declare const console: {
+  log(...data: any[]): void;
+  warn(...data: any[]): void;
+  error(...data: any[]): void;
+};
 
 declare function App<T extends WechatMiniprogram.IAnyObject>(
   options: T & ThisType<T>,

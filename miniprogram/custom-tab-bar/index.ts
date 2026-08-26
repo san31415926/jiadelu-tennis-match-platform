@@ -1,19 +1,15 @@
+import { themeBehavior } from '../behaviors/theme';
+
 /**
  * ============================================================================
  * 自定义底栏 —— 三个 Tab 的图标、文字与跳转
  * ============================================================================
  *
- * 【为什么不用微信自带的底栏】
- * 设计稿的底栏是 3D 立体图标 + 选中时图标背后有一圈淡绿光晕，微信原生底栏
- * 只支持"一张图 + 一行字"，做不出光晕效果。所以在 app.json 里设了
- * tabBar.custom: true，改用这个组件自己画。
+ * 设计稿是 3D 图标 + 选中光晕，微信原生底栏做不到，所以 app.json 里
+ * tabBar.custom: true，用这个组件自己画。文件夹名必须叫 custom-tab-bar。
  *
- * 【文件夹名字不能改】
- * 必须叫 custom-tab-bar，文件必须叫 index，这是微信的约定。改名后底栏会消失。
- *
- * 【选中态是怎么来的】
- * 这个组件不知道当前在哪个页面，需要每个 Tab 页在 onShow 里调用
- * syncTabBarSelected(this, 索引) 告诉它。详见 utils/tabbar.ts。
+ * 选中第几个：各 Tab 页 onShow 里 syncTabBarSelected(this, 索引)。
+ * 选中颜色：挂了 themeBehavior，跟全站强调色走，不必再单独登记。
  */
 
 interface TabItem {
@@ -78,8 +74,9 @@ const TABS: TabItem[] = [
 ];
 
 Component({
+  behaviors: [themeBehavior],
   data: {
-    /** 当前选中第几个（从 0 开始），由页面通过 syncTabBarSelected 写入 */
+    /** 当前选中第几个（从 0 开始）。以当前页路径为准，不要只信这份缓存 */
     selected: 0,
     tabs: TABS,
     /**
@@ -89,17 +86,43 @@ Component({
      * 调到 0.3 → 未选中更暗淡，选中态对比更强烈
      */
     idleOpacity: 0.52,
+    /** 首页侧栏打开时为 true，整条底栏藏掉，避免挡住侧栏底部两项 */
+    hidden: false,
+  },
+
+  pageLifetimes: {
+    show() {
+      this.syncFromRoute();
+    },
   },
 
   methods: {
+    currentRoute(): string {
+      const pages = getCurrentPages();
+      const current = pages[pages.length - 1];
+      return current && current.route ? `/${current.route}` : '';
+    },
+
+    /** 高亮跟当前页走，避免还停在「赛事」时点「赛事」被当成已经在这一页 */
+    syncFromRoute() {
+      const route = this.currentRoute();
+      const selected = TABS.findIndex((tab) => tab.path === route);
+      if (selected >= 0 && selected !== this.data.selected) {
+        this.setData({ selected });
+      }
+    },
+
     onTap(event: WechatMiniprogram.TouchEvent) {
       const index = Number(event.currentTarget.dataset.index);
-      // 点当前页不做任何事，避免重复触发页面生命周期
-      if (index === this.data.selected) {
+      if (index < 0 || index >= TABS.length) {
         return;
       }
-      // Tab 页之间必须用 switchTab，用 navigateTo 会报错
-      wx.switchTab({ url: TABS[index].path });
+      const url = TABS[index].path;
+      this.setData({ selected: index });
+      if (this.currentRoute() === url) {
+        return;
+      }
+      wx.switchTab({ url });
     },
   },
 });

@@ -1,17 +1,6 @@
-<view class="clubs">
-  <page-nav title="俱乐部" />
-  <!-- 头部，Figma node 23:345 -->
-  <view class="header" style="padding-top:{{statusBarHeight}}px">
-    <view class="header__inner">
-      <!-- 该页下缘同样是超宽椭圆（node 23:351） -->
-      <view class="header__ellipse"></view>
-
-      <image class="header__flag" src="/assets/images/club/header-flag.png" mode="aspectFit" />
-
-      <view class="header__heading">俱乐部</view>
-      <view class="header__summary">{{summary}}</view>
-    </view>
-  </view>
+<view class="clubs theme-{{theme}}" style="{{themeVars}}">
+  <page-nav title="俱乐部" occupy="{{true}}" />
+  <view class="kicker">{{summary}}</view>
 
   <!-- 搜索，Figma node 23:353 -->
   <view class="search">
@@ -32,6 +21,7 @@
   <view class="filters">
     <view
       class="filters__chip {{activeFilter === item ? 'is-active' : ''}}"
+      style="{{activeFilter === item ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}"
       wx:for="{{filters}}"
       wx:key="*this"
       data-filter="{{item}}"
@@ -54,6 +44,7 @@
       </view>
       <view
         class="list__action {{item.joined ? 'list__action--joined' : ''}}"
+        style="{{item.joined ? '' : 'background:' + accent + ';color:' + accentText}}"
         catchtap="onJoinTap"
         data-id="{{item.id}}"
       >
@@ -69,7 +60,7 @@
   <view class="create-spacer"></view>
 
   <!-- 底部固定按钮，Figma node 23:425 -->
-  <view class="create-btn" bindtap="onCreateClub">
+  <view class="create-btn" style="background:{{accent}};color:{{accentText}}" bindtap="onCreateClub">
     <view class="create-btn__plus"></view>
     <text>创建俱乐部</text>
   </view>

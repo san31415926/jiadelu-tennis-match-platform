@@ -19,7 +19,7 @@
 .venue {
   min-height: 100vh;
   padding-bottom: 48rpx;
-  background: #f1f1f1;
+  background: var(--page-bg);
 }
 
 /* 叠在头图左上。相册 Tab 改用 page-nav，这条会藏掉 */
@@ -85,7 +85,8 @@
 }
 
 .hero__pill.is-on {
-  background: #83d414;
+  background: var(--accent);
+  color: var(--accent-text);
 }
 
 .hero__more {
@@ -215,7 +216,7 @@
   width: 64rpx;
   height: 6rpx;
   border-radius: 3rpx;
-  background: #83d414;
+  background: var(--accent);
 }
 
 .tabs__item.is-on:nth-child(2) .tabs__bar,
@@ -268,7 +269,7 @@
 }
 
 .boards__item.is-on {
-  background: #83d414;
+  background: var(--accent);
   color: #1c1f21;
 }
 
@@ -363,7 +364,7 @@
 .rank-row--1 .rank-row__rank,
 .rank-row--2 .rank-row__rank,
 .rank-row--3 .rank-row__rank {
-  color: #83d414;
+  color: var(--accent);
 }
 
 .rank-row__avatar {
@@ -424,7 +425,7 @@
   width: 6rpx;
   height: 28rpx;
   border-radius: 3rpx;
-  background: #83d414;
+  background: var(--accent);
 }
 
 .album__title {

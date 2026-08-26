@@ -1,10 +1,5 @@
-<view class="records">
-  <page-nav title="参赛记录" variant="mint" />
-  <view class="sub-header sub-header--mint" style="padding-top:{{statusBarHeight}}px">
-    <view class="sub-header__inner sub-header__inner--compact">
-      <view class="sub-header__wave"></view>
-    </view>
-  </view>
+<view class="records theme-{{theme}}" style="{{themeVars}}">
+  <page-nav title="参赛记录" occupy="{{true}}" />
 
   <view class="summary">
     <view class="summary__title-row">
@@ -33,6 +28,7 @@
   <view class="filters">
     <view
       class="filters__chip {{activeFilter === item ? 'is-active' : ''}}"
+      style="{{activeFilter === item ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}"
       wx:for="{{filters}}"
       wx:key="*this"
       data-filter="{{item}}"

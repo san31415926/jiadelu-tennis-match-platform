@@ -1,33 +1,29 @@
-<view class="ranking">
-  <page-nav title="球员排名" />
-  <!-- 头部，Figma node 15:4 -->
-  <view class="header" style="padding-top:{{statusBarHeight}}px">
-    <view class="header__inner">
-      <view class="header__wave"></view>
-
-      <view class="scope-tabs">
-        <view
-          wx:for="{{scopes}}"
-          wx:key="*this"
-          class="scope-tabs__item {{activeScope === item ? 'is-active' : ''}}"
-          data-scope="{{item}}"
-          bindtap="onScopeTap"
-        >
-          {{item}}
-        </view>
+<view class="ranking theme-{{theme}}" style="{{themeVars}}">
+  <page-nav title="球员排名" occupy="{{true}}" />
+  <view class="rank-tools">
+    <view class="scope-tabs">
+      <view
+        wx:for="{{scopes}}"
+        wx:key="*this"
+        class="scope-tabs__item {{activeScope === item ? 'is-active' : ''}}"
+        style="{{activeScope === item ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}"
+        data-scope="{{item}}"
+        bindtap="onScopeTap"
+      >
+        {{item}}
       </view>
+    </view>
 
-      <view class="metric-tabs">
-        <view
-          wx:for="{{metrics}}"
-          wx:key="*this"
-          class="metric-tabs__item {{activeMetric === item ? 'is-active' : ''}}"
-          data-metric="{{item}}"
-          bindtap="onMetricTap"
-        >
-          {{item}}
-          <view class="metric-tabs__underline" wx:if="{{activeMetric === item}}"></view>
-        </view>
+    <view class="metric-tabs">
+      <view
+        wx:for="{{metrics}}"
+        wx:key="*this"
+        class="metric-tabs__item {{activeMetric === item ? 'is-active' : ''}}"
+        data-metric="{{item}}"
+        bindtap="onMetricTap"
+      >
+        {{item}}
+        <view class="metric-tabs__underline" wx:if="{{activeMetric === item}}" style="background:{{accent}}"></view>
       </view>
     </view>
   </view>
@@ -94,14 +90,14 @@
   </view>
 
   <view class="show-more" wx:if="{{totalRows > 3}}" bindtap="onToggleExpand">
+    <text>{{expanded ? '收起' : '查看全部 ' + totalCount + ' 名球员'}}</text>
     <text class="show-more__arrow">{{expanded ? '∧' : '∨'}}</text>
-    <text>{{expanded ? '收起' : '展示 TOP' + totalRows}}</text>
   </view>
 
   <view class="my-rank-spacer"></view>
 
-  <!-- 我的排名，设计中固定在底部 -->
-  <view class="my-rank">
+  <!-- 我的排名，设计中固定在底部。整条可点，去参赛切回赛事 Tab -->
+  <view class="my-rank" bindtap="onMineTap" hover-class="my-rank--pressed" hover-stay-time="80">
     <image class="my-rank__trophy" src="/assets/images/ranking/my-trophy.png" mode="aspectFit" />
     <text class="my-rank__summary">{{myRanking.summary}}</text>
     <text class="my-rank__action">{{myRanking.actionText}}</text>

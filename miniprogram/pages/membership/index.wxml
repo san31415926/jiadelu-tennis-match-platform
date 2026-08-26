@@ -1,4 +1,4 @@
-<view class="membership">
+<view class="membership theme-{{theme}}" style="{{themeVars}}">
   <page-nav title="开通会员" variant="plain" occupy="{{true}}" />
 
   <view class="sheet">
@@ -46,7 +46,7 @@
 
   <view class="checkout-spacer"></view>
   <view class="checkout">
-    <view class="checkout__btn" bindtap="onCheckout">
+    <view class="checkout__btn" style="background:{{accent}};color:{{accentText}}" bindtap="onCheckout">
       <text class="checkout__label">{{payLabel}}</text>
       <text class="checkout__save" wx:if="{{saveHint}}">{{saveHint}}</text>
     </view>

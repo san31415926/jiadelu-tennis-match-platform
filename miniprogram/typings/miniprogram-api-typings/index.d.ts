@@ -108,17 +108,48 @@ declare namespace WechatMiniprogram {
     width: number;
     height: number;
     getContext(contextType: '2d'): CanvasRenderingContext2D | null;
+    createImage(): CanvasImage;
+  }
+
+  /** canvas 2d 用 createImage 造出来的图，onload 之后才能 drawImage */
+  interface CanvasImage {
+    src: string;
+    width?: number;
+    height?: number;
+    onload: (() => void) | null;
+    onerror: (() => void) | null;
+  }
+
+  interface GetImageInfoSuccessCallbackResult {
+    width: number;
+    height: number;
+    path: string;
+    errMsg: string;
+  }
+
+  interface CanvasToTempFilePathSuccessCallbackResult {
+    tempFilePath: string;
+    errMsg: string;
   }
 
   interface NodesRef {
     fields(fields: { node?: boolean; size?: boolean }): SelectorQuery;
+    boundingClientRect(): SelectorQuery;
   }
 
   interface SelectorQuery {
     select(selector: string): NodesRef;
     exec(
       callback?: (
-        res: Array<{ node?: Canvas; width?: number; height?: number }>,
+        res: Array<{
+          node?: Canvas;
+          width?: number;
+          height?: number;
+          left?: number;
+          top?: number;
+          right?: number;
+          bottom?: number;
+        }>,
       ) => void,
     ): void;
   }
@@ -162,6 +193,26 @@ declare namespace WechatMiniprogram {
       sourceType?: Array<'album' | 'camera'>;
       success?: (res: ChooseMediaSuccessCallbackResult) => void;
     }): void;
+    getImageInfo(options: {
+      src: string;
+      success?: (res: GetImageInfoSuccessCallbackResult) => void;
+      fail?: (err: { errMsg: string }) => void;
+    }): void;
+    canvasToTempFilePath(options: {
+      canvas?: Canvas;
+      canvasId?: string;
+      x?: number;
+      y?: number;
+      width?: number;
+      height?: number;
+      destWidth?: number;
+      destHeight?: number;
+      fileType?: 'jpg' | 'png';
+      quality?: number;
+      success?: (res: CanvasToTempFilePathSuccessCallbackResult) => void;
+      fail?: (err: { errMsg: string }) => void;
+    }): void;
+    nextTick(callback: () => void): void;
     setClipboardData(options: { data: string; success?: () => void }): void;
     navigateTo(options: { url: string }): void;
     redirectTo(options: { url: string }): void;
@@ -177,6 +228,15 @@ declare namespace WechatMiniprogram {
       fail?: (err: { errMsg: string }) => void;
       complete?: () => void;
     }): void;
+    getStorageSync(key: string): string;
+    setStorageSync(key: string, data: string): void;
+    setBackgroundColor(options: {
+      backgroundColor?: string;
+      backgroundColorTop?: string;
+      backgroundColorBottom?: string;
+      success?: () => void;
+      fail?: () => void;
+    }): void;
   }
 
   interface PageInstanceMethods<D extends IAnyObject = IAnyObject> {
@@ -189,12 +249,15 @@ declare namespace WechatMiniprogram {
   type PageInstance<T extends IAnyObject> = T &
     PageInstanceMethods<T extends { data: infer D } ? D & IAnyObject : IAnyObject>;
 
-  type PageOptions<T extends IAnyObject> = T & ThisType<PageInstance<T>>;
+  type PageOptions<T extends IAnyObject> = T & {
+    behaviors?: any[];
+  } & ThisType<PageInstance<T>>;
 
   interface ComponentInstanceMethods {
     readonly data: IAnyObject;
     setData(data: IAnyObject, callback?: () => void): void;
     triggerEvent(name: string, detail?: IAnyObject, options?: IAnyObject): void;
+    createSelectorQuery(): SelectorQuery;
   }
 
   type ComponentInstance<T extends IAnyObject> = T &
@@ -203,6 +266,12 @@ declare namespace WechatMiniprogram {
 
   type ComponentOptions<T extends IAnyObject> = T & {
     methods?: T extends { methods: infer M } ? M & ThisType<ComponentInstance<T>> : never;
+    lifetimes?: WechatMiniprogram.IAnyObject;
+    pageLifetimes?: WechatMiniprogram.IAnyObject;
+    observers?: WechatMiniprogram.IAnyObject;
+    options?: WechatMiniprogram.IAnyObject;
+    properties?: WechatMiniprogram.IAnyObject;
+    data?: WechatMiniprogram.IAnyObject;
   } & ThisType<ComponentInstance<T>>;
 }
 
@@ -216,6 +285,17 @@ interface CanvasRenderingContext2D {
   lineWidth: number;
   scale(x: number, y: number): void;
   clearRect(x: number, y: number, w: number, h: number): void;
+  drawImage(
+    image: WechatMiniprogram.CanvasImage,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    dx: number,
+    dy: number,
+    dw: number,
+    dh: number,
+  ): void;
   beginPath(): void;
   moveTo(x: number, y: number): void;
   lineTo(x: number, y: number): void;
@@ -224,6 +304,8 @@ interface CanvasRenderingContext2D {
   fill(): void;
   arc(x: number, y: number, radius: number, startAngle: number, endAngle: number): void;
 }
+
+declare function setTimeout(handler: () => void, timeout?: number): number;
 
 declare const wx: WechatMiniprogram.Wx;
 
@@ -238,6 +320,14 @@ declare function App<T extends WechatMiniprogram.IAnyObject>(
 ): void;
 
 declare function getApp<T = any>(): T;
+
+declare function getCurrentPages(): Array<{
+  route: string;
+  data?: WechatMiniprogram.IAnyObject;
+  setData(data: WechatMiniprogram.IAnyObject, callback?: () => void): void;
+}>;
+
+declare function Behavior(options: WechatMiniprogram.IAnyObject): any;
 
 declare function Page<T extends WechatMiniprogram.IAnyObject>(
   options: WechatMiniprogram.PageOptions<T>,

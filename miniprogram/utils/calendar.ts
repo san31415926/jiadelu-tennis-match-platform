@@ -17,11 +17,11 @@ export interface CalendarCell {
   day: number;
   /** 是否属于当前显示的月份。false 的格子文字显示为浅灰 */
   inMonth: boolean;
-  /** 这天有没有赛事。true 会在日号下方画一个绿色小圆点 */
+  /** 这天有没有赛事。true 会在日号下方画一个强调色小圆点 */
   hasEvent: boolean;
 }
 
-const WEEKDAY_NAMES = ['日', '一', '二', '三', '四', '五', '六'];
+export const WEEKDAY_NAMES = ['日', '一', '二', '三', '四', '五', '六'];
 
 /** 把 8 补成 08，用于拼日期字符串 */
 function pad(value: number): string {
@@ -102,6 +102,29 @@ export function buildMonthCells(
     weeks.push(cells.slice(index, index + 7));
   }
   return weeks;
+}
+
+/** 筛选日历顶上那句「2026年08月」 */
+export function formatMonthTitle(year: number, month: number): string {
+  return `${year}年${pad(month)}月`;
+}
+
+/** 已选择那句「08月24日」，从 YYYY-MM-DD 来 */
+export function formatMonthDay(key: string): string {
+  const parts = key.split('-');
+  return `${parts[1]}月${parts[2]}日`;
+}
+
+/**
+ * 从赛事 time 文案抠出日期键。假数据没有年份，一律按 2026。
+ * 改了 time 写法（没有「08月29日」）这里会返回空字符串，那天就筛不中。
+ */
+export function eventDateKey(time: string, year = 2026): string {
+  const matched = time.match(/(\d+)月(\d+)日/);
+  if (!matched) {
+    return '';
+  }
+  return toDateKey(year, Number(matched[1]), Number(matched[2]));
 }
 
 /**

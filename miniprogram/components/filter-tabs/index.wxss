@@ -58,15 +58,19 @@
 
 /**
  * V5 胶囊条（Figma 148:199）。四项均分，选中态白字。
- * 外层圆角 999、内边距 10，单项高 58（14+30+14）。
+ *
+ * 设计稿未选中是浅灰底浅灰字，叠在换过的页底上会糊成一块。
+ * 外框改成白底 + 深一点描边，未选中字加深，选中项加一点投影，
+ * 当前项才一眼能认出来。想收回原稿对比，把 border / 未选中 color
+ * 改回 #e5e5e0 和 #73786b，并去掉 box-shadow。
  */
 .filters--capsule {
   gap: 8rpx;
   height: auto;
   padding: 10rpx;
-  border: 1rpx solid #e5e5e0;
+  border: 2rpx solid #cfd2c6;
   border-radius: 999rpx;
-  background: transparent;
+  background: #ffffff;
 }
 
 .filters--capsule .filters__item {
@@ -75,14 +79,14 @@
   height: auto;
   padding: 14rpx 8rpx;
   font-size: 22rpx;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 30rpx;
   letter-spacing: 0.44rpx;
-  color: #73786b;
-  background: #f1f1f0;
+  color: #3d4436;
+  background: #e8e8e2;
 }
 
 .filters--capsule .filters__item.is-active {
-  font-weight: 500;
-  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4rpx 10rpx rgba(20, 24, 16, 0.18);
 }

@@ -1,21 +1,12 @@
-<view class="gallery">
-  <page-nav title="相册" />
-  <!-- 头部，Figma node 23:274 -->
-  <view class="header" style="padding-top:{{statusBarHeight}}px">
-    <view class="header__inner">
-      <view class="header__ellipse"></view>
-
-      <image class="header__camera" src="/assets/images/gallery/header-camera.png" mode="aspectFit" />
-
-      <view class="header__heading">赛事相册</view>
-      <view class="header__summary">{{summary}}</view>
-    </view>
-  </view>
+<view class="gallery theme-{{theme}}" style="{{themeVars}}">
+  <page-nav title="相册" occupy="{{true}}" />
+  <view class="kicker">{{summary}}</view>
 
   <!-- 分类筛选，Figma node 23:281 -->
   <view class="filters">
     <view
       class="filters__chip {{activeFilter === item ? 'is-active' : ''}}"
+      style="{{activeFilter === item ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}"
       wx:for="{{filters}}"
       wx:key="*this"
       data-filter="{{item}}"

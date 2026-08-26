@@ -1,4 +1,4 @@
-<view class="venue">
+<view class="venue theme-{{theme}}" style="{{themeVars}}">
   <!-- 相册 Tab 换成白底导航，和稿 326:463 一致 -->
   <page-nav wx:if="{{activeTab === 'album'}}" title="品牌相册" variant="plain" occupy="{{true}}" />
 

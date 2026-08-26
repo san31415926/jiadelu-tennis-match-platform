@@ -40,7 +40,7 @@
   height: var(--header-height);
   overflow: hidden;
   /* swiper 原生组件底是深色，底下哪怕露 1px 也会变成一条黑横线 */
-  background: #fbfff4;
+  background: var(--page-bg);
 }
 
 /** 波浪必须盖在轮播图上面，才能切出设计稿那条白边 */
@@ -60,7 +60,7 @@
   bottom: 0;
   z-index: 3;
   height: 24rpx;
-  background: #fbfff4;
+  background: var(--page-bg);
   pointer-events: none;
 }
 
@@ -90,7 +90,7 @@
   width: 100%;
   height: calc(var(--header-height) + 12rpx);
   border: none;
-  background: #fbfff4;
+  background: var(--page-bg);
 }
 
 .banner__slide {
@@ -98,7 +98,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #fbfff4;
+  background: var(--page-bg);
 }
 
 .banner__image {

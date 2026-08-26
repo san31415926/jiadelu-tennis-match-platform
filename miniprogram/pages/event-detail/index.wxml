@@ -1,10 +1,5 @@
-<view class="detail">
-  <page-nav title="{{displayTitle}}" />
-  <view class="sub-header" style="padding-top:{{statusBarHeight}}px">
-    <view class="sub-header__inner sub-header__inner--compact">
-      <view class="sub-header__wave"></view>
-    </view>
-  </view>
+<view class="detail theme-{{theme}}" style="{{themeVars}}">
+  <page-nav title="{{displayTitle}}" occupy="{{true}}" />
 
   <view class="title-row">
     <view class="status">{{event.status}}</view>
@@ -14,6 +9,7 @@
   <view class="nav-card">
     <view
       class="nav-cell {{activeTab === item.key ? 'nav-cell--on' : ''}}"
+      style="{{activeTab === item.key ? 'background:' + accent : ''}}"
       wx:for="{{nav}}"
       wx:key="key"
       data-key="{{item.key}}"
@@ -268,7 +264,7 @@
         <view class="sched__time">{{item.time}}</view>
         <view class="sched__court">{{item.court}}</view>
         <view class="sched__round">{{item.round}}</view>
-        <view class="sched__st sched__st--{{item.status}}">{{item.status}}</view>
+        <view class="sched__st sched__st--{{item.statusTone}}">{{item.status}}</view>
       </view>
       <view class="sched__vs">
         <view class="sched__side">{{item.left}}</view>
@@ -281,10 +277,18 @@
 
   <block wx:if="{{activeTab === 'results'}}">
     <view class="res-head">
-      <view class="res-head__rank">名次</view>
-      <view class="res-head__player">选手</view>
-      <view class="res-head__pts">赛事积分</view>
-      <view class="res-head__cup">超级杯</view>
+      <view class="res__rank">名次</view>
+      <view class="res__players">
+        <view class="res-p res-p--head">
+          <view class="res-p__avatar-slot"></view>
+          <view class="res-p__name">选手</view>
+          <view class="res-p__rating"></view>
+          <view class="res-p__delta"></view>
+          <view class="res-p__club">俱乐部</view>
+        </view>
+      </view>
+      <view class="res__pts">赛事积分</view>
+      <view class="res__cup">超级杯</view>
     </view>
     <view class="res res--{{item.rank}}" wx:for="{{event.results}}" wx:key="rank">
       <view class="res__rank">
@@ -299,19 +303,18 @@
           </view>
           <view class="res-p__name">{{player.name}}</view>
           <view class="res-p__rating">{{player.rating}}</view>
-          <view class="res-p__delta" wx:if="{{player.ratingDelta}}">{{player.ratingDelta}}</view>
+          <view class="res-p__delta">{{player.ratingDelta}}</view>
+          <view class="res-p__club">{{player.club || '个人'}}</view>
         </view>
       </view>
-      <view class="res__nums">
-        <view class="res__pts">{{item.eventPoints}}</view>
-        <view class="res__cup">{{item.superCup}}</view>
-      </view>
+      <view class="res__pts">{{item.eventPoints}}</view>
+      <view class="res__cup">{{item.superCup}}</view>
     </view>
   </block>
 
   <view class="cta-spacer" wx:if="{{showCta}}"></view>
   <view class="cta" wx:if="{{showCta}}">
-    <view class="cta__btn {{ctaLime ? '' : 'cta__btn--mute'}}" bindtap="onCta">{{ctaLabel}}</view>
+    <view class="cta__btn {{ctaLime ? '' : 'cta__btn--mute'}}" style="{{ctaLime ? 'background:' + accent + ';color:' + accentText : ''}}" bindtap="onCta">{{ctaLabel}}</view>
     <view class="cta__hint {{ctaHintGray ? 'cta__hint--gray' : ''}}" wx:if="{{ctaHint}}">{{ctaHint}}</view>
   </view>
 

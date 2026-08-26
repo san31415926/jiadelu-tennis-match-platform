@@ -1,0 +1,282 @@
+/**
+ * ============================================================================
+ * 通用图片裁剪器
+ * ============================================================================
+ *
+ * 全屏遮罩。舞台里的图按 contain 完整放下，白框按调用方给的宽高比裁。
+ * 遮罩挂在框上一起拖，拖的时候不用 setData，避免 movable-view 回跳。
+ *
+ * 设计稿 1px = 1rpx。舞台几何由 JS 按真机 px 算，因为要跟原图像素对齐。
+ */
+
+.cropper {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  background: #111111;
+}
+
+.cropper__bar {
+  flex-shrink: 0;
+  padding: 16rpx 40rpx 20rpx;
+}
+
+.cropper__title {
+  color: #ffffff;
+  font-size: 34rpx;
+  font-weight: 600;
+  line-height: 48rpx;
+}
+
+.cropper__hint {
+  margin-top: 8rpx;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 22rpx;
+  line-height: 32rpx;
+}
+
+.cropper__stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #000000;
+}
+
+.cropper__wait {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 46%;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 24rpx;
+  pointer-events: none;
+}
+
+.cropper__image {
+  position: absolute;
+}
+
+.cropper__image--fit {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cropper__area {
+  position: absolute;
+  overflow: hidden;
+}
+
+.cropper__movable-area {
+  position: relative;
+  overflow: hidden;
+}
+
+.cropper__box {
+  position: relative;
+  z-index: 2;
+}
+
+.cropper__shade {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+.cropper__shade--t {
+  left: -2000px;
+  right: -2000px;
+  bottom: 100%;
+  height: 4000px;
+}
+
+.cropper__shade--b {
+  left: -2000px;
+  right: -2000px;
+  top: 100%;
+  height: 4000px;
+}
+
+.cropper__shade--l {
+  right: 100%;
+  top: 0;
+  bottom: 0;
+  width: 2000px;
+}
+
+.cropper__shade--r {
+  left: 100%;
+  top: 0;
+  bottom: 0;
+  width: 2000px;
+}
+
+.cropper__frame {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border: 4rpx solid #ffffff;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.cropper__grid {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+}
+
+.cropper__grid--v1,
+.cropper__grid--v2 {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.cropper__grid--v1 {
+  left: 33.33%;
+}
+
+.cropper__grid--v2 {
+  left: 66.66%;
+}
+
+.cropper__grid--h1,
+.cropper__grid--h2 {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.cropper__grid--h1 {
+  top: 33.33%;
+}
+
+.cropper__grid--h2 {
+  top: 66.66%;
+}
+
+.cropper__handle {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  z-index: 3;
+}
+
+.cropper__handle--nw {
+  left: -22px;
+  top: -22px;
+}
+
+.cropper__handle--ne {
+  right: -22px;
+  top: -22px;
+}
+
+.cropper__handle--sw {
+  left: -22px;
+  bottom: -22px;
+}
+
+.cropper__handle--se {
+  right: -22px;
+  bottom: -22px;
+}
+
+.cropper__corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 4rpx solid #ffffff;
+  pointer-events: none;
+}
+
+.cropper__handle--nw .cropper__corner {
+  left: 22px;
+  top: 22px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.cropper__handle--ne .cropper__corner {
+  right: 22px;
+  top: 22px;
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.cropper__handle--sw .cropper__corner {
+  left: 22px;
+  bottom: 22px;
+  border-right: 0;
+  border-top: 0;
+}
+
+.cropper__handle--se .cropper__corner {
+  right: 22px;
+  bottom: 22px;
+  border-left: 0;
+  border-top: 0;
+}
+
+.cropper__dock {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 28rpx calc(20rpx + env(safe-area-inset-bottom));
+  background: #161616;
+}
+
+.cropper__cancel,
+.cropper__ok,
+.cropper__zoom-btn {
+  height: 72rpx;
+  line-height: 72rpx;
+  text-align: center;
+  font-size: 26rpx;
+  border-radius: 36rpx;
+}
+
+.cropper__cancel {
+  width: 132rpx;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.cropper__zoom {
+  display: flex;
+  gap: 12rpx;
+}
+
+.cropper__zoom-btn {
+  width: 140rpx;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.cropper__ok {
+  width: 148rpx;
+  font-weight: 600;
+}
+
+.cropper__canvas {
+  position: fixed;
+  left: -4000px;
+  top: 0;
+  width: 300px;
+  height: 200px;
+  pointer-events: none;
+}

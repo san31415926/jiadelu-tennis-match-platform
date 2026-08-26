@@ -3,85 +3,58 @@
  * 球员排行页样式
  * ============================================================================
  * 数值来自 Figma node 15:3 及其子节点。
- * V5 页沿用原节点 15:2。草稿 228:786（Prototype / Cut Assets）是旧终稿拷贝，未换皮。
+ * 旧绿波浪头已经删掉，occupy 吸顶栏。城市榜 / 指标筛选走主题强调色。
  *
  * 【这一页的三种布局方式，各有原因】
- *   头部     绝对定位 —— 双榜切换、指标筛选是手工摆位的
- *   领奖台   绝对定位 —— 每个名次是「台座 + 金圈」合成切图，头像叠在圈心；
- *                        三张切图仍会左右重叠，所以继续绝对定位
- *   下方列表 流式布局 —— 行数会随展开/收起变化，必须能自适应高度
+ *   筛选条   流式 —— occupy 之后不再叠在装饰头上
+ *   领奖台   绝对定位 —— 每个名次是「台座 + 金圈」合成切图
+ *   下方列表 流式布局 —— 行数会随展开/收起变化
  *
- * 【头部样式覆盖了 app.wxss】
- * .header__wave 在 app.wxss 里有基础定义（七页共用），
- * 这一页的头部高度和波浪形状与首页不同，所以在下面重写了它们的
- * top / height / background-image。
+ * 「查看全部」跟俱乐部榜同一套：顶部分割线 + 灰字 + 强调色箭头，不要绿色药丸。
  *
  * 【领奖台的遮挡关系靠 DOM 顺序，不是 z-index】
  * 头像写在合成切图之后，才能盖住金圈中间的白色圆心。
- * 冠军那一套写在亚季军后面，台座边缘重叠时冠军压在上面。
- * 不要用负 z-index，头像会跑到页面背景底下看不见。
  */
 
 .ranking {
   min-height: 100vh;
-  background: #fcfef5;
+  background: var(--page-bg);
 }
 
-/* ---------- 头部 ---------- */
-
-.header {
-  position: relative;
-  background: linear-gradient(180deg, #a1d60f 0%, #c7f033 60%, #f0faa6 100%);
+.rank-tools {
+  padding: 16rpx 40rpx 24rpx;
 }
 
-.header__inner {
-  height: 272rpx;
-}
-
-/* 波浪路径取自 node 15:6 */
-.header__wave {
-  top: 174rpx;
-  height: 105rpx;
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105' viewBox='0 0 750 105' preserveAspectRatio='none'%3E%3Cpath d='M0 0C125 70 235 70 350 30C500 -24 585 75 750 8V105H0V0Z' fill='%23FCFEF5'/%3E%3C/svg%3E");
-}
-
-/* 城市榜 / 全国榜，node 15:8 */
 .scope-tabs {
-  position: absolute;
-  left: 140rpx;
-  top: 91rpx;
   display: flex;
   gap: 12rpx;
-  width: 470rpx;
   height: 58rpx;
 }
 
 .scope-tabs__item {
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  width: 229rpx;
   height: 58rpx;
+  border: 2rpx solid #cfd2c6;
   border-radius: 29rpx;
-  background: #e8f59e;
+  background: #ffffff;
   font-size: 24rpx;
   font-weight: 600;
-  color: #6b7059;
+  color: #3d4436;
 }
 
 .scope-tabs__item.is-active {
-  background: #2e3324;
-  color: #ffffff;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
 }
 
-/* 积分 / 身价 / 战力，node 15:13 */
 .metric-tabs {
-  position: absolute;
-  left: 121rpx;
-  top: 239rpx;
   display: flex;
   gap: 46rpx;
-  width: 520rpx;
+  margin-top: 20rpx;
 }
 
 .metric-tabs__item {
@@ -97,7 +70,6 @@
   color: #1f2114;
 }
 
-/* node 15:17：48x5 的圆角短线 */
 .metric-tabs__underline {
   position: absolute;
   left: 50%;
@@ -106,7 +78,7 @@
   height: 5rpx;
   margin-left: -24rpx;
   border-radius: 2.5rpx;
-  background: #548005;
+  background: var(--accent);
 }
 
 /* ---------- 领奖台 ---------- */
@@ -114,7 +86,7 @@
 .podium {
   position: relative;
   height: 454rpx;
-  background: #fcfef5;
+  background: var(--page-bg);
 }
 
 /**
@@ -352,10 +324,10 @@
   width: 58rpx;
   height: 29rpx;
   border-radius: 16rpx;
-  background: #e8f59e;
+  background: var(--accent);
   font-size: 18rpx;
   font-weight: 600;
-  color: #548005;
+  color: var(--accent-text);
 }
 
 .list__club {
@@ -385,24 +357,29 @@
 
 /* ---------- 展开与我的排名 ---------- */
 
-/* 设计值是 169rpx 宽，收起态文案更短，用 min-width 兼容两种文案 */
+/**
+ * 跟俱乐部榜 V5 同一套：顶部分割线 + 灰字 + 青绿箭头，
+ * 不是绿色药丸。收起态文案换成「收起」。
+ */
 .show-more {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8rpx;
-  min-width: 169rpx;
-  height: 28rpx;
-  margin: 8rpx auto 0;
-  padding: 0 20rpx;
-  border-radius: 82rpx;
-  background: #7ee7a3;
-  font-size: 20rpx;
-  color: #79815c;
+  width: 690rpx;
+  height: 64rpx;
+  margin: 8rpx 30rpx 0;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #e5e8e0;
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #101214;
 }
 
 .show-more__arrow {
   font-size: 22rpx;
+  font-weight: 700;
+  color: var(--accent);
 }
 
 /**
@@ -432,6 +409,10 @@
   box-shadow: 0 4rpx 10rpx rgba(51, 64, 31, 0.12);
 }
 
+.my-rank--pressed {
+  opacity: 0.72;
+}
+
 .my-rank__trophy {
   flex-shrink: 0;
   width: 70rpx;
@@ -449,7 +430,7 @@
 .my-rank__action {
   font-size: 22rpx;
   font-weight: 600;
-  color: #548005;
+  color: var(--accent);
 }
 
 .my-rank__cta {
@@ -460,8 +441,8 @@
   height: 36rpx;
   margin-left: 20rpx;
   border-radius: 18rpx;
-  background: #e8f59e;
+  background: var(--accent);
   font-size: 28rpx;
   font-weight: 700;
-  color: #548005;
+  color: var(--accent-text);
 }

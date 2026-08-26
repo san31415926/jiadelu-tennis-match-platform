@@ -1,12 +1,13 @@
 <view
   class="event-card {{event.featured ? 'event-card--featured' : ''}}"
+  style="{{themeVars}}"
   bindtap="onCardTap"
   wx:if="{{event}}"
 >
   <view class="event-card__main">
     <view class="event-card__poster">
       <image class="event-card__photo" src="{{event.poster}}" mode="aspectFill" />
-      <view class="event-card__status" wx:if="{{event.statusLabel}}">{{event.statusLabel}}</view>
+      <view class="event-card__status" wx:if="{{event.statusLabel}}" style="background:{{accent}};color:{{accentText}}">{{event.statusLabel}}</view>
       <view class="event-card__recommend" wx:if="{{event.recommended}}">推荐</view>
       <view class="event-card__slots" wx:if="{{event.slotCaption}}">{{event.slotCaption}}</view>
     </view>
@@ -42,7 +43,7 @@
   </view>
 
   <view class="event-card__dots" wx:if="{{event.featured}}">
-    <view class="dot dot--on"></view>
+    <view class="dot dot--on" style="background:{{accent}}"></view>
     <view class="dot"></view>
     <view class="dot"></view>
   </view>

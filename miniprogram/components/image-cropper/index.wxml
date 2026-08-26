@@ -1,0 +1,114 @@
+<view
+  class="cropper"
+  style="{{themeVars}};padding-top:{{statusBarHeight}}px"
+  catchtouchmove="onPreventMove"
+>
+  <view class="cropper__bar">
+    <view class="cropper__title">{{title}}</view>
+    <view class="cropper__hint">{{hint}}</view>
+  </view>
+
+  <view
+    class="cropper__stage"
+    bindtouchstart="onPinchStart"
+    bindtouchmove="onPinchMove"
+    bindtouchend="onPinchEnd"
+  >
+    <view wx:if="{{!ready}}" class="cropper__wait">正在载入图片</view>
+    <image
+      class="cropper__image {{ready ? '' : 'cropper__image--fit'}}"
+      src="{{src}}"
+      mode="{{ready ? 'scaleToFill' : 'aspectFit'}}"
+      style="{{ready ? imageStyle : ''}}"
+      bindload="onImageLoad"
+      binderror="onImageError"
+    />
+
+    <view
+      wx:if="{{ready}}"
+      class="cropper__area"
+      style="width:{{displayW}}px;height:{{displayH}}px;left:{{imgLeft}}px;top:{{imgTop}}px;"
+    >
+      <movable-area class="cropper__movable-area" style="width:{{displayW}}px;height:{{displayH}}px;">
+        <movable-view
+          class="cropper__box"
+          direction="all"
+          animation="{{false}}"
+          inertia="{{false}}"
+          damping="{{40}}"
+          friction="{{10}}"
+          disabled="{{resizing || exporting}}"
+          x="{{boxX}}"
+          y="{{boxY}}"
+          style="width:{{boxW}}px;height:{{boxH}}px;"
+          bindchange="onBoxChange"
+          bindtouchstart="onPinchStart"
+          bindtouchmove="onPinchMove"
+          bindtouchend="onPinchEnd"
+        >
+          <view class="cropper__shade cropper__shade--t"></view>
+          <view class="cropper__shade cropper__shade--b"></view>
+          <view class="cropper__shade cropper__shade--l"></view>
+          <view class="cropper__shade cropper__shade--r"></view>
+          <view class="cropper__frame">
+            <view class="cropper__grid cropper__grid--v1"></view>
+            <view class="cropper__grid cropper__grid--v2"></view>
+            <view class="cropper__grid cropper__grid--h1"></view>
+            <view class="cropper__grid cropper__grid--h2"></view>
+          </view>
+          <view
+            class="cropper__handle cropper__handle--nw"
+            data-corner="nw"
+            catchtouchstart="onHandleStart"
+            catchtouchmove="onHandleMove"
+            catchtouchend="onHandleEnd"
+          >
+            <view class="cropper__corner"></view>
+          </view>
+          <view
+            class="cropper__handle cropper__handle--ne"
+            data-corner="ne"
+            catchtouchstart="onHandleStart"
+            catchtouchmove="onHandleMove"
+            catchtouchend="onHandleEnd"
+          >
+            <view class="cropper__corner"></view>
+          </view>
+          <view
+            class="cropper__handle cropper__handle--sw"
+            data-corner="sw"
+            catchtouchstart="onHandleStart"
+            catchtouchmove="onHandleMove"
+            catchtouchend="onHandleEnd"
+          >
+            <view class="cropper__corner"></view>
+          </view>
+          <view
+            class="cropper__handle cropper__handle--se"
+            data-corner="se"
+            catchtouchstart="onHandleStart"
+            catchtouchmove="onHandleMove"
+            catchtouchend="onHandleEnd"
+          >
+            <view class="cropper__corner"></view>
+          </view>
+        </movable-view>
+      </movable-area>
+    </view>
+  </view>
+
+  <view class="cropper__dock">
+    <view class="cropper__cancel" bindtap="onCancel">取消</view>
+    <view class="cropper__zoom">
+      <view class="cropper__zoom-btn" bindtap="onZoomOut">缩小框</view>
+      <view class="cropper__zoom-btn" bindtap="onZoomIn">放大框</view>
+    </view>
+    <view
+      class="cropper__ok"
+      style="background:{{accent}};color:{{accentText}}"
+      bindtap="onConfirm"
+    >{{exporting ? '导出中' : '完成'}}</view>
+  </view>
+
+  <canvas type="2d" id="cropCanvas" class="cropper__canvas"></canvas>
+</view>

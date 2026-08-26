@@ -1,3 +1,5 @@
+import { themeBehavior } from '../../behaviors/theme';
+
 /**
  * ============================================================================
  * 赛事卡片组件
@@ -17,8 +19,10 @@
  * 卡片，所以点场馆只会触发 venuetap，不会同时触发 cardtap。
  *
  * 右下角现在是价格不是报名按钮。报名入口在赛事详情页。
+ * 状态条颜色走 themeBehavior，跟全站强调色走。
  */
 Component({
+  behaviors: [themeBehavior],
   properties: {
     /**
      * 赛事数据，结构见 mock/home.ts 的 EventItem。

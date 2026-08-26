@@ -3,7 +3,7 @@
     wx:for="{{tabs}}"
     wx:key="*this"
     class="filters__item {{active === item ? 'is-active' : ''}}"
-    style="{{active === item ? 'background:' + activeColor : ''}}"
+    style="{{active === item ? 'background:' + (activeColor || accent) + ';color:' + (activeTextColor || accentText) : ''}}"
     data-tab="{{item}}"
     bindtap="onTap"
   >

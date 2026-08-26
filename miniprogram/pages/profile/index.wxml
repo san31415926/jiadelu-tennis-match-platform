@@ -1,17 +1,24 @@
-<view class="profile profile--{{profile.theme}}">
-  <view class="hero" style="padding-top:{{statusBarHeight}}px">
-    <image class="hero__cover" src="{{profile.cover}}" mode="aspectFill" />
+<view class="profile profile--{{profile.theme}} theme-{{theme}}" style="{{themeVars}}">
+  <view class="hero {{coverFromAlbum ? 'hero--album' : ''}} {{profile.cover ? '' : 'hero--plain'}}" style="padding-top:{{statusBarHeight}}px">
+    <view class="hero__cover-clip" wx:if="{{profile.cover}}">
+      <image
+        class="hero__cover"
+        src="{{profile.cover}}"
+        mode="aspectFill"
+      />
+    </view>
     <view class="hero__frost"></view>
     <view class="hero__fade"></view>
 
     <view class="hero__inner">
       <view class="identity">
-        <image
-          class="identity__avatar"
-          src="{{profile.avatar}}"
-          mode="aspectFill"
-          bindtap="onAvatarTap"
-        />
+        <view class="identity__avatar" bindtap="onAvatarTap">
+          <image
+            class="identity__avatar-img"
+            src="{{profile.avatar}}"
+            mode="aspectFit"
+          />
+        </view>
         <view class="identity__info">
           <view
             class="identity__name {{isLoggedIn ? '' : 'identity__name--guest'}}"
@@ -56,7 +63,13 @@
       </view>
     </view>
 
-    <view class="vip" bindtap="onOpenMembership" hover-class="vip--pressed" hover-stay-time="60">
+    <view
+      class="vip"
+      style="background:{{accent}};color:{{accentText}}"
+      bindtap="onOpenMembership"
+      hover-class="vip--pressed"
+      hover-stay-time="60"
+    >
       <image
         class="vip__crown"
         src="/assets/icons/profile/vip-wheat-tennis.png"
@@ -78,7 +91,12 @@
       </view>
       <view class="radar-card">
         <view class="radar">
-          <canvas type="2d" id="radarCanvas" class="radar__canvas"></canvas>
+          <canvas
+            wx:if="{{!showCoverSheet && !showCropper}}"
+            type="2d"
+            id="radarCanvas"
+            class="radar__canvas"
+          ></canvas>
           <view class="radar-label radar-label--n">
             <text>发球</text>
             <text class="radar-label__num">{{profile.radar.axes[0].value}}</text>
@@ -180,7 +198,7 @@
     <view class="sheet__panel" catchtouchmove="onPreventMove">
       <view class="sheet__handle"></view>
       <view class="sheet__title">更换背景</view>
-      <view class="sheet__sub">先选颜色，也可以再换一张封面图</view>
+      <view class="sheet__sub">默认是纯色，也可以从相册上传封面</view>
       <view class="sheet__label">背景色</view>
       <view class="swatches">
         <view
@@ -197,11 +215,12 @@
               style="background:{{item.swatch}}"
             ></view>
             <image
-              wx:else
+              wx:elif="{{profile.cover}}"
               class="swatch__fill"
               src="{{profile.cover}}"
               mode="aspectFill"
             />
+            <view wx:else class="swatch__fill swatch__fill--empty"></view>
           </view>
           <text>{{item.label}}</text>
         </view>
@@ -209,17 +228,26 @@
       <view class="sheet__label">背景图</view>
       <view class="covers">
         <view
-          class="cover-pick {{profile.cover === item.image ? 'cover-pick--on' : ''}}"
-          wx:for="{{covers}}"
-          wx:key="id"
-          data-image="{{item.image}}"
-          bindtap="onPickCover"
+          class="cover-pick cover-pick--solid {{profile.cover ? '' : 'cover-pick--on'}}"
+          bindtap="onClearCover"
+        >纯色</view>
+        <view
+          wx:if="{{profile.cover}}"
+          class="cover-pick cover-pick--on"
         >
-          <image class="cover-pick__img" src="{{item.image}}" mode="aspectFill" />
+          <image class="cover-pick__img" src="{{profile.cover}}" mode="aspectFill" />
         </view>
         <view class="cover-pick cover-pick--album" bindtap="onPickAlbumCover">+ 相册</view>
       </view>
       <view class="sheet__done" bindtap="onCloseCoverSheet">完成</view>
     </view>
   </view>
+
+  <image-cropper
+    wx:if="{{showCropper}}"
+    src="{{cropSrc}}"
+    aspect-ratio="{{cropRatio}}"
+    bind:confirm="onCropConfirm"
+    bind:cancel="onCropCancel"
+  />
 </view>

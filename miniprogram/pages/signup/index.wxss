@@ -3,45 +3,18 @@
  * 报名页样式
  * ============================================================================
  * 视觉刷新草稿：选方式 369:359 / 369:559 / 369:770，报名详情 370:359 / 371:371。
- * 设计稿 1px = 1rpx。选方式页底 #f7f9f7，详情页底 #fbf6f0。
+ * 设计稿 1px = 1rpx。页底接到 --page-bg，和全站画布一致。
  *
- * 去支付按钮是橙色 #e59b16，和详情页青柠 CTA 区分开：这边已经进入结算。
- * 波浪 fill 要跟当前页底色一致，详情态换成米色。
+ * 去支付按钮是橙色 #e59b16，和详情页主题 CTA 区分开：这边已经进入结算。
  */
 
 .signup {
   min-height: 100vh;
-  background: #f7f9f7;
+  background: var(--page-bg);
 }
 
 .signup--detail {
-  background: #fbf6f0;
-}
-
-.sub-header {
-  position: relative;
-  background: linear-gradient(180deg, #abe514 0%, #c7f038 62%, #f0fab8 100%);
-}
-
-.sub-header__inner--compact {
-  height: 150rpx;
-  overflow: hidden;
-}
-
-.sub-header__wave {
-  position: absolute;
-  left: 0;
-  top: 45rpx;
-  width: 100%;
-  height: 105rpx;
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105.289' viewBox='0 0 750 105.289' preserveAspectRatio='none'%3E%3Cpath d='M0 51.3173C92 15.0413 166 78.7455 263 62.8194C343 49.5477 373 24.7739 448 49.5477C546 80.515 628 31.8521 750 0V105.289H0V51.3173Z' fill='%23F7F9F7'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  pointer-events: none;
-}
-
-.signup--detail .sub-header__wave {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105.289' viewBox='0 0 750 105.289' preserveAspectRatio='none'%3E%3Cpath d='M0 51.3173C92 15.0413 166 78.7455 263 62.8194C343 49.5477 373 24.7739 448 49.5477C546 80.515 628 31.8521 750 0V105.289H0V51.3173Z' fill='%23FBF6F0'/%3E%3C/svg%3E");
+  background: var(--page-bg);
 }
 
 .title-row {
@@ -117,7 +90,7 @@
 }
 
 .mode.is-on {
-  border-color: #83d414;
+  border-color: var(--accent);
   background: #f3fbe0;
   color: #101214;
 }
@@ -187,13 +160,13 @@
 .empty__plus {
   width: 88rpx;
   height: 88rpx;
-  border: 3rpx dashed #83d414;
+  border: 3rpx dashed var(--accent);
   border-radius: 50%;
   font-size: 40rpx;
   font-weight: 700;
   line-height: 82rpx;
   text-align: center;
-  color: #83d414;
+  color: var(--accent);
 }
 
 .empty__title {
@@ -221,7 +194,7 @@
   margin-top: 16rpx;
   padding: 14rpx 36rpx;
   border-radius: 28rpx;
-  background: #83d414;
+  background: var(--accent);
   font-size: 24rpx;
   font-weight: 700;
   color: #101214;
@@ -297,7 +270,7 @@
 .cta__btn {
   padding: 22rpx 0;
   border-radius: 20rpx;
-  background: #83d414;
+  background: var(--accent);
   font-size: 28rpx;
   font-weight: 700;
   text-align: center;

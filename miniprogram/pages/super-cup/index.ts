@@ -13,6 +13,7 @@ import { headerMetrics } from '../../utils/header';
 import { venueIdByEventId } from '../../mock/venue';
 import { navigateToEventDetail, navigateToPage } from '../../utils/navigate';
 import { syncTabBarSelected } from '../../utils/tabbar';
+import { themeBehavior } from '../../behaviors/theme';
 
 const DEFAULT_FILTER = '报名中';
 const LOGIN_REQUIRED_FILTER = '我的报名';
@@ -56,8 +57,8 @@ function feedTitleOf(filter: string): string {
  * ============================================================================
  *
  * 【这个文件负责什么】
- * 绿顶栏字标、头图叠字、两组 Cover Flow、俱乐部中心按钮、胶囊筛选、赛事卡。
- * 文案和路径都在 mock/super-cup.ts。
+ * 顶栏字标、头图叠字、两组 Cover Flow、俱乐部中心按钮、胶囊筛选、赛事卡。
+ * 文案和路径都在 mock/super-cup.ts。顶栏自己画，换色挂 themeBehavior。
  *
  * 【Cover Flow】
  * 横滑切换当前项（中间放大、两侧缩小）。点卡片走 SUPER_CUP_FEATURES 的 path，
@@ -67,6 +68,7 @@ function feedTitleOf(filter: string): string {
  * 仍是 我的报名 / 报名中 / 进行中 / 已结束。「我的报名」的登录判断和首页一致。
  */
 Page({
+  behaviors: [themeBehavior],
   data: {
     statusBarHeight: 0,
     navBarHeight: 44,
@@ -83,6 +85,8 @@ Page({
     feedTitle: feedTitleOf(DEFAULT_FILTER),
     events: [] as EventItem[],
     emptyHint: '该分类下暂无赛事',
+    /** 离开本页时藏掉 fixed 顶栏，避免挡住下一页左上角「返回」 */
+    pageHidden: false,
   },
 
   onLoad() {
@@ -91,10 +95,15 @@ Page({
   },
 
   onShow() {
+    this.setData({ pageHidden: false });
     syncTabBarSelected(this, 1);
     if (this.data.activeFilter === LOGIN_REQUIRED_FILTER) {
       this.applyFilter(LOGIN_REQUIRED_FILTER);
     }
+  },
+
+  onHide() {
+    this.setData({ pageHidden: true });
   },
 
   /** 「我的报名」依赖登录态，未登录时列表为空并提示登录 */

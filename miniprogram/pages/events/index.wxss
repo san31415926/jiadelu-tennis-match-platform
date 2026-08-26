@@ -6,24 +6,42 @@
  *
  * 【这一页的块】
  *   1. 顶栏 88rpx（不含状态栏）—— 汉堡 + 居中字标
- *   2. 轮播 320rpx —— 图 + 渐变遮罩 + 叠字 + 指示点
- *   3. 内容白底区 —— 热门活动横滑、城市搜索、胶囊筛选、赛事卡
+ *   2. 轮播 320rpx —— 直边照片 + 渐变遮罩 + 叠字 + 指示点
+ *   3. 内容白底区 —— 热门赛事横滑、城市搜索、胶囊筛选、赛事卡
  *   4. 左侧栏 520rpx —— 原来的七宫格入口
+ *   5. 筛选弹层 —— 项目 194:346、区域 204:199、日期 204:322、更多 204:237
  *
- * 侧栏打开是同一页的状态（157:199），不要另做一页。
+ * 侧栏打开是同一页的状态（157:199），四个筛选弹层也是。不要另做一页。
  */
 
 .home {
   min-height: 100vh;
-  background: #f7f7f6;
+  background: var(--page-bg);
 }
 
 /**
- * 顶栏绿渐变。高度 = 状态栏 + 88rpx 导航行。
- * 稿上整条 176（含假状态栏），真机状态栏用 padding-top 接上。
+ * 顶栏钉在屏幕最上，下滑列表时汉堡还在，才能开侧栏。
+ * fixed 不占文档流，下面 .topbar-spacer 垫同等高度（状态栏 + 88rpx）。
+ * z-index 200 压过轮播，但低于侧栏（300）和筛选弹层（450）。
  */
 .topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  /* JS 还没量到高度时，先用系统安全区垫住，避免字钻进状态栏 */
+  padding-top: env(safe-area-inset-top);
   background: var(--header-gradient);
+}
+
+/**
+ * 跳到二级页后本页还在栈里。fixed 顶栏有的机型会继续挡在下一页上面，
+ * 点「返回」其实点到了首页汉堡 / 超级杯字标。离开时藏掉，回来再亮。
+ */
+.topbar--parked {
+  display: none;
+  pointer-events: none;
 }
 
 .topbar__row {
@@ -123,9 +141,12 @@
 }
 
 .hero__swiper,
+.hero__item,
 .hero__slide {
+  position: relative;
   width: 100%;
   height: 320rpx;
+  overflow: hidden;
 }
 
 .hero__image {
@@ -139,12 +160,20 @@
   top: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(13, 18, 13, 0.35) 0%,
-    rgba(13, 18, 13, 0.1) 45%,
-    rgba(13, 18, 13, 0.82) 100%
-  );
+  /* 竖向压底 + 横向压左，盖住 jpg 里烤着的旧标题，避免和叠字重影 */
+  background:
+    linear-gradient(
+      90deg,
+      rgba(13, 18, 13, 0.72) 0%,
+      rgba(13, 18, 13, 0.28) 36%,
+      rgba(13, 18, 13, 0) 58%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(13, 18, 13, 0.28) 0%,
+      rgba(13, 18, 13, 0.08) 42%,
+      rgba(13, 18, 13, 0.82) 100%
+    );
 }
 
 .hero__copy {
@@ -191,12 +220,12 @@
 .hero__dot--on {
   width: 22rpx;
   border-radius: 6rpx;
-  background: #83d414;
+  background: var(--accent);
 }
 
 /**
  * 内容区。上圆角 40，左右 32，块与块 gap 28。
- * 底色几乎透明，露出页底 #f7f7f6。
+ * 底色接到 --page-bg，和全站画布一致。
  */
 .sheet {
   display: flex;
@@ -204,10 +233,10 @@
   gap: 28rpx;
   padding: 36rpx 32rpx 24rpx;
   border-radius: 40rpx 40rpx 0 0;
-  background: #f7f7f6;
+  background: var(--page-bg);
 }
 
-/* ---------- 热门活动 ---------- */
+/* ---------- 热门赛事 ---------- */
 
 .hot {
   display: flex;
@@ -357,20 +386,20 @@
 .search__pin {
   width: 22rpx;
   height: 26rpx;
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='26' viewBox='0 0 22 26'%3E%3Cpath fill='%2383d414' d='M11 0C5.5 0 1 4.3 1 9.7 1 16.8 11 26 11 26s10-9.2 10-16.3C21 4.3 16.5 0 11 0zm0 13.2a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='26' viewBox='0 0 22 26'%3E%3Cpath fill='%236bb50f' d='M11 0C5.5 0 1 4.3 1 9.7 1 16.8 11 26 11 26s10-9.2 10-16.3C21 4.3 16.5 0 11 0zm0 13.2a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
 
 .search__city-name {
   font-size: 26rpx;
-  font-weight: 500;
+  font-weight: 700;
   color: #1f211c;
 }
 
 .search__caret {
   font-size: 18rpx;
-  color: #73786b;
+  color: #4a5144;
 }
 
 .search__field {
@@ -380,8 +409,9 @@
   min-width: 0;
   height: 64rpx;
   padding: 0 20rpx 0 24rpx;
+  border: 2rpx solid #cfd2c6;
   border-radius: 32rpx;
-  background: #f3f3f1;
+  background: #ffffff;
 }
 
 .search__input {
@@ -393,14 +423,14 @@
 }
 
 .search__placeholder {
-  color: #9b9e96;
+  color: #6b7264;
 }
 
 .search__icon {
   flex-shrink: 0;
   width: 32rpx;
   height: 32rpx;
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='14' cy='14' r='8' fill='none' stroke='%239b9e96' stroke-width='2.4'/%3E%3Cpath stroke='%239b9e96' stroke-width='2.4' stroke-linecap='round' d='M20.2 20.2L26 26'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='14' cy='14' r='8' fill='none' stroke='%234a5144' stroke-width='2.6'/%3E%3Cpath stroke='%234a5144' stroke-width='2.6' stroke-linecap='round' d='M20.2 20.2L26 26'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
@@ -439,7 +469,8 @@
 }
 
 .list-filters__item.is-on {
-  color: #83d414;
+  color: var(--accent);
+  font-weight: 700;
 }
 
 .list-filters__caret {
@@ -495,9 +526,9 @@
   z-index: 301;
   display: flex;
   flex-direction: column;
-  gap: 8rpx;
   width: 520rpx;
-  padding: 100rpx 32rpx 28rpx;
+  padding: 100rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
   background: #ffffff;
   transform: translateX(-100%);
   transition: transform 0.22s ease;
@@ -509,13 +540,22 @@
   pointer-events: auto;
 }
 
+.drawer__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
 .drawer__item {
   display: flex;
   align-items: center;
   gap: 22rpx;
   padding: 22rpx 16rpx 22rpx 20rpx;
   border-radius: 16rpx;
-  background: #f7f7f6;
+  background: var(--page-bg);
 }
 
 .drawer__icon {
@@ -531,21 +571,23 @@
   color: #1f211c;
 }
 
-.drawer__spacer {
-  flex: 1;
-  min-height: 24rpx;
-}
-
 .drawer__line {
+  flex-shrink: 0;
   height: 1rpx;
+  margin-top: 12rpx;
   background: #e6e6e6;
 }
 
 .drawer__foot {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 16rpx;
   padding: 18rpx 8rpx;
+}
+
+.drawer__foot--pressed {
+  opacity: 0.55;
 }
 
 .drawer__foot-icon {
@@ -560,4 +602,400 @@
   font-weight: 500;
   line-height: 42rpx;
   color: #2e2e2e;
+}
+
+/**
+ * 筛选弹层蒙层压过侧栏（301）和底栏（400）。
+ * 点蒙层等于取消，不写入筛选结果。
+ */
+.filter-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 450;
+  background: rgba(20, 24, 16, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+}
+
+.filter-mask.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.fsheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 460;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 28rpx 28rpx 0 0;
+  background: #ffffff;
+  box-shadow: 0 -6rpx 28rpx rgba(0, 0, 0, 0.14);
+  transform: translateY(110%);
+  transition: transform 0.22s ease;
+  pointer-events: none;
+}
+
+.fsheet.is-open {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.fsheet__handle {
+  width: 64rpx;
+  height: 8rpx;
+  margin: 12rpx 0 0;
+  border-radius: 4rpx;
+  background: #e5e5e3;
+}
+
+.fsheet--cat {
+  /**
+   * 自定义底栏是独立一层，页面 z-index 压不住它。
+   * 底部垫上底栏高度，滚轮和取消/确定才会出现在底栏上面。
+   * 滚轮加到 5 格（440rpx），弹层顶边再往上长一截。
+   */
+  padding-bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 16rpx);
+}
+
+.fsheet-picker {
+  width: 750rpx;
+  height: 440rpx;
+}
+
+.fsheet-picker__window {
+  height: 88rpx;
+  border-top: 1rpx solid #e5e5e3;
+  border-bottom: 1rpx solid #e5e5e3;
+}
+
+.fsheet-picker__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  font-size: 28rpx;
+  color: #b0b2ac;
+}
+
+.fsheet__actions {
+  display: flex;
+  gap: 20rpx;
+  width: 686rpx;
+  margin-top: 16rpx;
+}
+
+.fsheet__actions--more {
+  width: 100%;
+  margin: 12rpx 0 0;
+}
+
+.fsheet__btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  line-height: 88rpx;
+  text-align: center;
+}
+
+.fsheet__btn--ghost {
+  background: #f2f2f0;
+  color: #50544c;
+}
+
+.fsheet--area {
+  height: 70vh;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.fsheet-list {
+  width: 750rpx;
+  height: 62vh;
+  margin-top: 8rpx;
+}
+
+.fsheet-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 88rpx;
+  padding: 0 40rpx;
+  border-bottom: 1rpx solid #ebebe8;
+}
+
+.fsheet-row__name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #1f211c;
+}
+
+.fsheet-row.is-on .fsheet-row__name,
+.fsheet-row__check {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.fsheet-row__check {
+  font-size: 28rpx;
+}
+
+.fsheet--date {
+  padding: 24rpx 32rpx calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 16rpx);
+  align-items: stretch;
+}
+
+.date-head {
+  display: flex;
+  align-items: center;
+  height: 40rpx;
+}
+
+.date-head__title {
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #1f211c;
+}
+
+.date-head__hint {
+  margin-left: 12rpx;
+  font-size: 22rpx;
+  color: #9b9e96;
+}
+
+.date-head__nav {
+  display: flex;
+  gap: 24rpx;
+  margin-left: auto;
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #1f211c;
+}
+
+.date-head__arrow {
+  width: 48rpx;
+  text-align: center;
+}
+
+.date-weekdays,
+.date-week {
+  display: flex;
+}
+
+.date-weekdays {
+  margin-top: 20rpx;
+  height: 36rpx;
+}
+
+.date-weekday,
+.date-cell {
+  flex: 1;
+  min-width: 0;
+}
+
+.date-weekday {
+  font-size: 22rpx;
+  font-weight: 500;
+  line-height: 36rpx;
+  text-align: center;
+  color: #9b9e96;
+}
+
+.date-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  margin-top: 8rpx;
+}
+
+.date-week {
+  height: 64rpx;
+}
+
+.date-cell {
+  display: flex;
+  justify-content: center;
+}
+
+.date-cell__day {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  line-height: 64rpx;
+  text-align: center;
+  color: #1f211c;
+}
+
+.date-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20rpx;
+}
+
+.date-foot__sum {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 22rpx;
+}
+
+.date-foot__label {
+  color: #73786b;
+}
+
+.date-foot__value {
+  font-weight: 500;
+}
+
+.date-foot__btns {
+  display: flex;
+  gap: 16rpx;
+}
+
+.date-reset,
+.date-ok {
+  height: 80rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 80rpx;
+  text-align: center;
+}
+
+.date-reset {
+  width: 140rpx;
+  border: 2rpx solid var(--accent);
+  color: var(--accent);
+}
+
+.date-ok {
+  width: 180rpx;
+}
+
+.fsheet--more {
+  height: 86vh;
+  padding: 28rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
+  align-items: stretch;
+}
+
+.fsheet-more {
+  height: 80vh;
+}
+
+.more-block {
+  margin-bottom: 28rpx;
+}
+
+.more-title {
+  margin-bottom: 14rpx;
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #1f211c;
+}
+
+.more-chips {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.more-chip {
+  flex: 1;
+  height: 56rpx;
+  padding: 0 16rpx;
+  border-radius: 12rpx;
+  background: #f2f2f0;
+  font-size: 22rpx;
+  font-weight: 500;
+  line-height: 56rpx;
+  text-align: center;
+  color: #50544c;
+}
+
+.more-range-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.more-range-head .more-title {
+  margin-bottom: 0;
+}
+
+.more-check {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.more-check__box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28rpx;
+  height: 28rpx;
+  border: 2rpx solid var(--accent);
+  border-radius: 6rpx;
+}
+
+.more-check__tick {
+  font-size: 20rpx;
+  line-height: 20rpx;
+}
+
+.more-check__label {
+  font-size: 20rpx;
+}
+
+.more-stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 14rpx;
+}
+
+.more-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 180rpx;
+  height: 72rpx;
+  padding: 0 10rpx;
+  border-radius: 10rpx;
+  background: #f2f2f0;
+}
+
+.more-stepper__btn {
+  width: 36rpx;
+  font-size: 36rpx;
+  font-weight: 700;
+  text-align: center;
+}
+
+.more-stepper__value {
+  flex: 1;
+  font-size: 28rpx;
+  font-weight: 500;
+  text-align: center;
+  color: #50544c;
+}
+
+.more-stepper-mid {
+  flex: 1;
+  min-width: 0;
+  font-size: 28rpx;
+  text-align: center;
+  color: #50544c;
 }

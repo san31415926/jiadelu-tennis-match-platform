@@ -24,9 +24,9 @@
   ],
   "window": {
     "navigationStyle": "custom",
-    "backgroundColor": "#FBFFF4",
+    "backgroundColor": "#F0FCF7",
     "backgroundTextStyle": "dark",
-    "navigationBarBackgroundColor": "#B5E51A",
+    "navigationBarBackgroundColor": "#B8EDDC",
     "navigationBarTitleText": "LTJIMMY赛事",
     "navigationBarTextStyle": "black"
   },

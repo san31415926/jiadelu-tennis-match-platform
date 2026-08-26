@@ -1,4 +1,6 @@
 {
   "navigationStyle": "custom",
-  "usingComponents": {}
+  "usingComponents": {
+    "image-cropper": "../../components/image-cropper/index"
+  }
 }

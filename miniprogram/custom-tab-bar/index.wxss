@@ -17,19 +17,23 @@
  * padding-bottom: env(safe-area-inset-bottom) 是给全面屏手机底部横杠留出空间，
  * 否则图标文字会被横杠压住。老款手机上这个值是 0，不影响。
  *
- * z-index: 100 保证它盖在页面内容之上。如果某个页面有别的悬浮元素挡住了底栏，
- * 把那个元素的 z-index 调到 100 以下。
+ * z-index: 400 压过首页侧栏蒙层（300），底栏三个入口随时能点。
  */
 .tabbar {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 100;
+  z-index: 400;
   display: flex;
   height: calc(153rpx + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   background: #ffffff;
+}
+
+/* 侧栏打开时藏掉。自定义底栏不走页面 z-index，不藏就会盖住底部「收起」 */
+.tabbar.is-hidden {
+  display: none;
 }
 
 /**
@@ -60,6 +64,8 @@
  * 想让光晕更大更醒目 → 加大 width/height 并相应减小 left/top
  * 想换成正圆 → 把 height 改成和 width 一样的 81rpx
  * 想去掉光晕 → 在 index.wxml 里删掉那行 <view class="tabbar__halo">
+ *
+ * 底色由内联 accent 写入，这里只做淡一层，换主题才不会永远青绿。
  */
 .tabbar__halo {
   position: absolute;
@@ -68,7 +74,8 @@
   width: 81rpx;
   height: 76rpx;
   border-radius: 50%;
-  background: #e6ffb0;
+  background: var(--accent);
+  opacity: 0.38;
 }
 
 /**
@@ -99,8 +106,8 @@
   color: #6b7566;
 }
 
-/* 选中的那一项：文字变绿并加粗 */
+/* 选中字色由内联 accent 写入，这里只加粗 */
 .tabbar__label.is-active {
   font-weight: 600;
-  color: #59850a;
+  color: var(--accent);
 }

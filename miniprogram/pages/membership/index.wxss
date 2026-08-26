@@ -13,7 +13,7 @@
 
 .membership {
   min-height: 100vh;
-  background: #f7f7f6;
+  background: var(--page-bg);
 }
 
 .sheet {
@@ -66,7 +66,7 @@
 }
 
 .plan.is-active {
-  border-color: #83d414;
+  border-color: var(--accent);
   background: #f7fbe8;
 }
 
@@ -77,7 +77,7 @@
   transform: translateX(-50%);
   padding: 4rpx 10rpx;
   border-radius: 0 0 8rpx 8rpx;
-  background: #83d414;
+  background: var(--accent);
   font-size: 16rpx;
   font-weight: 700;
   line-height: 19rpx;
@@ -190,7 +190,7 @@
 }
 
 .pay.is-active {
-  border-color: #83d414;
+  border-color: var(--accent);
   background: #f7fbe8;
 }
 
@@ -231,18 +231,19 @@
   gap: 12rpx;
   height: 80rpx;
   border-radius: 16rpx;
-  background: #83d414;
+  background: var(--accent);
 }
 
 .checkout__label {
   font-size: 30rpx;
   font-weight: 700;
-  color: #1a1f16;
+  color: inherit;
 }
 
 .checkout__save {
   font-size: 20rpx;
-  color: #3a6b08;
+  color: inherit;
+  opacity: 0.78;
 }
 
 .checkout__agree {

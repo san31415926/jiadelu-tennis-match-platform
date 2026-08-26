@@ -7,10 +7,13 @@
  * 版式是视觉刷新草稿 355:361 那张底部结算抽屉，支付还没接。
  *
  * 想改默认选中的套餐 → 改 data 里的 activePlan（填 PLANS 某一项的 key）
+ * 吸顶栏 occupy 打开；立即支付按钮底色走 {{accent}}。
  */
 import { PAY_METHODS, PLANS } from '../../mock/membership';
+import { themeBehavior } from '../../behaviors/theme';
 
 Page({
+  behaviors: [themeBehavior],
   data: {
     plans: PLANS,
     payMethods: PAY_METHODS,

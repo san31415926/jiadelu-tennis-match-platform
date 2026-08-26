@@ -4,8 +4,8 @@
  * ============================================================================
  *
  * 从赛事卡点进来。路径带 ?id=e-open-1，对应 mock/event-detail.ts。
- * 版式来自视觉刷新草稿 V5（首页 228:514 等）：矮青柠头 + 八宫格切同一页状态。
- * 旧稿 447:103 的高波浪头、网球、大海报已经拿掉。
+ * 版式来自视觉刷新草稿 V5（首页 228:514 等）：occupy 吸顶栏 + 八宫格切同一页状态。
+ * 旧稿 447:103 的高波浪头、网球、大海报已经拿掉。八宫格选中走主题强调色。
  *
  * 【Tab 怎么切】
  * 八个入口都在本页切 activeTab，不新开页面。报名 Tab 只是预览名单，
@@ -29,6 +29,7 @@ import type {
 } from '../../mock/event-detail';
 import { venueIdByEventId } from '../../mock/venue';
 import { navigateToPage } from '../../utils/navigate';
+import { themeBehavior } from '../../behaviors/theme';
 
 const TABS: EventDetailTab[] = [
   'home',
@@ -46,8 +47,8 @@ function isTab(value: string): value is EventDetailTab {
 }
 
 Page({
+  behaviors: [themeBehavior],
   data: {
-    statusBarHeight: 0,
     event: getEventDetail('e-open-1') as EventDetail,
     displayTitle: '赛事详情',
     nav: EVENT_NAV,
@@ -65,15 +66,13 @@ Page({
     recruitLevel: '同级优先',
     recruitDeadline: '2026年8月25日',
     recruitNote: '',
-    emptyAvatars: [SIGNUP_SELF.avatar, '/assets/images/ranking/avatar-4.jpg'],
+    emptyAvatars: [SIGNUP_SELF.avatar, '/assets/images/avatars/anime-02.jpg'],
   },
 
   onLoad(query: Record<string, string | undefined>) {
-    const app = getApp<IAppOption>();
     const event = getEventDetail(query.id ?? '');
     const tab = query.tab && isTab(query.tab) ? query.tab : 'home';
     this.setData({
-      statusBarHeight: app.globalData.statusBarHeight,
       event,
       displayTitle: event.grade ? `${event.grade}${event.title}` : event.title,
     });

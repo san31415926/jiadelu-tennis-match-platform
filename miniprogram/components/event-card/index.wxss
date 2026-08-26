@@ -65,7 +65,7 @@
   left: 8rpx;
   padding: 4rpx 8rpx;
   border-radius: 6rpx;
-  background: #83d414;
+  background: var(--accent);
   font-size: 16rpx;
   font-weight: 500;
   line-height: 21rpx;
@@ -244,7 +244,7 @@
 }
 
 .dot--on {
-  background: #83d414;
+  background: var(--accent);
 }
 
 .event-card__divider {

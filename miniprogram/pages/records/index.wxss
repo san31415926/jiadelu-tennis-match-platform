@@ -1,43 +1,23 @@
-@import '../../styles/subpage-header.wxss';
-
 /**
  * ============================================================================
  * 参赛记录页样式
  * ============================================================================
  * 草稿 Figma「参赛记录 / V5」(419:359)。
- * 薄荷底沿用「我的 / V5 / 薄荷资料头」：#B8EDDC → #D6F5E8 → #F0FCF7。
- * 矮页头 150rpx，对齐报名详情 (370:359)，不要用 300rpx 的通用绿头。
- *
- * 波浪 fill 必须和页面底色 #F0FCF7 一致，否则接头会有一条色差。
- * 吸顶返回栏用 page-nav 的 mint，滚过白卡片时字才不会糊进去。
+ * 旧绿波浪头已经删掉，occupy 吸顶栏。筛选和胜场标走主题强调色。
  *
  * 【想改顶卡数字】改 mock/records.ts 的 RECORDS_SUMMARY，样式不用动。
- * 【想加高头部】同时改 .sub-header__inner--compact 的 height 和波浪 top。
  */
 
 .records {
   min-height: 100vh;
   padding-bottom: 48rpx;
-  background: #f0fcf7;
-}
-
-.sub-header--mint {
-  background: linear-gradient(180deg, #b8eddc 0%, #d6f5e8 58%, #f0fcf7 100%);
-}
-
-.sub-header__inner--compact {
-  height: 150rpx;
-}
-
-.sub-header--mint .sub-header__wave {
-  top: 45rpx;
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105.289' viewBox='0 0 750 105.289' preserveAspectRatio='none'%3E%3Cpath d='M0 51.3173C92 15.0413 166 78.7455 263 62.8194C343 49.5477 373 24.7739 448 49.5477C546 80.515 628 31.8521 750 0V105.289H0V51.3173Z' fill='%23F0FCF7'/%3E%3C/svg%3E");
+  background: var(--page-bg);
 }
 
 .summary {
   position: relative;
   z-index: 1;
-  margin: -8rpx 28rpx 0;
+  margin: 8rpx 28rpx 0;
   padding: 24rpx 28rpx;
   border-radius: 28rpx;
   background: #ffffff;
@@ -118,17 +98,20 @@
   justify-content: center;
   height: 52rpx;
   padding: 0 24rpx;
-  border: 1rpx solid #e0e3d9;
+  border: 2rpx solid #cfd2c6;
   border-radius: 26rpx;
   background: #ffffff;
   font-size: 22rpx;
+  font-weight: 600;
   color: #1c1f21;
 }
 
 .filters__chip.is-active {
-  border-color: #83d414;
-  background: #83d414;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
   font-weight: 700;
+  box-shadow: 0 4rpx 10rpx rgba(20, 24, 16, 0.16);
 }
 
 .list {
@@ -192,8 +175,8 @@
 }
 
 .badge--win {
-  background: #83d414;
-  color: #10140e;
+  background: var(--accent);
+  color: var(--accent-text);
 }
 
 .badge--loss {

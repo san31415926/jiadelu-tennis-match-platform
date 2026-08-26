@@ -1,4 +1,5 @@
 @import './styles/tokens.wxss';
+@import './styles/theme.wxss';
 
 /**
  * ============================================================================
@@ -7,15 +8,14 @@
  *
  * 【这个文件是干什么的】
  * 1. 设定全站的字体、字号、背景色基线
- * 2. 放"每个页面都长一样"的部件：渐变头部、波浪下缘、页面标题、底栏占位
+ * 2. 底栏占位、返回按钮骨架；以及一份已不再给现页用的旧绿头/波浪（只留给未引用的 hero-carousel）
  *
  * 【和页面样式的关系】
  * app.wxss 是全局的，页面自己的 index.wxss 可以覆盖这里的规则。
- * 比如榜单页的头部高度和首页不同，就在它自己的 wxss 里重写 .header__inner 的高度。
  *
  * 【重要】
- * 这里的 .header / .header__wave / .header__title 是七个页面共用的，
- * 改动会一次影响所有页面，改之前先确认是不是真的想全站生效。
+ * 现页二级页已经改成 page-nav occupy，不要再给新页套 .header + .header__wave。
+ * 下面那组头部样式先留着，避免 hero-carousel 哪天接回来时全站波浪形状对不上。
  */
 
 /**
@@ -115,10 +115,10 @@ image {
  * 不建议手动改这串路径，很难改对。正确做法是在 Figma 里调好曲线，
  * 重新导出 SVG，然后把新的 d 值替换进来。
  *
- * 【注意 fill 的颜色】
- * fill='%23FBFFF4' 里 %23 就是 # 号（URL 里 # 有特殊含义必须转义）。
- * 这个颜色必须和页面底色 --page-bg 完全一致，否则波浪和下方页面之间
- * 会出现一条明显的色差线。
+ * 【注意波浪颜色怎么跟主题走】
+ * 以前 SVG 的 fill 写死成 %23F0FCF7，换主题后波浪还是薄荷，接头会有一条色差。
+ * 现在用 mask：路径仍是那条曲线，填充改成 background-color: var(--page-bg)。
+ * 各页如果重写波浪，请改 -webkit-mask-image / mask-image，不要再写 background-image。
  *
  * preserveAspectRatio='none' 表示允许拉伸变形，这样波浪能横向铺满任意宽度屏幕。
  */
@@ -128,9 +128,14 @@ image {
   top: 0;
   width: 100%;
   height: 100%;
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='321' viewBox='0 0 750 321' preserveAspectRatio='none'%3E%3Cpath d='M0 260C92 219 166 291 263 273C343 258 373 230 448 258C546 293 628 238 750 202V321H0V260Z' fill='%23FBFFF4'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
+  background-color: var(--page-bg);
+  background-image: none;
+  -webkit-mask-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='321' viewBox='0 0 750 321' preserveAspectRatio='none'%3E%3Cpath d='M0 260C92 219 166 291 263 273C343 258 373 230 448 258C546 293 628 238 750 202V321H0V260Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='321' viewBox='0 0 750 321' preserveAspectRatio='none'%3E%3Cpath d='M0 260C92 219 166 291 263 273C343 258 373 230 448 258C546 293 628 238 750 202V321H0V260Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
   /* 波浪只是装饰，不该拦截点击。不加这行，它会挡住下面元素的点击事件 */
   pointer-events: none;
 }

@@ -1,9 +1,8 @@
 /**
  * 重新合成首页 / 超级杯轮播图。
  *
- * 版式按终稿 Figma node 1:233 / 1:234：主标题 36、副标题 19，字在左、人在右。
- * 原图是 3:2，画布是 750×321，从顶部裁切以免削掉头部。
- * 底部波浪仍按设计稿路径填 #FBFFF4，和页面 CSS 波浪对齐。
+ * V5 首页 145:199 是直边头图，字由页面 WXML 叠上去，不要再画进 jpg，也不要白浪。
+ * 原图是 3:2，画布按 750×320 从顶部裁切以免削掉头部。
  */
 const fs = require('fs');
 const path = require('path');
@@ -19,8 +18,6 @@ const RAW_DIR = path.join(
 const TEST_DIR = path.join(__dirname, '../测试图/轮播图');
 const APP_DIR = path.join(__dirname, '../miniprogram/assets/images/banners');
 const TMP_DIR = path.join(APP_DIR, '_tmp');
-
-const FONT_BOLD = fs.readFileSync('C:/Windows/Fonts/Dengb.ttf').toString('base64');
 
 const BANNERS = [
   {
@@ -68,51 +65,19 @@ const BANNERS = [
 ];
 
 const W = 1500;
-const H = Math.round((1500 * 321) / 750);
+const H = Math.round((1500 * 320) / 750);
 
-function escapeXml(text) {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-/** JPEG 在画布最底一排常压出深色像素，合成后用页面底色盖住。 */
-async function coverBottomSeam(buf, rows = 12) {
-  const { width, height } = await sharp(buf).metadata();
-  const bar = Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${rows}"><rect width="100%" height="100%" fill="#FBFFF4"/></svg>`,
-  );
-  return sharp(buf)
-    .composite([{ input: bar, top: height - rows, left: 0 }])
-    .toBuffer();
-}
-
-function overlaySvg(item) {
-  const kicker = escapeXml(item.kicker);
-  const title = escapeXml(item.title);
-  const sub = escapeXml(item.sub);
-
+function overlaySvg() {
   return Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
-<svg width="${W}" height="${H}" viewBox="0 0 750 321" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="${W}" height="${H}" viewBox="0 0 750 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <style>@font-face{font-family:Dengb;src:url(data:font/ttf;base64,${FONT_BOLD});}</style>
     <linearGradient id="leftDim" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#050805" stop-opacity="0.22"/>
-      <stop offset="0.36" stop-color="#050805" stop-opacity="0.08"/>
-      <stop offset="0.58" stop-color="#050805" stop-opacity="0"/>
+      <stop offset="0" stop-color="#0d120d" stop-opacity="0.42"/>
+      <stop offset="0.36" stop-color="#0d120d" stop-opacity="0.12"/>
+      <stop offset="0.62" stop-color="#0d120d" stop-opacity="0"/>
     </linearGradient>
-    <filter id="textShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="1" stdDeviation="1.8" flood-color="#000000" flood-opacity="0.55"/>
-    </filter>
   </defs>
-  <rect width="750" height="321" fill="url(#leftDim)"/>
-  <path d="M0 260C92 219 166 291 263 273C343 258 373 230 448 258C546 293 628 238 750 202V321H0V260Z" fill="#FBFFF4"/>
-  <rect x="0" y="312" width="750" height="10" fill="#FBFFF4"/>
-  <text x="48" y="64" font-family="Dengb" font-size="13" fill="#D4F34A" filter="url(#textShadow)">${kicker}</text>
-  <rect x="48" y="74" width="28" height="3" rx="1.5" fill="#D4F34A"/>
-  <text x="48" y="122" font-family="Dengb" font-size="36" fill="#FFFFFF" filter="url(#textShadow)">${title}</text>
-  <text x="48" y="154" font-family="Dengb" font-size="19" fill="#F4F7EA" opacity="0.9" filter="url(#textShadow)">${sub}</text>
+  <rect width="750" height="320" fill="url(#leftDim)"/>
 </svg>`);
 }
 
@@ -131,18 +96,16 @@ async function run() {
       .resize(W, H, { fit: 'cover', position: 'north' })
       .toBuffer();
 
-    const withText = await coverBottomSeam(
-      await sharp(photo)
-        .composite([{ input: overlaySvg(item), top: 0, left: 0 }])
-        .toBuffer(),
-    );
+    const withDim = await sharp(photo)
+      .composite([{ input: overlaySvg(), top: 0, left: 0 }])
+      .toBuffer();
 
     fs.writeFileSync(
       path.join(TEST_DIR, item.out + '.png'),
-      await sharp(withText).png({ compressionLevel: 9 }).toBuffer(),
+      await sharp(withDim).png({ compressionLevel: 9 }).toBuffer(),
     );
 
-    const jpg = await sharp(withText)
+    const jpg = await sharp(withDim)
       .jpeg({ quality: 72, mozjpeg: true })
       .toBuffer();
     fs.writeFileSync(path.join(TMP_DIR, item.out + '.jpg'), jpg);

@@ -3,7 +3,8 @@
  * 我的资料页逻辑 —— 视觉刷新草稿 V5
  * ============================================================================
  *
- * Figma node 389:359。旧绿波浪头已经删掉，改成薄荷底 + page-nav occupy。
+ * Figma node 389:359。波浪头已经删掉，改成主题底 + page-nav occupy。
+ * 头像是圆形封面图，不再套 gold-avatar 的 large 档。
  *
  * 【哪些能改、哪些不能改】
  * 能改：头像、昵称、手机、姓名、性别、惯用手、城市、俱乐部、
@@ -20,20 +21,16 @@ import {
   PLAY_OPTIONS,
 } from '../../mock/profile-edit';
 import type { ProfileEditForm } from '../../mock/profile-edit';
-import { navigateToPage } from '../../utils/navigate';
+import { openMyClub } from '../../utils/navigate';
+import { themeBehavior } from '../../behaviors/theme';
 
 Page({
+  behaviors: [themeBehavior],
   data: {
-    statusBarHeight: 0,
     form: MOCK_PROFILE_EDIT as ProfileEditForm,
     genders: GENDER_OPTIONS,
     hands: HAND_OPTIONS,
     plays: PLAY_OPTIONS,
-  },
-
-  onLoad() {
-    const app = getApp<IAppOption>();
-    this.setData({ statusBarHeight: app.globalData.statusBarHeight });
   },
 
   onPickAvatar() {
@@ -79,7 +76,7 @@ Page({
   },
 
   onEditClub() {
-    navigateToPage('/pages/clubs/index');
+    openMyClub();
   },
 
   onGenderTap(event: WechatMiniprogram.TouchEvent) {

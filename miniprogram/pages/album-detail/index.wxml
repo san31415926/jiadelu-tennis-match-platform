@@ -1,12 +1,5 @@
-<view class="album">
-  <page-nav title="相册详情" />
-  <!-- 头部，草稿 Figma 相册详情 / Header -->
-  <view class="header" style="padding-top:{{statusBarHeight}}px">
-    <view class="header__inner">
-      <view class="header__ellipse"></view>
-      <image class="header__camera" src="/assets/images/gallery/header-camera.png" mode="aspectFit" />
-    </view>
-  </view>
+<view class="album theme-{{theme}}" style="{{themeVars}}">
+  <page-nav title="相册详情" occupy="{{true}}" />
 
   <view class="hero">
     <view class="hero__title">

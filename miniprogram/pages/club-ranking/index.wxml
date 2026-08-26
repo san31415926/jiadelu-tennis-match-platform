@@ -1,32 +1,29 @@
-<view class="club-ranking">
-  <page-nav title="俱乐部榜单" />
-  <view class="header" style="padding-top:{{statusBarHeight}}px">
-    <view class="header__inner">
-      <view class="header__wave"></view>
-
-      <view class="scope-tabs">
-        <view
-          wx:for="{{periods}}"
-          wx:key="*this"
-          class="scope-tabs__item {{activePeriod === item ? 'is-active' : ''}}"
-          data-period="{{item}}"
-          bindtap="onPeriodTap"
-        >
-          {{item}}
-        </view>
+<view class="club-ranking theme-{{theme}}" style="{{themeVars}}">
+  <page-nav title="俱乐部榜单" occupy="{{true}}" />
+  <view class="rank-tools">
+    <view class="scope-tabs">
+      <view
+        wx:for="{{periods}}"
+        wx:key="*this"
+        class="scope-tabs__item {{activePeriod === item ? 'is-active' : ''}}"
+        style="{{activePeriod === item ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}"
+        data-period="{{item}}"
+        bindtap="onPeriodTap"
+      >
+        {{item}}
       </view>
+    </view>
 
-      <view class="metric-tabs">
-        <view
-          wx:for="{{metrics}}"
-          wx:key="*this"
-          class="metric-tabs__item {{activeMetric === item ? 'is-active' : ''}}"
-          data-metric="{{item}}"
-          bindtap="onMetricTap"
-        >
-          {{item}}
-          <view class="metric-tabs__underline" wx:if="{{activeMetric === item}}"></view>
-        </view>
+    <view class="metric-tabs">
+      <view
+        wx:for="{{metrics}}"
+        wx:key="*this"
+        class="metric-tabs__item {{activeMetric === item ? 'is-active' : ''}}"
+        data-metric="{{item}}"
+        bindtap="onMetricTap"
+      >
+        {{item}}
+        <view class="metric-tabs__underline" wx:if="{{activeMetric === item}}" style="background:{{accent}}"></view>
       </view>
     </view>
   </view>
@@ -87,9 +84,9 @@
     <text class="show-more__arrow">{{expanded ? '∧' : '∨'}}</text>
   </view>
 
-  <view class="my-rank-spacer"></view>
+  <view class="my-rank-spacer" wx:if="{{myRanking.clubId}}"></view>
 
-  <view class="my-rank" bindtap="onMineTap">
+  <view class="my-rank" wx:if="{{myRanking.clubId}}" bindtap="onMineTap">
     <image class="my-rank__trophy" src="/assets/images/ranking/my-trophy.png" mode="aspectFit" />
     <text class="my-rank__summary">{{myRanking.summary}}</text>
     <text class="my-rank__action">{{myRanking.actionText}}</text>

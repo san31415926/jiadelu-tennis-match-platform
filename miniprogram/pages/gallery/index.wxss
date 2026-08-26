@@ -3,7 +3,7 @@
  * 赛事相册页样式
  * ============================================================================
  * 数值来自 Figma node 23:272 及其子节点。
- * V5 页沿用原节点 23:272。草稿 228:883（Prototype / Cut Assets）是旧终稿拷贝，未换皮。
+ * 旧绿头、相机、椭圆白浪已经删掉，occupy 吸顶栏。筛选选中走主题强调色。
  *
  * 【两种版式用修饰类切换】
  * 相册分两种排法，差异不只是图片尺寸，连内外边距、标题字号、行间距都不同：
@@ -19,65 +19,17 @@
  * 实现方式是给赛程表分组加一个 .section--bracket 修饰类，用它覆盖默认值，
  * 这样只写一套模板就能出两种版式。哪个分组用哪种由 mock/gallery.ts 里
  * 每项的 layout 字段决定（'bracket' 或 'photo'）。
- *
- * 【想加第三种版式】
- * 在 mock 里给 layout 加一个新值，然后在这里照 .section--bracket 的方式
- * 再写一组覆盖规则。
  */
 
 .gallery {
   min-height: 100vh;
   padding-bottom: 40rpx;
-  background: #fbfcf9;
+  background: var(--page-bg);
 }
 
-/* ---------- 头部 ---------- */
-
-.header {
-  position: relative;
-  background: linear-gradient(90deg, #b2e514 4.55%, #d6f557 20.59%, #f5fac7 51.18%);
-}
-
-.header__inner {
-  height: 360rpx;
-}
-
-/* node 23:275：与俱乐部页同款的 900x190 椭圆下缘 */
-.header__ellipse {
-  position: absolute;
-  left: -75rpx;
-  top: 278rpx;
-  width: 900rpx;
-  height: 190rpx;
-  border-radius: 50%;
-  background: #fbfcf9;
-}
-
-.header__camera {
-  position: absolute;
-  left: 414rpx;
-  top: 110rpx;
-  z-index: 0;
-  width: 330rpx;
-  height: 230rpx;
-}
-
-.header__heading {
-  position: absolute;
-  left: 72rpx;
-  top: 156rpx;
-  height: 68rpx;
-  font-size: 42rpx;
-  font-weight: 700;
-  line-height: 68rpx;
-  color: #0a0f08;
-}
-
-.header__summary {
-  position: absolute;
-  left: 74rpx;
-  top: 227rpx;
-  height: 34rpx;
+.kicker {
+  margin-top: 8rpx;
+  padding: 0 54rpx 4rpx;
   font-size: 20rpx;
   line-height: 34rpx;
   color: #424740;
@@ -99,16 +51,19 @@
   justify-content: center;
   height: 52rpx;
   padding: 0 24rpx;
-  border: 1rpx solid #e0e3d9;
+  border: 2rpx solid #cfd2c6;
   border-radius: 26rpx;
-  background: #fbfcf9;
+  background: #ffffff;
   font-size: 19rpx;
+  font-weight: 600;
   color: #141a12;
 }
 
 .filters__chip.is-active {
-  border-color: #b2e514;
-  background: #b2e514;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+  box-shadow: 0 4rpx 10rpx rgba(20, 24, 16, 0.16);
 }
 
 /* ---------- 分组 ---------- */
@@ -156,7 +111,7 @@
 }
 
 .section__title-part--brand {
-  color: #80b214;
+  color: var(--accent);
 }
 
 .section__more {

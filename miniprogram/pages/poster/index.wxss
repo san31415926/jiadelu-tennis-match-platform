@@ -10,7 +10,7 @@
 
 .poster-page {
   min-height: 100vh;
-  background: #ffffff;
+  background: var(--page-bg);
 }
 
 .notice {

@@ -45,7 +45,7 @@ export const HAND_OPTIONS: HandOption[] = ['右手', '左手'];
 export const PLAY_OPTIONS: PlayOption[] = ['单打', '双打', '混双'];
 
 export const MOCK_PROFILE_EDIT: ProfileEditForm = {
-  avatar: '/assets/images/ranking/avatar-demo.jpg',
+  avatar: '/assets/images/avatars/anime-01.jpg',
   nickname: '帆',
   phone: '138****2618',
   uid: '10008652',

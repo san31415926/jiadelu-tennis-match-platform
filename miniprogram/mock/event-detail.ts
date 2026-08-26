@@ -14,6 +14,7 @@
  * 想改报名预览名单       → 改 SIGNUP_PAIRS / SIGNUP_SINGLES
  * 想改组队招募卡片       → 改 TEAM_RECRUITS
  * 想改签表 / 成绩 / 赛程 → 改 BRACKET_GROUPS / RESULT_ROWS / SCHEDULE_MATCHES
+ * 成绩选手的 club 不填（或空字符串）时，成绩 Tab 显示「个人」
  * 想改精选图             → 改 FEATURED_PHOTOS，复用相册和球场照
  */
 import { CALENDAR_EVENTS } from './calendar';
@@ -59,6 +60,12 @@ export interface EventPlayer {
   points?: string;
   groupTag?: string;
   ratingDelta?: string;
+  /**
+   * 所在俱乐部。成绩 Tab 用来填「俱乐部」列。
+   * 不填就显示「个人」。名称尽量用 mock/club.ts / ranking.ts 里已有的，
+   * 避免同一人在榜单和成绩里挂两家俱乐部。
+   */
+  club?: string;
 }
 
 export interface EventSignupPair {
@@ -126,7 +133,13 @@ export interface ScheduleMatch {
   left: string;
   right: string;
   score: string;
+  /** 画面上的中文，如 已结束 / 进行中 / 未开始 */
   status: string;
+  /**
+   * 给 WXSS 用的英文后缀。小程序样式选择器不能写中文，
+   * 所以 class 是 sched__st--{{statusTone}}，不要把 status 直接拼进类名。
+   */
+  statusTone: 'done' | 'live' | 'soon';
 }
 
 export interface SignupPerson {
@@ -177,10 +190,12 @@ export const EVENT_NAV: EventNavItem[] = [
 const DEFAULT_SERIES = 'LTJIMMY® · 大湾区网球信任制爱好者常年赛';
 const COURT_PHOTO = '/assets/images/court-photo.jpg';
 const AVATARS = [
-  '/assets/images/ranking/avatar-demo.jpg',
-  '/assets/images/ranking/avatar-4.jpg',
-  '/assets/images/ranking/avatar-5.jpg',
-  '/assets/images/ranking/avatar-6.jpg',
+  '/assets/images/avatars/anime-01.jpg',
+  '/assets/images/avatars/anime-02.jpg',
+  '/assets/images/avatars/anime-03.jpg',
+  '/assets/images/avatars/anime-04.jpg',
+  '/assets/images/avatars/anime-05.jpg',
+  '/assets/images/avatars/anime-06.jpg',
 ];
 
 function av(index: number): string {
@@ -208,13 +223,13 @@ export const SIGNUP_PARTNER: SignupPerson = {
 const FEATURED_PHOTOS = [
   '/assets/images/gallery/photo-1.jpg',
   '/assets/images/gallery/photo-2.jpg',
-  '/assets/images/banners/banner-05-night-court.jpg',
+  '/assets/images/banners/banner-05-night-court-photo.jpg',
   '/assets/images/gallery/photo-3.jpg',
 ];
 
 function collectPhotos(): string[] {
   const pool = GALLERY_SECTIONS.flatMap((section) => section.photos);
-  pool.push(COURT_PHOTO, '/assets/images/banners/banner-06-mixed-doubles.jpg');
+  pool.push(COURT_PHOTO, '/assets/images/banners/banner-06-mixed-doubles-photo.jpg');
   return expandAlbumPhotos(pool, 12);
 }
 
@@ -319,8 +334,8 @@ const RESULT_ROWS: EventResultRow[] = [
     eventPoints: '+200',
     superCup: '+200',
     players: [
-      { name: '小鹿', rating: '[3.4级]', gender: 'female', avatar: av(1), ratingDelta: '↑ 0.2' },
-      { name: '杰森', rating: '[3.5级]', gender: 'male', avatar: av(2), ratingDelta: '↑ 0.2' },
+      { name: '小鹿', rating: '[3.4级]', gender: 'female', avatar: av(1), ratingDelta: '↑ 0.2', club: 'GagaTennis Club' },
+      { name: '杰森', rating: '[3.5级]', gender: 'male', avatar: av(2), ratingDelta: '↑ 0.2', club: '菜菜才不菜' },
     ],
   },
   {
@@ -329,7 +344,7 @@ const RESULT_ROWS: EventResultRow[] = [
     superCup: '+120',
     players: [
       { name: 'LIN', rating: '[2.7级]', gender: 'female', avatar: av(3) },
-      { name: '阿豪', rating: '[3.0级]', gender: 'male', avatar: av(0), ratingDelta: '↑ 0.1' },
+      { name: '阿豪', rating: '[3.0级]', gender: 'male', avatar: av(0), ratingDelta: '↑ 0.1', club: '椒个鹏友' },
     ],
   },
   {
@@ -337,7 +352,7 @@ const RESULT_ROWS: EventResultRow[] = [
     eventPoints: '+60',
     superCup: '+60',
     players: [
-      { name: '阿月', rating: '[3.8级]', gender: 'female', avatar: av(1) },
+      { name: '阿月', rating: '[3.8级]', gender: 'female', avatar: av(1), club: '佛山飞跃队' },
       { name: '老周', rating: '[4.1级]', gender: 'male', avatar: av(2) },
     ],
   },
@@ -346,7 +361,7 @@ const RESULT_ROWS: EventResultRow[] = [
     eventPoints: '+40',
     superCup: '+40',
     players: [
-      { name: '林林', rating: '[3.7级]', gender: 'female', avatar: av(3) },
+      { name: '林林', rating: '[3.7级]', gender: 'female', avatar: av(3), club: 'RisingAce 网球社' },
       { name: '克克克', rating: '[3.9级]', gender: 'male', avatar: av(0) },
     ],
   },
@@ -355,8 +370,8 @@ const RESULT_ROWS: EventResultRow[] = [
     eventPoints: '+30',
     superCup: '+30',
     players: [
-      { name: '小鱼', rating: '[3.9级]', gender: 'female', avatar: av(1) },
-      { name: '大飞', rating: '[4.0级]', gender: 'male', avatar: av(2) },
+      { name: '小鱼', rating: '[3.9级]', gender: 'female', avatar: av(1), club: '椒个鹏友' },
+      { name: '大飞', rating: '[4.0级]', gender: 'male', avatar: av(2), club: 'inininAlive Club' },
     ],
   },
 ];
@@ -449,6 +464,7 @@ const SCHEDULE_MATCHES: ScheduleMatch[] = [
     right: 'LIN / 阿豪',
     score: '6-3  6-4',
     status: '已结束',
+    statusTone: 'done',
   },
   {
     time: '16:50',
@@ -458,6 +474,7 @@ const SCHEDULE_MATCHES: ScheduleMatch[] = [
     right: '林林 / 克克克',
     score: '',
     status: '进行中',
+    statusTone: 'live',
   },
   {
     time: '17:40',
@@ -467,6 +484,7 @@ const SCHEDULE_MATCHES: ScheduleMatch[] = [
     right: '阿泰 / 帆',
     score: '',
     status: '未开始',
+    statusTone: 'soon',
   },
   {
     time: '18:30',
@@ -476,6 +494,7 @@ const SCHEDULE_MATCHES: ScheduleMatch[] = [
     right: '交叉位待定',
     score: '',
     status: '未开始',
+    statusTone: 'soon',
   },
 ];
 

@@ -1,3 +1,5 @@
+import { themeBehavior } from '../../behaviors/theme';
+
 /**
  * ============================================================================
  * 状态筛选条组件
@@ -5,21 +7,20 @@
  *
  * 【怎么用】
  *   <filter-tabs
- *     tabs="{{filters}}"          <!-- 选项文字数组 -->
- *     active="{{activeFilter}}"   <!-- 当前选中的那一项（传文字本身，不是索引） -->
- *     active-color="#83d414"      <!-- 选中态底色 -->
- *     variant="capsule"           <!-- V5 胶囊条；不传仍是旧矮条 -->
+ *     tabs="{{filters}}"
+ *     active="{{activeFilter}}"
+ *     variant="capsule"
  *     bind:change="onFilterChange"
  *   />
  *
- * 【为什么用文字而不是索引表示选中】
- * 因为筛选项的文字同时也是数据的键名（见 mock/home.ts 的 MOCK_EVENTS），
- * 用文字可以直接拿去查数据，不用再做一次索引到键名的转换。
+ * 选中色默认跟全站主题走。要覆盖时再传 active-color / active-text-color。
  *
- * 【wxml 里属性名要用连字符】
- * TS 里定义的 activeColor，在 wxml 里要写成 active-color，这是小程序的约定。
+ * 【为什么用文字而不是索引表示选中】
+ * 筛选项的文字同时也是数据的键名（见 mock/home.ts 的 MOCK_EVENTS），
+ * 用文字可以直接拿去查数据，不用再做一次索引到键名的转换。
  */
 Component({
+  behaviors: [themeBehavior],
   properties: {
     /** 选项文字数组，如 ['我的报名', '报名中', '进行中', '已结束'] */
     tabs: {
@@ -32,18 +33,21 @@ Component({
       value: '',
     },
     /**
-     * 选中态底色。
-     *
-     * V5 首页和超级杯都是 #83d414。做成可配置项，万一哪页要换色不用改组件。
-     * 不传则用默认的 #83d414。
+     * 选中态底色。不传就用当前主题的 accent。
+     * 首页 / 超级杯也会显式传入，效果一样。
      */
     activeColor: {
       type: String,
-      value: '#83d414',
+      value: '',
+    },
+    /** 选中态文字色。不传就用 accentText。 */
+    activeTextColor: {
+      type: String,
+      value: '',
     },
     /**
      * 外观。capsule 是 V5 圆角胶囊条（首页 148:199 / 超级杯 231:199）；
-     * 不传仍是旧的矮条，给还没换皮的页用。
+     * 不传仍是旧的矮条。
      */
     variant: {
       type: String,

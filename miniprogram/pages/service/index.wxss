@@ -1,35 +1,24 @@
-@import '../../styles/subpage-header.wxss';
-
 /**
  * ============================================================================
  * 联系客服页样式
  * ============================================================================
- * 终稿 node 68:655。头部和图标与商务合作同款，卡片里是 630×88 的青柠胶囊按钮。
- * button 默认有边框和内边距，下面全部清掉，才长得像设计稿。
+ * 和「我的资料」一样：吸顶栏 occupy，不再画波浪头、圆形图标。
+ * button 默认有边框和内边距，下面全部清掉，才长得像胶囊。
  */
 
 .info {
   min-height: 100vh;
   padding-bottom: 48rpx;
-  background: #f0ffd5;
-}
-
-.hero-icon {
-  position: relative;
-  z-index: 2;
-  width: 120rpx;
-  height: 120rpx;
-  margin: -114rpx auto 0;
 }
 
 .kicker {
-  margin-top: 12rpx;
-  height: 28rpx;
+  margin-top: 24rpx;
+  padding: 0 32rpx;
   font-size: 22rpx;
   font-weight: 500;
   line-height: 28rpx;
   text-align: center;
-  color: #7d8583;
+  color: #5c6356;
 }
 
 .card {
@@ -39,16 +28,17 @@
   width: 694rpx;
   margin: 14rpx 28rpx 0;
   padding: 32rpx 32rpx 36rpx;
+  border: 2rpx solid #cfd2c6;
   border-radius: 28rpx;
-  background: linear-gradient(180deg, #abd7a7 0%, rgba(126, 224, 117, 0.6) 100%);
-  box-shadow: 0 10rpx 12rpx rgba(31, 46, 31, 0.12);
+  background: #ffffff;
+  box-shadow: 0 10rpx 16rpx rgba(31, 46, 31, 0.12);
 }
 
 .card__title {
   font-size: 30rpx;
   font-weight: 700;
   line-height: 38rpx;
-  color: #42385f;
+  color: #1b201d;
 }
 
 .card__sub {
@@ -57,7 +47,7 @@
   font-size: 22rpx;
   line-height: 28rpx;
   text-align: center;
-  color: #7d8583;
+  color: #5c6356;
 }
 
 .contact-btn {
@@ -67,11 +57,11 @@
   padding: 0;
   border: none;
   border-radius: 44rpx;
-  background: #54b50a;
+  background: var(--accent);
   font-size: 28rpx;
   font-weight: 700;
   line-height: 88rpx;
-  color: #ffffff;
+  color: var(--accent-text);
 }
 
 .contact-btn::after {

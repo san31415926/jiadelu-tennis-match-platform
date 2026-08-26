@@ -14,7 +14,7 @@
  *
  * 【常见改动】
  * 想改杯赛 / 荣誉入口 → 改 SUPER_CUP_FEATURES（path 决定点进去去哪）
- * 想改头图 / 叠字     → 改 SUPER_CUP_BANNERS（图和首页共用 banners 目录）
+ * 想改头图 / 叠字     → 图用 banners 目录（直边、不要白浪）；文案改 SUPER_CUP_BANNERS
  * 想改赛事内容         → 改 SUPER_CUP_EVENTS，键名必须和 EVENT_FILTERS 一致
  * Cover Flow 的排列    → 改 SUPER_CUP_EVENT_TYPE_KEYS / SUPER_CUP_HONOR_KEYS
  */
@@ -39,7 +39,7 @@ export const SUPER_CUP_BANNERS: SuperCupBanner[] = [
     eyebrow: '俱乐部联赛',
     title: '广佛俱乐部联名赛',
     subtitle: '球员精彩瞬间 · 点击查看',
-    image: '/assets/images/banners/banner-01-club-union.jpg',
+    image: '/assets/images/banners/banner-01-club-union-photo.jpg',
     target: '/pages/gallery/index',
   },
   {
@@ -47,7 +47,7 @@ export const SUPER_CUP_BANNERS: SuperCupBanner[] = [
     eyebrow: '俱乐部联赛',
     title: '俱乐部新秀杯',
     subtitle: '第二届 · 12 支球队集结',
-    image: '/assets/images/banners/banner-02-rookie-cup.jpg',
+    image: '/assets/images/banners/banner-02-rookie-cup-photo.jpg',
     target: '/pages/super-cup/index',
   },
   {
@@ -55,7 +55,7 @@ export const SUPER_CUP_BANNERS: SuperCupBanner[] = [
     eyebrow: '年度盛典',
     title: '年度颁奖典礼',
     subtitle: '11 月 15 日 · 广州四季酒店',
-    image: '/assets/images/banners/banner-03-ceremony.jpg',
+    image: '/assets/images/banners/banner-03-ceremony-photo.jpg',
     target: '/pages/poster/index?id=ceremony',
   },
   {
@@ -63,7 +63,7 @@ export const SUPER_CUP_BANNERS: SuperCupBanner[] = [
     eyebrow: '俱乐部联赛',
     title: '超级杯冠军之夜',
     subtitle: '俱乐部荣耀时刻',
-    image: '/assets/images/banners/banner-04-super-cup.jpg',
+    image: '/assets/images/banners/banner-04-super-cup-photo.jpg',
     target: '/pages/super-cup/index',
   },
   {
@@ -71,7 +71,7 @@ export const SUPER_CUP_BANNERS: SuperCupBanner[] = [
     eyebrow: '球场开放',
     title: '夜间球场开放',
     subtitle: '灯光球场 · 预约开打',
-    image: '/assets/images/banners/banner-05-night-court.jpg',
+    image: '/assets/images/banners/banner-05-night-court-photo.jpg',
     target: '/pages/clubs/index',
   },
   {
@@ -79,7 +79,7 @@ export const SUPER_CUP_BANNERS: SuperCupBanner[] = [
     eyebrow: '精彩瞬间',
     title: '混双精彩对决',
     subtitle: '默契搭档 · 点击查看',
-    image: '/assets/images/banners/banner-06-mixed-doubles.jpg',
+    image: '/assets/images/banners/banner-06-mixed-doubles-photo.jpg',
     target: '/pages/gallery/index',
   },
 ];
@@ -257,6 +257,25 @@ export const SUPER_CUP_EVENTS: Record<string, EventItem[]> = {
       price: '查看成绩',
       category: '团体',
       area: '东莞',
+      venueLink: true,
+    },
+    {
+      id: 'sc-night-1',
+      title: '超级杯冠军之夜',
+      poster: '/assets/images/banners/banner-04-super-cup-photo.jpg',
+      venue: '广州天河体育中心',
+      time: '08月22日 19:00-22:00',
+      slots: '16/16 队',
+      actionText: '查看详情',
+      grade: '典礼',
+      gradeTone: 'orange',
+      statusLabel: '已结束',
+      slotCaption: '典礼·冠军之夜',
+      tags: [EVENT_TAGS.realname],
+      price: '查看详情',
+      category: '团体',
+      area: '广州',
+      district: '天河',
       venueLink: true,
     },
   ],

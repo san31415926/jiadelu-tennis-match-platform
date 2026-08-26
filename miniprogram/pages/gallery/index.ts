@@ -6,12 +6,14 @@ import {
 } from '../../mock/gallery';
 import type { GallerySection } from '../../mock/gallery';
 import { navigateToPage } from '../../utils/navigate';
+import { themeBehavior } from '../../behaviors/theme';
 
 /**
  * ============================================================================
  * 赛事相册页逻辑
  * ============================================================================
- * V5 草稿 228:883 与现页（原节点 23:272）几乎一样，未换皮。
+ * 版式来自终稿 23:272。V5 草稿 228:883 几乎同构图，已去掉波浪头和相机装饰，
+ * 改 occupy 吸顶栏。筛选选中走主题强调色。
  *
  * 【照片预览用的是微信原生能力】
  * wx.previewImage 会打开系统级的图片查看器，支持双指缩放、左右滑动切换、
@@ -23,8 +25,8 @@ import { navigateToPage } from '../../utils/navigate';
  * 逻辑上很混乱。按分组隔离更符合预期。
  */
 Page({
+  behaviors: [themeBehavior],
   data: {
-    statusBarHeight: 0,
     summary: GALLERY_SUMMARY,
     filters: GALLERY_FILTERS,
     activeFilter: '全部',
@@ -32,9 +34,7 @@ Page({
   },
 
   onLoad() {
-    const app = getApp<IAppOption>();
     this.setData({
-      statusBarHeight: app.globalData.statusBarHeight,
       sections: filterSections('全部'),
     });
   },

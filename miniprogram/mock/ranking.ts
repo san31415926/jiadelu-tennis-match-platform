@@ -63,13 +63,15 @@ export const RANKING_METRICS = ['积分', '身价', '战力'];
 export const CURRENT_CITY = '广州';
 
 const AVATARS = [
-  '/assets/images/ranking/avatar-demo.jpg',
-  '/assets/images/ranking/avatar-4.jpg',
-  '/assets/images/ranking/avatar-5.jpg',
-  '/assets/images/ranking/avatar-6.jpg',
+  '/assets/images/avatars/anime-01.jpg',
+  '/assets/images/avatars/anime-02.jpg',
+  '/assets/images/avatars/anime-03.jpg',
+  '/assets/images/avatars/anime-04.jpg',
+  '/assets/images/avatars/anime-05.jpg',
+  '/assets/images/avatars/anime-06.jpg',
 ];
 
-/** 头像资产只有 4 张示例图，按序循环复用 */
+/** 头像在 assets/images/avatars/，按序循环复用 */
 function avatarOf(index: number): string {
   return AVATARS[index % AVATARS.length];
 }

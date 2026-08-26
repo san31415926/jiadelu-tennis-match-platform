@@ -5,25 +5,43 @@
  * 数值来自 Figma node 230:158（信息架构默认态）。设计稿 1px = 1rpx。
  *
  * 【这一页的块】
- *   1. 顶栏 —— 绿渐变 + 居中字标「超级杯」。稿上汉堡 hidden，不要做侧栏
- *   2. 头图 321rpx —— 图 + 叠字 + 指示点 + 底部白浪
+ *   1. 顶栏 —— 主题渐变 + 居中字标「超级杯」。稿上汉堡 hidden，不要做侧栏
+ *   2. 头图 321rpx —— 直边照片 + 叠字 + 指示点。稿上虽有波浪层，按产品要求改成和首页一样的直边
  *   3. 内容白底区 —— 两组 Cover Flow、俱乐部中心按钮、胶囊筛选、赛事卡
  *
- * Cover Flow 中间卡 280×248、两侧 168×176。swiper 的 previous/next-margin
- * 各 235，让当前项正好 280 宽居中；两侧卡靠 prev/next 把 168 卡贴向中间。
+ * Cover Flow 中间卡 280×248、两侧 168×176。swiper 必须铺满 750 屏宽，
+ * previous/next-margin 各 235 才能露出左右两张。内容区有 32 内边距，
+ * 所以 cover-flow 用负边距撑出去，否则当前槽只剩 216，右侧卡会被裁掉。
  */
 
 .super-cup {
   min-height: 100vh;
-  background: #ffffff;
+  background: var(--page-bg);
 }
 
 /**
- * 顶栏绿渐变。稿上整条 176（含假状态栏），字标高 72 贴在底边。
- * 真机状态栏用 padding-top 接上，导航行只留字标那 72。
+ * 顶栏钉在屏幕最上，下滑列表时字标还在。
+ * 写法跟赛事首页同一套：fixed + .topbar-spacer 垫状态栏 + 72rpx。
+ * z-index 200 压过头图。
  */
 .topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  /* JS 还没量到高度时，先用系统安全区垫住，避免字钻进状态栏 */
+  padding-top: env(safe-area-inset-top);
   background: var(--header-gradient);
+}
+
+/**
+ * 跳到海报等二级页后本页还在栈里。fixed 顶栏有的机型会继续挡在下一页上面，
+ * 点「返回」其实点到了这条字标。离开时藏掉，回来再亮。
+ */
+.topbar--parked {
+  display: none;
+  pointer-events: none;
 }
 
 .topbar__row {
@@ -58,9 +76,12 @@
 }
 
 .hero__swiper,
+.hero__item,
 .hero__slide {
+  position: relative;
   width: 100%;
   height: 321rpx;
+  overflow: hidden;
 }
 
 .hero__image {
@@ -74,11 +95,13 @@
   top: 0;
   right: 0;
   bottom: 0;
+  /* 横向压左，盖住 jpg 旧标题；叠字仍由 hero__copy 画 */
   background: linear-gradient(
     90deg,
-    rgba(13, 18, 13, 0.42) 0%,
-    rgba(13, 18, 13, 0.12) 52%,
-    rgba(13, 18, 13, 0.05) 100%
+    rgba(13, 18, 13, 0.78) 0%,
+    rgba(13, 18, 13, 0.32) 42%,
+    rgba(13, 18, 13, 0.08) 68%,
+    rgba(13, 18, 13, 0.04) 100%
   );
 }
 
@@ -95,19 +118,15 @@
   font-size: 13rpx;
   font-weight: 600;
   line-height: 18rpx;
-  color: #d4f34a;
+  color: var(--accent);
 }
 
-/**
- * 小标签下方那根 28×3 的青绿短条（node 230:193）。
- * 圆角 1.5，颜色跟 eyebrow 同一支 #d4f34a。
- */
 .hero__accent {
   width: 28rpx;
   height: 3rpx;
   margin-top: 8rpx;
   border-radius: 1.5rpx;
-  background: #d4f34a;
+  background: var(--accent);
 }
 
 .hero__title {
@@ -148,35 +167,18 @@
 .hero__dot--on {
   width: 18rpx;
   border-radius: 4rpx;
-  background: #d4f34a;
+  background: var(--accent);
 }
 
 /**
- * 头图底部白浪，接到内容区。路径仿首页轮播下缘，fill 必须和 .sheet 起点色
- * #fcfff8 一致，否则接头会有一条色差。
- */
-.hero__wave {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  z-index: 3;
-  width: 100%;
-  height: 72rpx;
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='72' viewBox='0 0 750 72' preserveAspectRatio='none'%3E%3Cpath d='M0 28C120 62 230 62 350 22C500 -18 600 48 750 16V72H0V28Z' fill='%23FCFFF8'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  pointer-events: none;
-}
-
-/**
- * 内容区。稿上从 #fcfff8 过渡到白，左右 32，块与块 gap 24。
+ * 内容区。左右 32，块与块 gap 24。画布接到 --page-bg。
  */
 .sheet {
   display: flex;
   flex-direction: column;
   gap: 24rpx;
   padding: 24rpx 32rpx 8rpx;
-  background: linear-gradient(180deg, #fcfff8 0%, #ffffff 100%);
+  background: var(--page-bg);
 }
 
 .section {
@@ -212,8 +214,9 @@
 /* ---------- Cover Flow ---------- */
 
 .cover-flow {
-  width: 100%;
+  width: 750rpx;
   height: 248rpx;
+  margin-left: -32rpx;
 }
 
 .cover-slide {
@@ -267,7 +270,7 @@
   width: 280rpx;
   height: 248rpx;
   padding: 22rpx 8rpx 18rpx;
-  border-color: #83d414;
+  border-color: var(--accent);
   opacity: 1;
 }
 
@@ -318,7 +321,7 @@
 .cover-dots__item.is-on {
   width: 18rpx;
   border-radius: 4rpx;
-  background: #83d414;
+  background: var(--accent);
 }
 
 /**
@@ -331,10 +334,10 @@
   gap: 8rpx;
   height: 96rpx;
   border-radius: 20rpx;
-  background: #83d414;
+  background: var(--accent);
   font-size: 30rpx;
   font-weight: 700;
-  color: #1a1f16;
+  color: var(--accent-text);
 }
 
 .club-cta--pressed {

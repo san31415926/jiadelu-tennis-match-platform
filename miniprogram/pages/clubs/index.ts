@@ -2,17 +2,21 @@ import {
   CLUB_FILTERS,
   CLUB_LIST,
   CLUB_SUMMARY,
+  clubsForViewer,
   filterClubs,
 } from '../../mock/club';
 import type { ClubItem } from '../../mock/club';
 import { navigateToPage } from '../../utils/navigate';
+import { themeBehavior } from '../../behaviors/theme';
 
 /**
  * ============================================================================
  * 俱乐部页逻辑
  * ============================================================================
  *
- * V5 草稿 228:310 与现页一致（旧绿头），未整页重写。
+ * 版式来自终稿俱乐部列表。V5 草稿 228:310 几乎同构图，已去掉波浪头、旗子、椭圆，
+ * 改 occupy 吸顶栏。申请加入 / 创建俱乐部 / 筛选选中走主题强调色。
+ * 「已加入」只在登录后出现；未登录当俱乐部中心逛，不会显示已经加入任何一家。
  *
  * 【筛选和搜索是叠加的】
  * 所以两个交互都调同一个 apply(filter, keyword) 方法，把两个条件一起传给
@@ -23,8 +27,8 @@ import { navigateToPage } from '../../utils/navigate';
  * 数据量大时可能需要加防抖，但本地过滤六条数据不用担心性能。
  */
 Page({
+  behaviors: [themeBehavior],
   data: {
-    statusBarHeight: 0,
     summary: CLUB_SUMMARY,
     filters: CLUB_FILTERS,
     activeFilter: '全部',
@@ -33,19 +37,30 @@ Page({
   },
 
   onLoad() {
-    const app = getApp<IAppOption>();
+    this.refreshList();
+  },
+
+  onShow() {
+    this.refreshList();
+  },
+
+  refreshList() {
+    const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
     this.setData({
-      statusBarHeight: app.globalData.statusBarHeight,
-      clubs: filterClubs('全部', ''),
+      clubs: clubsForViewer(
+        filterClubs(this.data.activeFilter || '全部', this.data.keyword || ''),
+        isLoggedIn,
+      ),
     });
   },
 
   /** 筛选与关键词叠加生效；接入云开发后改为服务端查询 */
   apply(filter: string, keyword: string) {
+    const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
     this.setData({
       activeFilter: filter,
       keyword,
-      clubs: filterClubs(filter, keyword),
+      clubs: clubsForViewer(filterClubs(filter, keyword), isLoggedIn),
     });
   },
 
@@ -67,6 +82,10 @@ Page({
   },
 
   onJoinTap(event: WechatMiniprogram.TouchEvent) {
+    if (!getApp<IAppOption>().globalData.isLoggedIn) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
     const id = String(event.currentTarget.dataset.id);
     const club = CLUB_LIST.find((item) => item.id === id);
     wx.showToast({
@@ -76,6 +95,10 @@ Page({
   },
 
   onCreateClub() {
+    if (!getApp<IAppOption>().globalData.isLoggedIn) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
     wx.showToast({ title: '创建俱乐部待接入云开发', icon: 'none' });
   },
 });

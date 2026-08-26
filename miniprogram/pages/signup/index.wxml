@@ -1,10 +1,5 @@
-<view class="signup {{step === 'detail' ? 'signup--detail' : ''}}">
-  <page-nav title="{{step === 'mode' ? '选择参赛方式' : '报名详情'}}" />
-  <view class="sub-header" style="padding-top:{{statusBarHeight}}px">
-    <view class="sub-header__inner sub-header__inner--compact">
-      <view class="sub-header__wave"></view>
-    </view>
-  </view>
+<view class="signup {{step === 'detail' ? 'signup--detail' : ''}} theme-{{theme}}" style="{{themeVars}}">
+  <page-nav title="{{step === 'mode' ? '选择参赛方式' : '报名详情'}}" occupy="{{true}}" />
 
   <view class="title-row">
     <view class="status">{{event.status}}</view>
@@ -17,8 +12,8 @@
       <view class="sheet__title">选择参赛方式</view>
       <view class="sheet__desc">单人报名后由赛事组分配搭档；组队报名需先有搭档，不是约球匹配。</view>
       <view class="modes">
-        <view class="mode {{mode === '单人' ? 'is-on' : ''}}" data-mode="单人" bindtap="onPickMode">单人</view>
-        <view class="mode {{mode === '组队' ? 'is-on' : ''}}" data-mode="组队" bindtap="onPickMode">组队</view>
+        <view class="mode {{mode === '单人' ? 'is-on' : ''}}" style="{{mode === '单人' ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}" data-mode="单人" bindtap="onPickMode">单人</view>
+        <view class="mode {{mode === '组队' ? 'is-on' : ''}}" style="{{mode === '组队' ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}" data-mode="组队" bindtap="onPickMode">组队</view>
       </view>
 
       <view class="who" wx:if="{{mode === '单人' || hasTeam}}">
@@ -50,7 +45,7 @@
 
     <view class="cta-spacer"></view>
     <view class="cta">
-      <view class="cta__btn {{mode === '组队' && !hasTeam ? 'is-mute' : ''}}" bindtap="onConfirmMode">确认报名</view>
+      <view class="cta__btn {{mode === '组队' && !hasTeam ? 'is-mute' : ''}}" style="{{mode === '组队' && !hasTeam ? '' : 'background:' + accent + ';color:' + accentText}}" bindtap="onConfirmMode">确认报名</view>
     </view>
   </block>
 

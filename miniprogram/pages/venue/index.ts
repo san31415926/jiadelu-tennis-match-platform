@@ -16,6 +16,7 @@
  *
  * 【query】
  * ?id=chancheng 默认禅城店。?tab=album 可直接落到相册。
+ * 赛事 / 球员榜 Tab 自己量 statusBarHeight 垫头图上的返回；相册 Tab 改用 page-nav occupy。
  */
 import type { EventItem } from '../../mock/home';
 import type { RankingRow } from '../../mock/ranking';
@@ -38,7 +39,9 @@ import type {
   VenueInfo,
   VenueTab,
 } from '../../mock/venue';
-import { navigateToEventDetail, navigateToPage } from '../../utils/navigate';
+import { headerMetrics } from '../../utils/header';
+import { navigateBackOrHome, navigateToEventDetail, navigateToPage } from '../../utils/navigate';
+import { themeBehavior } from '../../behaviors/theme';
 
 function asTab(value?: string): VenueTab {
   if (value === 'ranking' || value === 'album' || value === 'events') {
@@ -48,6 +51,7 @@ function asTab(value?: string): VenueTab {
 }
 
 Page({
+  behaviors: [themeBehavior],
   data: {
     statusBarHeight: 0,
     tabs: VENUE_TABS,
@@ -68,11 +72,10 @@ Page({
   },
 
   onLoad(query: Record<string, string | undefined>) {
-    const app = getApp<IAppOption>();
     const venue = getVenue(query.id);
     const activeTab = asTab(query.tab);
     this.setData({
-      statusBarHeight: app.globalData.statusBarHeight,
+      ...headerMetrics(),
       venue,
       activeTab,
       heroSrc: venue.hero.featured,
@@ -83,11 +86,7 @@ Page({
   },
 
   onBack() {
-    wx.navigateBack({
-      fail: () => {
-        wx.switchTab({ url: '/pages/events/index' });
-      },
-    });
+    navigateBackOrHome();
   },
 
   onPillTap(event: WechatMiniprogram.TouchEvent) {

@@ -7,10 +7,13 @@
  * 点海报会用微信自带预览打开，方便把兑换表看大、长按存图。
  *
  * 想改提示文案或换海报 → mock/rewards.ts
+ * 吸顶栏 occupy 打开，variant 用 plain（页底色，不走顶栏实色）。
  */
 import { REWARDS_NOTICE, REWARDS_POSTER } from '../../mock/rewards';
+import { themeBehavior } from '../../behaviors/theme';
 
 Page({
+  behaviors: [themeBehavior],
   data: {
     notice: REWARDS_NOTICE,
     poster: REWARDS_POSTER,

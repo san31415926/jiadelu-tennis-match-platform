@@ -9,10 +9,11 @@
  * 页面布局只有一套，靠换数据切换。
  *
  * 【常见改动】
- * 想改示例资料     → 改 MOCK_PROFILE
+ * 想改示例头像 → 改 MOCK_PROFILE.avatar，图在 assets/images/avatars/
  * 想改未登录文案   → 改 GUEST_PROFILE
- * 想改封面候选图   → 改 PROFILE_COVERS
- * 想改背景色色板   → 改 PROFILE_THEMES（页面用 theme 字段换 CSS class）
+ * 想改背景色色板   → 改 PROFILE_THEMES；选中后由 utils/theme.ts 作用到全站
+ *                    顶栏 / 页底，不只这一页的霜化罩
+ * 封面默认空，只显示主题纯色。用户从相册上传后才写入 cover。
  * 想改战力六个分   → 改 MOCK_PROFILE.radar
  */
 export interface ProfileRadar {
@@ -46,11 +47,6 @@ export interface ProfileTheme {
   swatch: string;
 }
 
-export interface ProfileCover {
-  id: string;
-  image: string;
-}
-
 export const PROFILE_THEMES: ProfileTheme[] = [
   { key: 'mint', label: '薄荷', swatch: '#66c4b4' },
   { key: 'lime', label: '青柠', swatch: '#83d414' },
@@ -60,18 +56,12 @@ export const PROFILE_THEMES: ProfileTheme[] = [
   { key: 'photo', label: '原图', swatch: '' },
 ];
 
-export const PROFILE_COVERS: ProfileCover[] = [
-  { id: 'cover-1', image: '/assets/images/banners/banner-01-club-union.jpg' },
-  { id: 'cover-2', image: '/assets/images/banners/banner-04-super-cup.jpg' },
-  { id: 'cover-3', image: '/assets/images/banners/banner-05-night-court.jpg' },
-];
-
 export const GUEST_PROFILE: ProfileSummary = {
   nickname: '登录',
-  avatar: '/assets/images/ranking/avatar-demo.jpg',
+  avatar: '/assets/images/avatars/anime-01.jpg',
   uid: 'UID --',
   bio: '登录后编辑介绍',
-  cover: PROFILE_COVERS[0].image,
+  cover: '',
   theme: 'mint',
   marketValue: '--',
   points: '--',
@@ -97,10 +87,10 @@ export const GUEST_PROFILE: ProfileSummary = {
 
 export const MOCK_PROFILE: ProfileSummary = {
   nickname: '帆',
-  avatar: '/assets/images/ranking/avatar-demo.jpg',
+  avatar: '/assets/images/avatars/anime-01.jpg',
   uid: 'UID 10008652',
   bio: '',
-  cover: PROFILE_COVERS[0].image,
+  cover: '',
   theme: 'mint',
   marketValue: '¥12,800',
   points: '1650',

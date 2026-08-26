@@ -2,18 +2,17 @@
  * ============================================================================
  * 关于我们页
  * ============================================================================
- * 终稿 Figma node 68:618。金色头 + 公众号二维码占位，文案在 mock/info-pages.ts。
+ * 终稿 Figma node 68:618。文案和二维码占位在 mock/info-pages.ts。
+ *
+ * 吸顶栏 occupy 打开，状态栏高度由 page-nav 自己量，本页不必再抄 statusBarHeight。
+ * 根节点挂 themeBehavior，换背景时竖向渐变跟着走。
  */
 import { ABOUT_PAGE } from '../../mock/info-pages';
+import { themeBehavior } from '../../behaviors/theme';
 
 Page({
+  behaviors: [themeBehavior],
   data: {
-    statusBarHeight: 0,
     page: ABOUT_PAGE,
-  },
-
-  onLoad() {
-    const app = getApp<IAppOption>();
-    this.setData({ statusBarHeight: app.globalData.statusBarHeight });
   },
 });

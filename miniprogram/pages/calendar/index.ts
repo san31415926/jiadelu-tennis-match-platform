@@ -8,12 +8,14 @@ import {
 import type { CalendarCell } from '../../utils/calendar';
 import { venueIdByEventId } from '../../mock/venue';
 import { navigateToEventDetail, navigateToPage } from '../../utils/navigate';
+import { themeBehavior } from '../../behaviors/theme';
 
 /**
  * ============================================================================
  * 赛事日历页逻辑
  * ============================================================================
- * V5 草稿 228:954 与现页（原节点 17:92）几乎一样，未换皮。
+ * 版式来自终稿 17:92。V5 草稿 228:954 几乎同构图，已去掉波浪头，改 occupy 吸顶栏。
+ * 「今日」、选中日、有赛圆点走主题强调色。
  *
  * 【核心是一个 render 方法】
  * 翻月、点日期、点今日，最终都归结为"用新的年月和选中日期重画一次"，
@@ -37,8 +39,8 @@ function monthLabelOf(year: number, month: number): string {
 }
 
 Page({
+  behaviors: [themeBehavior],
   data: {
-    statusBarHeight: 0,
     weekdays: WEEKDAY_LABELS,
     year: 2026,
     month: 8,
@@ -50,8 +52,6 @@ Page({
   },
 
   onLoad() {
-    const app = getApp<IAppOption>();
-    this.setData({ statusBarHeight: app.globalData.statusBarHeight });
     this.jumpToToday();
   },
 

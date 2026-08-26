@@ -90,7 +90,7 @@ export const CATEGORY_OPTIONS = ['全部项目', '混双', '男双', '团体'];
 
 const HERO = '/assets/images/venue/hero.jpg';
 const AVATAR = '/assets/images/venue/avatar.jpg';
-const FEATURED_HERO = '/assets/images/banners/banner-06-mixed-doubles.jpg';
+const FEATURED_HERO = '/assets/images/banners/banner-06-mixed-doubles-photo.jpg';
 const EVENTS_HERO = '/assets/images/gallery/photo-1.jpg';
 
 const GALLERY_PHOTOS = GALLERY_SECTIONS.flatMap((section) => section.photos);

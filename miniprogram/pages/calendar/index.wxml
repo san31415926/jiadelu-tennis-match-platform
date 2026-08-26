@@ -1,21 +1,12 @@
-<view class="calendar">
-  <page-nav title="赛事日历" />
-  <!-- 头部，Figma node 17:94 -->
-  <view class="header" style="padding-top:{{statusBarHeight}}px">
-    <view class="header__inner">
-      <!-- 该页的下缘是一个超出屏宽的椭圆，而非波浪路径 -->
-      <view class="header__ellipse"></view>
-
-      <view class="month-controls">
-        <view class="month-controls__arrow" bindtap="onPrevMonth">‹</view>
-        <view class="month-controls__label">{{monthLabel}}</view>
-        <view class="month-controls__arrow" bindtap="onNextMonth">›</view>
-      </view>
-
-      <view class="today-btn" bindtap="onToday">今日</view>
-
-      <image class="header__ball" src="/assets/images/hero-tennis-ball.png" mode="aspectFit" />
+<view class="calendar theme-{{theme}}" style="{{themeVars}}">
+  <page-nav title="赛事日历" occupy="{{true}}" />
+  <view class="month-bar">
+    <view class="month-controls">
+      <view class="month-controls__arrow" bindtap="onPrevMonth">‹</view>
+      <view class="month-controls__label">{{monthLabel}}</view>
+      <view class="month-controls__arrow" bindtap="onNextMonth">›</view>
     </view>
+    <view class="today-btn" style="background:{{accent}};color:{{accentText}}" bindtap="onToday">今日</view>
   </view>
 
   <!-- 月视图，Figma node 17:105 -->

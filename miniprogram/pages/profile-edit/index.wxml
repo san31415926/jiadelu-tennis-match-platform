@@ -1,9 +1,11 @@
-<view class="edit">
+<view class="edit theme-{{theme}}" style="{{themeVars}}">
   <!-- occupy 把吸顶栏高度垫进文档流，下面不再画旧绿波浪头 -->
   <page-nav title="我的资料" variant="mint" occupy="{{true}}" />
 
   <view class="avatar-block" bindtap="onPickAvatar">
-    <image class="avatar-block__photo" src="{{form.avatar}}" mode="aspectFill" />
+    <view class="avatar-block__frame">
+      <image class="avatar-block__photo" src="{{form.avatar}}" mode="aspectFit" />
+    </view>
     <view class="avatar-block__hint">点击更换头像</view>
   </view>
 
@@ -48,6 +50,7 @@
           wx:for="{{genders}}"
           wx:key="*this"
           class="pill {{form.gender === item ? 'pill--on' : ''}}"
+          style="{{form.gender === item ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}"
           data-value="{{item}}"
           bindtap="onGenderTap"
         >{{item}}</view>
@@ -60,6 +63,7 @@
           wx:for="{{hands}}"
           wx:key="*this"
           class="pill {{form.hand === item ? 'pill--on' : ''}}"
+          style="{{form.hand === item ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}"
           data-value="{{item}}"
           bindtap="onHandTap"
         >{{item}}</view>
@@ -90,6 +94,7 @@
           wx:for="{{plays}}"
           wx:key="*this"
           class="pill {{form.play === item ? 'pill--on' : ''}}"
+          style="{{form.play === item ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}"
           data-value="{{item}}"
           bindtap="onPlayTap"
         >{{item}}</view>
@@ -142,6 +147,6 @@
     </view>
   </view>
 
-  <view class="save" bindtap="onSave">保存资料</view>
+  <view class="save" style="background:{{accent}};color:{{accentText}}" bindtap="onSave">保存资料</view>
   <view class="footnote">评分 / 积分 / 身价由赛绩更新，其余项均可编辑</view>
 </view>

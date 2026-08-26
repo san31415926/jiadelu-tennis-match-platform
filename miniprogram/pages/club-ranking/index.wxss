@@ -3,73 +3,51 @@
  * 俱乐部榜单页样式 —— 视觉刷新草稿 V5
  * ============================================================================
  * 数值来自 Figma node 287:292（本月 × 积分）。设计稿 1px = 1rpx。
+ * 旧绿波浪头已经删掉，occupy 吸顶栏。本月 / 累计走主题强调色。
  *
- * 绿头 + 领奖台沿用球员排行的骨架，不要做成白顶栏。
- * page-nav 叠在绿头上（不要开 occupy），本月 / 累计在原来城市榜的位置。
- *
- * 想改本月/累计的选中色 → .scope-tabs__item.is-active
- * 想改展开条文案样式 → .show-more（V5 是顶部分割线，不是绿色药丸）
+ * 想改本月/累计的选中色 → 跟全站 accent 走
+ * 想改展开条文案样式 → .show-more
  */
 
 .club-ranking {
   min-height: 100vh;
-  background: #fcfef5;
+  background: var(--page-bg);
 }
 
-/* ---------- 头部 ---------- */
-
-.header {
-  position: relative;
-  background: linear-gradient(180deg, #a1d60f 0%, #c7f033 60%, #f0faa6 100%);
+.rank-tools {
+  padding: 16rpx 40rpx 24rpx;
 }
 
-.header__inner {
-  height: 272rpx;
-}
-
-/* 波浪路径取自 node 287:296，fill 必须和页底 #fcfef5 一致 */
-.header__wave {
-  top: 174rpx;
-  height: 105rpx;
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='105' viewBox='0 0 750 105' preserveAspectRatio='none'%3E%3Cpath d='M0 0C125 70 235 70 350 30C500 -24 585 75 750 8V105H0V0Z' fill='%23FCFEF5'/%3E%3C/svg%3E");
-}
-
-/* 本月 / 累计，对齐球员排行的城市榜位置（node 287:298） */
 .scope-tabs {
-  position: absolute;
-  left: 140rpx;
-  top: 91rpx;
   display: flex;
   gap: 12rpx;
-  width: 470rpx;
   height: 58rpx;
 }
 
 .scope-tabs__item {
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
-  width: 229rpx;
   height: 58rpx;
+  border: 2rpx solid #cfd2c6;
   border-radius: 29rpx;
-  background: #e8f59e;
+  background: #ffffff;
   font-size: 24rpx;
   font-weight: 600;
-  color: #6b7059;
+  color: #3d4436;
 }
 
 .scope-tabs__item.is-active {
-  background: #2e3324;
-  color: #ffffff;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
 }
 
 .metric-tabs {
-  position: absolute;
-  left: 121rpx;
-  top: 239rpx;
   display: flex;
   gap: 46rpx;
-  width: 520rpx;
+  margin-top: 20rpx;
 }
 
 .metric-tabs__item {
@@ -85,7 +63,6 @@
   color: #1f2114;
 }
 
-/* node 287:307：48x5 的圆角短线 */
 .metric-tabs__underline {
   position: absolute;
   left: 50%;
@@ -94,7 +71,7 @@
   height: 5rpx;
   margin-left: -24rpx;
   border-radius: 2.5rpx;
-  background: #548005;
+  background: var(--accent);
 }
 
 /* ---------- 领奖台 ---------- */
@@ -102,7 +79,7 @@
 .podium {
   position: relative;
   height: 454rpx;
-  background: #fcfef5;
+  background: var(--page-bg);
 }
 
 .podium__confetti {
@@ -345,7 +322,7 @@
 .show-more__arrow {
   font-size: 22rpx;
   font-weight: 700;
-  color: #83d414;
+  color: var(--accent);
 }
 
 .my-rank-spacer {
@@ -385,7 +362,7 @@
 .my-rank__action {
   font-size: 22rpx;
   font-weight: 600;
-  color: #548005;
+  color: var(--accent);
 }
 
 .my-rank__cta {
@@ -396,8 +373,8 @@
   height: 36rpx;
   margin-left: 20rpx;
   border-radius: 18rpx;
-  background: #e8f59e;
+  background: var(--accent);
   font-size: 28rpx;
   font-weight: 700;
-  color: #548005;
+  color: var(--accent-text);
 }

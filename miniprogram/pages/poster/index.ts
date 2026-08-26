@@ -8,10 +8,13 @@
  * 不传 id 或 id 不认识，就落到积分兑换，避免空白页。
  *
  * 点海报会用微信预览打开，方便看大图、长按保存。换图去 mock/posters.ts。
+ * 吸顶栏 occupy 打开，variant 用 plain。
  */
 import { POSTER_PAGES } from '../../mock/posters';
+import { themeBehavior } from '../../behaviors/theme';
 
 Page({
+  behaviors: [themeBehavior],
   data: {
     title: '',
     notice: '',

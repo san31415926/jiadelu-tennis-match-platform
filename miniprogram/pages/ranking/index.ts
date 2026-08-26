@@ -8,17 +8,22 @@ import {
   toRows,
 } from '../../mock/ranking';
 import type { PodiumPlayer, RankingRow } from '../../mock/ranking';
+import { themeBehavior } from '../../behaviors/theme';
+import { switchToEvents } from '../../utils/navigate';
 
 /**
  * ============================================================================
  * 球员排行页逻辑
  * ============================================================================
- * V5 草稿 228:786 与现页（原节点 15:2）几乎一样，未换皮。
+ * 版式来自终稿 15:2。V5 草稿 228:786 几乎同构图，已去掉波浪头，改 occupy 吸顶栏。
+ * 筛选选中色走主题强调色，不要再写死青柠。
  *
  * 【三个状态维度会互相影响】
  *   范围（城市榜/全国榜）→ 决定参与排名的人有哪些
  *   指标（积分/身价/战力）→ 决定按什么排序、显示什么数值
  *   展开态（收起/展开）  → 决定列表显示 3 行还是全部
+ *   展开条文案跟俱乐部榜一样，写成「查看全部 N 名球员」
+ *   底部「去参赛」切回赛事 Tab，不要 navigateTo（Tab 页只能 switchTab）
  *
  * 任何一个变了都要重算榜单，所以统一走 refresh() 这一个方法，
  * 避免三处各写一遍排序逻辑。
@@ -28,8 +33,8 @@ import type { PodiumPlayer, RankingRow } from '../../mock/ranking';
  * 不负责"怎么算"。接云开发后 rankPlayers 换成云函数调用，这里几乎不用改。
  */
 Page({
+  behaviors: [themeBehavior],
   data: {
-    statusBarHeight: 0,
     scopes: RANKING_SCOPES,
     /** 默认打开全国榜。改成 '城市榜' 就默认显示同城排名 */
     activeScope: '城市榜',
@@ -39,12 +44,11 @@ Page({
     podium: [] as PodiumPlayer[],
     rows: [] as RankingRow[],
     totalRows: 0,
+    totalCount: 0,
     myRanking: MY_RANKING,
   },
 
   onLoad() {
-    const app = getApp<IAppOption>();
-    this.setData({ statusBarHeight: app.globalData.statusBarHeight });
     this.refresh();
   },
 
@@ -58,6 +62,7 @@ Page({
       podium: toPodium(players, activeMetric),
       rows: expanded ? allRows : allRows.slice(0, COLLAPSED_ROW_COUNT),
       totalRows: allRows.length,
+      totalCount: players.length,
     });
   },
 
@@ -80,5 +85,10 @@ Page({
 
   onToggleExpand() {
     this.setData({ expanded: !this.data.expanded }, () => this.refresh());
+  },
+
+  /** 底部条「去参赛」：未上榜就去报名，切回赛事首页 */
+  onMineTap() {
+    switchToEvents();
   },
 });

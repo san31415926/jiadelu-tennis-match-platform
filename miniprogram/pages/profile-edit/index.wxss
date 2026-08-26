@@ -15,7 +15,7 @@
 .edit {
   min-height: 100vh;
   padding-bottom: 48rpx;
-  background: linear-gradient(180deg, #b8eddc 0%, #d6f5e8 55%, #f0fcf7 100%);
+  background: var(--header-gradient-down);
 }
 
 .avatar-block {
@@ -26,11 +26,22 @@
   padding: 8rpx 0 12rpx;
 }
 
-.avatar-block__photo {
+.avatar-block__frame {
   width: 140rpx;
   height: 140rpx;
-  border-radius: 70rpx;
+  overflow: hidden;
+  border-radius: 50%;
   background: #ffffff;
+}
+
+/**
+ * 外圈裁圆，图用 aspectFit 完整放进圆里。
+ * 不要 aspectFill：相册竖图会被切掉头。
+ */
+.avatar-block__photo {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .avatar-block__hint {
@@ -131,8 +142,8 @@
 }
 
 .pill--on {
-  border-color: #83d414;
-  background: #83d414;
+  border-color: var(--accent);
+  background: var(--accent);
   color: #1c1f21;
 }
 
@@ -143,7 +154,7 @@
   height: 72rpx;
   margin: 0 32rpx;
   border-radius: 16rpx;
-  background: #83d414;
+  background: var(--accent);
   font-size: 28rpx;
   font-weight: 700;
   color: #1c1f21;

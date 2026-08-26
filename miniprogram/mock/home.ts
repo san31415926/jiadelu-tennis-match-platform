@@ -4,7 +4,7 @@
  * ============================================================================
  *
  * 【这个文件是干什么的】
- * 首页上所有的文字内容都在这里：轮播标题、侧栏七个入口的名字、热门活动卡、
+ * 首页上所有的文字内容都在这里：轮播标题、侧栏七个入口的名字、热门赛事卡、
  * 赛事卡片的名称地点时间。页面只负责渲染，不含任何文案。
  *
  * 【接云开发后怎么办】
@@ -14,22 +14,24 @@
  * 【常见改动】
  * 想改轮播图           → 换 miniprogram/assets/images/banners/ 里对应 jpg，
  *                        原图在仓库根目录 测试图/轮播图/
- * 想改轮播文案         → 文案已经画进 jpg（主标题 36、副标题 19，对齐 Figma）
- *                        换图才改得了字；title/subtitle 只是对照用
+ * 想改轮播文案         → 改 HOME_BANNERS 的 title / subtitle，页面叠在图上
+ *                        图本身不要再画字，也不要白浪（V5 145:199 直边）
  * 想加一张轮播         → 往 HOME_BANNERS 加一项，指示点会自动变多
  * 想加一个侧栏入口     → 往 HOME_FEATURES 里加一项，侧栏会自动变长
  * 想改赛事卡片内容     → 改 MOCK_EVENTS
  * 想改筛选项名字       → 改 EVENT_FILTERS，但要同步改 MOCK_EVENTS 的键名，
  *                        两者必须一致，否则切过去是空列表
+ * 想改热门赛事卡     → 改 HOME_HOT_EVENTS；eventId 必须能在
+ *                        MOCK_EVENTS 或 SUPER_CUP_EVENTS 里找到，点进去才是那场
  */
 
 /** 顶部轮播的一张 */
 export interface HomeBanner {
   /** 唯一标识，wx:for 的 key 用它，随便起但不要重复 */
   id: string;
-  /** 大标题。已经画进轮播 jpg，页面上不再叠一层；留着方便对照换图 */
+  /** 大标题，叠在轮播图上（Figma 145:205，56rpx） */
   title: string;
-  /** 副标题，同样画进 jpg */
+  /** 副标题，叠在标题下面 */
   subtitle: string;
   /** 轮播配图。铺满整块绿色头部（750×321），图片本身建议宽 1200 左右的 jpg */
   image: string;
@@ -103,15 +105,20 @@ export interface EventItem {
   /** 右下角价格，如 ¥158。纯展示，点它和点卡片一样进详情 */
   price: string;
   /**
-   * 「项目」筛选项的值，必须能对上 EVENT_LIST_FILTERS 里项目的 options。
-   * 例如 混双 / 男双 / 团体 / 女单。
+   * 「项目」筛到的细项：男单 / 女单 / 男双 / 女双 / 混双 / 团体。
+   * 弹层左边是单打/双打，右边才是这一项；对不上就筛成空列表。
    */
   category: string;
   /**
-   * 「区域」筛选项的值，必须能对上 EVENT_LIST_FILTERS 里区域的 options。
+   * 城市。搜索条左侧「广州 ▾」按它过滤。
    * 例如 广州 / 佛山 / 东莞。
    */
   area: string;
+  /**
+   * 区县。点「区域」弹出的名单按它过滤，比如 天河 / 禅城。
+   * 不填则区域筛选选具体区时这条不会出现。
+   */
+  district?: string;
   /** 桃底推荐卡。为 true 时卡片背景换成 #fff5ed，并画出底部三点 */
   featured?: boolean;
   /** 海报右上角「推荐」角标 */
@@ -130,18 +137,230 @@ export const EVENT_TAGS = {
 
 /**
  * 状态筛选下面那一行：项目 / 区域 / 日期 / 更多。
+ * 四个弹层是同一页的状态（Figma 194:199 / 203:199 / 203:354 / 203:509），
+ * 不是微信自带的 ActionSheet。
  *
- * 日期的选项是根据当前列表现场算的，不写在这里。
- * 改了 options 文案，赛事的 category / area / tags.label 也要能对得上，
- * 否则点下去会筛成空列表。
+ * 改了左边/右边的项目名，赛事的 category 也要能对得上，否则会筛成空列表。
+ * 改了区县名单，赛事的 district 也要能对得上。
  */
-export const EVENT_LIST_FILTERS = [
-  { key: 'category', label: '项目', options: ['全部', '混双', '男双', '团体', '女单'] },
-  { key: 'area', label: '区域', options: ['全部', '广州', '佛山', '东莞'] },
-  { key: 'more', label: '更多', options: ['全部', '室内场', '风雨场', '实名', '推荐'] },
-] as const;
+export const UNLIMITED = '不限';
+
+export const CATEGORY_LEFT = ['不限', '单打', '双打'];
+
+/** 左边选哪一项，右边滚轮就换成这一列 */
+export const CATEGORY_RIGHT: Record<string, string[]> = {
+  不限: ['不限'],
+  单打: ['不限', '男单', '女单'],
+  双打: ['不限', '男双', '女双', '混双'],
+};
+
+/**
+ * 「区域」名单跟着搜索条上的城市走。
+ * 设计稿画的是广州十二区（城市停在广州时）。佛山 / 东莞另给常用区，避免点了没赛事。
+ */
+export const AREA_BY_CITY: Record<string, string[]> = {
+  全部: [
+    '不限',
+    '荔湾',
+    '越秀',
+    '海珠',
+    '天河',
+    '白云',
+    '黄埔',
+    '番禺',
+    '花都',
+    '南沙',
+    '从化',
+    '增城',
+    '禅城',
+    '南海',
+    '顺德',
+    '松山湖',
+  ],
+  广州: ['不限', '荔湾', '越秀', '海珠', '天河', '白云', '黄埔', '番禺', '花都', '南沙', '从化', '增城'],
+  佛山: ['不限', '禅城', '南海', '顺德', '三水', '高明'],
+  东莞: ['不限', '东城', '南城', '莞城', '万江', '松山湖'],
+};
+
+export const COURT_TYPE_ROWS = [
+  ['不限', '室内', '室外'],
+  ['风雨', '草地'],
+];
+
+export const SLOT_ROWS = [
+  ['不限', '上午(7-9点)'],
+  ['中午(11-13点)', '下午(14-16点)'],
+  ['傍晚(17-19点)', '晚上(20-23点)'],
+];
+
+export const GRADE_BAND_ROWS = [
+  ['不限', '7.0', '6.5', '6.0'],
+  ['5.5', '5.0', '4.5', '4.0'],
+];
+
+/** 等级范围步进器中间那格的数字，0 是「不限」 */
+export const LEVEL_LABELS = [
+  '不限',
+  '2.0',
+  '2.5',
+  '3.0',
+  '3.5',
+  '4.0',
+  '4.5',
+  '5.0',
+  '5.5',
+  '6.0',
+  '6.5',
+  '7.0',
+];
+
+/**
+ * 「仅展示我可报名的」拿这个数和赛事 grade 比。
+ * 假数据没有真实球员档案，6.5 能报 6.5，报不了 7.0，用来看出勾选有没有生效。
+ */
+export const HOME_USER_RATING = 6.5;
 
 export type EventListFilterKey = 'category' | 'area' | 'date' | 'more';
+
+export interface MoreFilterState {
+  court: string;
+  eligible: boolean;
+  personalMin: number;
+  personalMax: number;
+  teamMin: number;
+  teamMax: number;
+  slot: string;
+  gradeBand: string;
+}
+
+export function defaultMoreFilters(): MoreFilterState {
+  return {
+    court: UNLIMITED,
+    eligible: false,
+    personalMin: 0,
+    personalMax: 0,
+    teamMin: 0,
+    teamMax: 0,
+    slot: UNLIMITED,
+    gradeBand: UNLIMITED,
+  };
+}
+
+export function moreFiltersActive(more: MoreFilterState): boolean {
+  return (
+    more.court !== UNLIMITED ||
+    more.eligible ||
+    more.personalMin > 0 ||
+    more.personalMax > 0 ||
+    more.teamMin > 0 ||
+    more.teamMax > 0 ||
+    more.slot !== UNLIMITED ||
+    more.gradeBand !== UNLIMITED
+  );
+}
+
+function categoryFamily(category: string): '单打' | '双打' | '' {
+  if (category === '男单' || category === '女单') {
+    return '单打';
+  }
+  if (category === '男双' || category === '女双' || category === '混双' || category === '团体') {
+    return '双打';
+  }
+  return '';
+}
+
+function courtTypeOf(item: EventItem): string {
+  const labels = (item.tags || []).map((tag) => tag.label);
+  if (labels.indexOf('室内场') >= 0) {
+    return '室内';
+  }
+  if (labels.indexOf('风雨场') >= 0) {
+    return '风雨';
+  }
+  if (labels.indexOf('室外场') >= 0) {
+    return '室外';
+  }
+  if (labels.indexOf('草地场') >= 0) {
+    return '草地';
+  }
+  return '';
+}
+
+function startHourOf(time: string): number {
+  const matched = time.match(/(\d{1,2}):\d{2}/);
+  return matched ? Number(matched[1]) : -1;
+}
+
+function slotOf(hour: number): string {
+  if (hour >= 7 && hour <= 9) {
+    return '上午(7-9点)';
+  }
+  if (hour >= 11 && hour <= 13) {
+    return '中午(11-13点)';
+  }
+  if (hour >= 14 && hour <= 16) {
+    return '下午(14-16点)';
+  }
+  if (hour >= 17 && hour <= 19) {
+    return '傍晚(17-19点)';
+  }
+  if (hour >= 20 && hour <= 23) {
+    return '晚上(20-23点)';
+  }
+  return '';
+}
+
+function parseGrade(grade: string): number {
+  const value = parseFloat(grade);
+  return Number.isFinite(value) ? value : NaN;
+}
+
+function levelValue(index: number): number {
+  if (index <= 0) {
+    return NaN;
+  }
+  return parseFloat(LEVEL_LABELS[index] || '');
+}
+
+export function matchCategory(item: EventItem, selected: string): boolean {
+  if (!selected || selected === UNLIMITED) {
+    return true;
+  }
+  if (selected === '单打' || selected === '双打') {
+    return categoryFamily(item.category) === selected;
+  }
+  return item.category === selected;
+}
+
+export function matchMoreFilters(item: EventItem, more: MoreFilterState): boolean {
+  if (more.court !== UNLIMITED && courtTypeOf(item) !== more.court) {
+    return false;
+  }
+  const grade = parseGrade(item.grade);
+  if (more.eligible && Number.isFinite(grade) && grade > HOME_USER_RATING) {
+    return false;
+  }
+  if (more.gradeBand !== UNLIMITED && item.grade !== more.gradeBand) {
+    return false;
+  }
+  const family = categoryFamily(item.category);
+  const minIndex = family === '单打' ? more.personalMin : more.teamMin;
+  const maxIndex = family === '单打' ? more.personalMax : more.teamMax;
+  const min = levelValue(minIndex);
+  const max = levelValue(maxIndex);
+  if (Number.isFinite(grade)) {
+    if (Number.isFinite(min) && grade < min) {
+      return false;
+    }
+    if (Number.isFinite(max) && grade > max) {
+      return false;
+    }
+  }
+  if (more.slot !== UNLIMITED && slotOf(startHourOf(item.time)) !== more.slot) {
+    return false;
+  }
+  return true;
+}
 
 /**
  * 从 time 文案里抽出「08月29日」这种日期，给「日期」筛选当选项。
@@ -157,48 +376,49 @@ export const HOME_BANNERS: HomeBanner[] = [
     id: 'banner-club-union',
     title: '广佛俱乐部联名赛',
     subtitle: '球员精彩瞬间 · 点击查看',
-    image: '/assets/images/banners/banner-01-club-union.jpg',
+    image: '/assets/images/banners/banner-01-club-union-photo.jpg',
     target: '/pages/gallery/index',
   },
   {
     id: 'banner-rookie-cup',
     title: '俱乐部新秀杯',
     subtitle: '第二届 · 12 支球队集结',
-    image: '/assets/images/banners/banner-02-rookie-cup.jpg',
+    image: '/assets/images/banners/banner-02-rookie-cup-photo.jpg',
     target: '/pages/super-cup/index',
   },
   {
     id: 'banner-annual',
     title: '年度颁奖典礼',
     subtitle: '11 月 15 日 · 广州四季酒店',
-    image: '/assets/images/banners/banner-03-ceremony.jpg',
+    image: '/assets/images/banners/banner-03-ceremony-photo.jpg',
     target: '/pages/poster/index?id=ceremony',
   },
   {
     id: 'banner-super-cup',
     title: '超级杯冠军之夜',
     subtitle: '俱乐部荣耀时刻',
-    image: '/assets/images/banners/banner-04-super-cup.jpg',
+    image: '/assets/images/banners/banner-04-super-cup-photo.jpg',
     target: '/pages/super-cup/index',
   },
   {
     id: 'banner-night-court',
     title: '夜间球场开放',
     subtitle: '灯光球场 · 预约开打',
-    image: '/assets/images/banners/banner-05-night-court.jpg',
+    image: '/assets/images/banners/banner-05-night-court-photo.jpg',
     target: '/pages/clubs/index',
   },
   {
     id: 'banner-mixed-doubles',
     title: '混双精彩对决',
     subtitle: '默契搭档 · 点击查看',
-    image: '/assets/images/banners/banner-06-mixed-doubles.jpg',
+    image: '/assets/images/banners/banner-06-mixed-doubles-photo.jpg',
     target: '/pages/gallery/index',
   },
 ];
 
 /**
- * 首页「热门活动」横滑卡。内容和前四张轮播一致，点进去走同一条跳转。
+ * 首页「热门赛事」横滑卡（Figma 145:199 写的是热门赛事，不是热门活动）。
+ * 点卡进赛事详情，eventId 必须能在 MOCK_EVENTS / SUPER_CUP_EVENTS 里找到。
  * 序号角标 1～4 是稿上画的，不是排名。
  */
 export const HOME_HOT_EVENTS = [
@@ -207,36 +427,36 @@ export const HOME_HOT_EVENTS = [
     rank: '1',
     title: '广佛俱乐部联名赛',
     subtitle: '球员精彩瞬间',
-    image: '/assets/images/banners/banner-01-club-union.jpg',
-    target: '/pages/gallery/index',
+    image: '/assets/images/banners/banner-01-club-union-photo.jpg',
+    eventId: 'e-club-union',
   },
   {
     id: 'hot-rookie-cup',
     rank: '2',
     title: '俱乐部新秀杯',
     subtitle: '第二届 · 12 支球队',
-    image: '/assets/images/banners/banner-02-rookie-cup.jpg',
-    target: '/pages/super-cup/index',
+    image: '/assets/images/banners/banner-02-rookie-cup-photo.jpg',
+    eventId: 'sc-open-1',
   },
   {
     id: 'hot-annual',
     rank: '3',
     title: '年度颁奖典礼',
     subtitle: '11 月 15 日 · 广州',
-    image: '/assets/images/banners/banner-03-ceremony.jpg',
-    target: '/pages/poster/index?id=ceremony',
+    image: '/assets/images/banners/banner-03-ceremony-photo.jpg',
+    eventId: 'e-ceremony',
   },
   {
     id: 'hot-super-cup',
     rank: '4',
     title: '超级杯冠军之夜',
     subtitle: '俱乐部荣耀时刻',
-    image: '/assets/images/banners/banner-04-super-cup.jpg',
-    target: '/pages/super-cup/index',
+    image: '/assets/images/banners/banner-04-super-cup-photo.jpg',
+    eventId: 'sc-night-1',
   },
 ];
 
-/** 搜索条左侧城市。选项要和 EVENT_LIST_FILTERS 的区域对得上 */
+/** 搜索条左侧城市。区域弹层的名单按这座城市切换，见 AREA_BY_CITY */
 export const HOME_CITIES = ['全部', '广州', '佛山', '东莞'];
 
 export const HOME_FEATURES: HomeFeature[] = [
@@ -335,6 +555,7 @@ export const MOCK_EVENTS: Record<string, EventItem[]> = {
       price: '¥158',
       category: '混双',
       area: '佛山',
+      district: '禅城',
     },
   ],
   报名中: [
@@ -354,6 +575,7 @@ export const MOCK_EVENTS: Record<string, EventItem[]> = {
       price: '¥158',
       category: '混双',
       area: '佛山',
+      district: '禅城',
       recommended: true,
       venueLink: true,
     },
@@ -373,6 +595,46 @@ export const MOCK_EVENTS: Record<string, EventItem[]> = {
       price: '¥138',
       category: '男双',
       area: '广州',
+      district: '天河',
+      venueLink: true,
+    },
+    {
+      id: 'e-club-union',
+      title: '广佛俱乐部联名赛',
+      poster: '/assets/images/banners/banner-01-club-union-photo.jpg',
+      venue: '广州润盈网球中心',
+      time: '09月20日 14:00-20:00',
+      slots: '16/32',
+      actionText: '立即报名',
+      grade: '混双',
+      gradeTone: 'green',
+      statusLabel: '报名中',
+      slotCaption: '混双·16/32签',
+      tags: [EVENT_TAGS.realname, EVENT_TAGS.indoor],
+      price: '¥168',
+      category: '混双',
+      area: '广州',
+      district: '天河',
+      recommended: true,
+      venueLink: true,
+    },
+    {
+      id: 'e-ceremony',
+      title: '年度颁奖典礼',
+      poster: '/assets/images/banners/banner-03-ceremony-photo.jpg',
+      venue: '广州四季酒店',
+      time: '11月15日 18:00-21:00',
+      slots: '200/200',
+      actionText: '查看详情',
+      grade: '典礼',
+      gradeTone: 'orange',
+      statusLabel: '报名中',
+      slotCaption: '典礼·11月15日',
+      tags: [EVENT_TAGS.realname],
+      price: '免费',
+      category: '团体',
+      area: '广州',
+      district: '天河',
       venueLink: true,
     },
   ],
@@ -393,6 +655,7 @@ export const MOCK_EVENTS: Record<string, EventItem[]> = {
       price: '¥188',
       category: '团体',
       area: '东莞',
+      district: '松山湖',
     },
   ],
   已结束: [
@@ -412,6 +675,7 @@ export const MOCK_EVENTS: Record<string, EventItem[]> = {
       price: '¥158',
       category: '混双',
       area: '佛山',
+      district: '禅城',
     },
   ],
 };

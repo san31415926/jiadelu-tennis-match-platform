@@ -14,6 +14,7 @@
  * 改「同城」的城市 → 改 CURRENT_CITY
  * 改「战力榜前50」的门槛 → 改 filterClubs() 里的 powerRank > 50
  * 加一个筛选条件 → 在 CLUB_FILTERS 加名字，并在 filterClubs() 里加判断分支
+ * 改示例账号加入哪家 → 改 CLUB_LIST 里的 joined（同时对齐 mock/club-ranking.ts 的 MY_CLUB_ID）
  */
 
 /** 一个俱乐部 */
@@ -44,9 +45,8 @@ export interface ClubItem {
    */
   rankBadge?: string;
   /**
-   * 是否已加入。
-   * true  → 右侧按钮显示「已加入」，金色描边白底
-   * false → 显示「申请加入」，绿色实底
+   * 是否已加入。只表示「已登录的示例账号」加入了哪一家。
+   * 未登录时页面要用 withViewerJoinState() 抹掉，列表和主页都不能出现「已加入」。
    */
   joined?: boolean;
 }
@@ -168,6 +168,25 @@ export function filterClubs(filter: string, keyword: string): ClubItem[] {
   });
 }
 
+/** 已登录示例账号加入的那一家。没有 joined 就是还没入会 */
+export function getJoinedClub(): ClubItem | undefined {
+  return CLUB_LIST.find((club) => club.joined);
+}
+
+/**
+ * 未登录时不能看到「已加入」。列表和主页都走这一层，不要直接读 ClubItem.joined。
+ */
+export function withViewerJoinState(club: ClubItem, isLoggedIn: boolean): ClubItem {
+  if (isLoggedIn) {
+    return club;
+  }
+  return { ...club, joined: false };
+}
+
+export function clubsForViewer(clubs: ClubItem[], isLoggedIn: boolean): ClubItem[] {
+  return clubs.map((club) => withViewerJoinState(club, isLoggedIn));
+}
+
 /** 俱乐部主页成员行。主页只展示前几条，总人数仍用 ClubItem.members */
 export interface ClubMember {
   id: string;
@@ -180,10 +199,12 @@ export interface ClubMember {
 }
 
 const MEMBER_AVATARS = [
-  '/assets/images/ranking/avatar-demo.jpg',
-  '/assets/images/ranking/avatar-4.jpg',
-  '/assets/images/ranking/avatar-5.jpg',
-  '/assets/images/ranking/avatar-6.jpg',
+  '/assets/images/avatars/anime-01.jpg',
+  '/assets/images/avatars/anime-02.jpg',
+  '/assets/images/avatars/anime-03.jpg',
+  '/assets/images/avatars/anime-04.jpg',
+  '/assets/images/avatars/anime-05.jpg',
+  '/assets/images/avatars/anime-06.jpg',
 ];
 
 function memberOf(

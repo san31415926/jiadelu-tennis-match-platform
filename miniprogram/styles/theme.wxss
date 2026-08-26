@@ -1,0 +1,70 @@
+/**
+ * ============================================================================
+ * 全站主题色 —— 挂在页面根节点的 .theme-mint / .theme-lime ...
+ * ============================================================================
+ *
+ * 【这是干什么的】
+ * 「我的 → 更换背景」选中的色，要换的是整站壳：顶栏横渐变、二级页竖渐变、
+ * 页面底、吸顶返回栏。色值写在这里，页面只引用 var(--header-gradient) 这些变量。
+ *
+ * 根节点必须同时有 theme-{{theme}} 和 style="{{themeVars}}"。
+ * 微信里 class 上的 CSS 变量经常压不过 page {}，真正换色靠内联 themeVars。
+ *
+ * 【photo 原图】
+ * 壳色跟薄荷一样，只有「我的」霜化罩更透（见 pages/profile/index.wxss）。
+ *
+ * 【想微调某个主题的顶栏】
+ * 真正改色请改 utils/theme.ts 的 THEME_CHROME，这里抄一份给 .theme-* 备用。
+ * 两份必须一致。横条用 --header-gradient；二级页竖渐变用 --header-gradient-down。
+ */
+
+.theme-mint,
+.theme-photo {
+  --header-gradient: linear-gradient(90deg, #c8f4e8 0%, #b8eddc 48%, #66c4b4 100%);
+  --header-gradient-down: linear-gradient(180deg, #b8eddc 0%, #d6f5e8 55%, #f0fcf7 100%);
+  --page-bg: #f0fcf7;
+  --page-nav-bg: #b8eddc;
+  --header-solid: #b8eddc;
+  --accent: #66c4b4;
+  --accent-text: #14211a;
+}
+
+.theme-lime {
+  --header-gradient: linear-gradient(90deg, #d4f34a 0%, #bfe63b 48%, #7ebb27 100%);
+  --header-gradient-down: linear-gradient(180deg, #a1d60f 0%, #c7f033 60%, #f0faa6 100%);
+  --page-bg: #f7f7f6;
+  --page-nav-bg: #b2e514;
+  --header-solid: #d4f34a;
+  --accent: #83d414;
+  --accent-text: #1a1f16;
+}
+
+.theme-gold {
+  --header-gradient: linear-gradient(90deg, #f7e052 0%, #edc71f 50%, #e2b15a 100%);
+  --header-gradient-down: linear-gradient(180deg, #edc71f 0%, #f7e052 62%, #fff5c7 100%);
+  --page-bg: #fbf4e4;
+  --page-nav-bg: #edc71f;
+  --header-solid: #edc71f;
+  --accent: #edc71f;
+  --accent-text: #1a1f16;
+}
+
+.theme-sky {
+  --header-gradient: linear-gradient(90deg, #c5e8f8 0%, #8ec8ea 50%, #6eb4e0 100%);
+  --header-gradient-down: linear-gradient(180deg, #8ec8ea 0%, #c5e8f8 55%, #eef7fc 100%);
+  --page-bg: #eef7fc;
+  --page-nav-bg: #8ec8ea;
+  --header-solid: #8ec8ea;
+  --accent: #6eb4e0;
+  --accent-text: #142028;
+}
+
+.theme-dusk {
+  --header-gradient: linear-gradient(90deg, #f5c5d6 0%, #e08aaa 50%, #d4789c 100%);
+  --header-gradient-down: linear-gradient(180deg, #e08aaa 0%, #f5c5d6 55%, #fceef4 100%);
+  --page-bg: #fceef4;
+  --page-nav-bg: #e08aaa;
+  --header-solid: #e08aaa;
+  --accent: #d4789c;
+  --accent-text: #ffffff;
+}

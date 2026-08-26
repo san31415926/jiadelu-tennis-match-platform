@@ -1,12 +1,14 @@
-<view class="super-cup">
+<view class="super-cup theme-{{theme}}" style="{{themeVars}}">
   <!-- 顶栏：居中字标。汉堡在稿上 hidden，不要做侧栏。状态栏用 padding-top 躲开 -->
-  <view class="topbar" style="padding-top:{{statusBarHeight}}px">
+  <view class="topbar {{pageHidden ? 'topbar--parked' : ''}}" style="padding-top:{{statusBarHeight}}px;background:{{headerGradient}}">
     <view class="topbar__row">
       <view class="wordmark">超级杯</view>
     </view>
   </view>
+  <!-- 顶栏 fixed 不占高度，用同等高的空块把头图顶下去 -->
+  <view class="topbar-spacer" style="height: calc({{statusBarHeight}}px + 72rpx)"></view>
 
-  <!-- 头图 321rpx。标题叠在图上，底部白浪接到内容区 -->
+  <!-- 头图 321rpx。V5 直边叠字，不要底部白浪 -->
   <view class="hero">
     <swiper
       class="hero__swiper"
@@ -16,13 +18,13 @@
       duration="400"
       bindchange="onSwiperChange"
     >
-      <swiper-item wx:for="{{banners}}" wx:key="id">
+      <swiper-item class="hero__item" wx:for="{{banners}}" wx:key="id">
         <view class="hero__slide" data-index="{{index}}" bindtap="onBannerTap">
           <image class="hero__image" src="{{item.image}}" mode="aspectFill" />
           <view class="hero__scrim"></view>
           <view class="hero__copy">
-            <view class="hero__eyebrow" wx:if="{{item.eyebrow}}">{{item.eyebrow}}</view>
-            <view class="hero__accent" wx:if="{{item.eyebrow}}"></view>
+            <view class="hero__eyebrow" wx:if="{{item.eyebrow}}" style="color:{{accent}}">{{item.eyebrow}}</view>
+            <view class="hero__accent" wx:if="{{item.eyebrow}}" style="background:{{accent}}"></view>
             <view class="hero__title">{{item.title}}</view>
             <view class="hero__sub">{{item.subtitle}}</view>
           </view>
@@ -34,9 +36,9 @@
         wx:for="{{banners}}"
         wx:key="id"
         class="hero__dot {{index === currentBanner ? 'hero__dot--on' : ''}}"
+        style="{{index === currentBanner ? 'background:' + accent : ''}}"
       ></view>
     </view>
-    <view class="hero__wave"></view>
   </view>
 
   <view class="sheet">
@@ -55,6 +57,7 @@
         next-margin="235rpx"
         current="{{eventTypeIndex}}"
         circular
+        indicator-dots="{{false}}"
         bindchange="onEventTypeChange"
       >
         <swiper-item wx:for="{{eventTypes}}" wx:key="key">
@@ -96,6 +99,7 @@
         next-margin="235rpx"
         current="{{honorIndex}}"
         circular
+        indicator-dots="{{false}}"
         bindchange="onHonorChange"
       >
         <swiper-item wx:for="{{honors}}" wx:key="key">
@@ -122,7 +126,13 @@
       </view>
     </view>
 
-    <view class="club-cta" bindtap="onClubCenterTap" hover-class="club-cta--pressed" hover-stay-time="60">
+    <view
+      class="club-cta"
+      style="background:{{accent}};color:{{accentText}}"
+      bindtap="onClubCenterTap"
+      hover-class="club-cta--pressed"
+      hover-stay-time="60"
+    >
       <text>进入俱乐部中心</text>
       <text class="club-cta__arrow">→</text>
     </view>
@@ -130,7 +140,8 @@
     <filter-tabs
       tabs="{{filters}}"
       active="{{activeFilter}}"
-      active-color="#83d414"
+      active-color="{{accent}}"
+      active-text-color="{{accentText}}"
       variant="capsule"
       bind:change="onFilterChange"
     />

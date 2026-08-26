@@ -1,12 +1,14 @@
 import {
   GUEST_PROFILE,
   MOCK_PROFILE,
-  PROFILE_COVERS,
   PROFILE_THEMES,
 } from '../../mock/profile';
 import type { ProfileSummary } from '../../mock/profile';
-import { navigateToPage } from '../../utils/navigate';
-import { syncTabBarSelected } from '../../utils/tabbar';
+import { headerMetrics } from '../../utils/header';
+import { navigateToPage, openMyClub } from '../../utils/navigate';
+import { syncTabBarSelected, setTabBarHidden } from '../../utils/tabbar';
+import { getAppTheme, setAppTheme } from '../../utils/theme';
+import { themeBehavior } from '../../behaviors/theme';
 
 /**
  * ============================================================================
@@ -18,11 +20,21 @@ import { syncTabBarSelected } from '../../utils/tabbar';
  * app.globalData.isLoggedIn，首页「我的报名」也读它。
  *
  * 【更换背景是同一页的抽屉，不是新路由】
- * 对应画板 401:359。先选背景色，再选封面图；从相册选会调 wx.chooseMedia。
+ * 对应画板 401:359。选中的色会写入 utils/theme.ts，全站顶栏和页底一起换，
+ * 不是只改这一页的霜化罩。封面默认空，头图只显示主题纯色；相册上传后才铺图。
+ *
+ * 【我的俱乐部】
+ * 未登录进俱乐部中心，列表不显示「已加入」。
+ * 已登录且 mock 里有 joined 的俱乐部，直接进那家主页；还没入会也去俱乐部中心。
  *
  * 【战力图】
  * 六个轴的分数在 mock 里。用 canvas 2d 画六边形雷达，标签叠在 canvas 外面。
  * 分数改了要在 applyProfile 之后再调一次 drawRadar。
+ * canvas 是原生层，更换背景抽屉或裁剪器打开时要卸掉，关了再画，否则雷达会盖住。
+ *
+ * 【相册封面要先裁】
+ * 选完图会按当前头图窗口的宽高比打开通用裁剪器，框里就是头图会铺到的那一块。
+ * 取消不改封面；完成才写入 profile.cover，并走相册轻糊。
  *
  * 【分享好友】
  * 设计里没有单独菜单行，放在「更多服务」右侧透明热区不够，所以在生涯卡
@@ -30,20 +42,24 @@ import { syncTabBarSelected } from '../../utils/tabbar';
  */
 
 Page({
+  behaviors: [themeBehavior],
   data: {
     statusBarHeight: 0,
     isLoggedIn: false,
     profile: GUEST_PROFILE as ProfileSummary,
     themes: PROFILE_THEMES,
-    covers: PROFILE_COVERS,
     showCoverSheet: false,
+    showCropper: false,
+    cropSrc: '',
+    cropRatio: 1.5,
+    /** 封面来自相册时为 true，头图要糊得更厉害 */
+    coverFromAlbum: false,
     tags: [] as string[],
   },
 
   onLoad() {
-    const app = getApp<IAppOption>();
-    this.setData({ statusBarHeight: app.globalData.statusBarHeight });
-    this.applyProfile(app.globalData.isLoggedIn);
+    this.setData(headerMetrics());
+    this.applyProfile(getApp<IAppOption>().globalData.isLoggedIn);
   },
 
   onReady() {
@@ -52,9 +68,16 @@ Page({
 
   onShow() {
     syncTabBarSelected(this, 2);
+    if (this.data.showCropper) {
+      setTabBarHidden(this, true);
+    }
     const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
     if (isLoggedIn !== this.data.isLoggedIn) {
       this.applyProfile(isLoggedIn);
+    }
+    const theme = getAppTheme();
+    if (this.data.profile.theme !== theme) {
+      this.setData({ 'profile.theme': theme });
     }
   },
 
@@ -70,8 +93,8 @@ Page({
     const stored = this.data.profile;
     const next = {
       ...(isLoggedIn ? MOCK_PROFILE : GUEST_PROFILE),
-      cover: stored.cover || MOCK_PROFILE.cover,
-      theme: stored.theme || 'mint',
+      cover: stored.cover,
+      theme: getAppTheme(),
     };
     getApp<IAppOption>().globalData.isLoggedIn = isLoggedIn;
     this.setData({ isLoggedIn, profile: next }, () => this.drawRadar());
@@ -147,10 +170,7 @@ Page({
   },
 
   onOpenClub() {
-    if (!this.requireLogin()) {
-      return;
-    }
-    navigateToPage('/pages/clubs/index');
+    openMyClub();
   },
 
   onOpenRecords() {
@@ -189,34 +209,82 @@ Page({
     if (!this.requireLogin()) {
       return;
     }
+    // canvas 是原生层，抽屉 z-index 压不住，打开时先卸掉雷达
     this.setData({ showCoverSheet: true });
   },
 
   onCloseCoverSheet() {
-    this.setData({ showCoverSheet: false });
+    this.setData({ showCoverSheet: false }, () => {
+      wx.nextTick(() => this.drawRadar());
+    });
   },
 
   /** 抽屉打开时挡住背后滚动，空函数即可，靠 catchtouchmove 拦住 */
   onPreventMove() {},
 
   onPickTheme(event: WechatMiniprogram.TouchEvent) {
-    this.setData({ 'profile.theme': String(event.currentTarget.dataset.key) });
+    const theme = setAppTheme(String(event.currentTarget.dataset.key));
+    this.setData({ 'profile.theme': theme });
   },
 
-  onPickCover(event: WechatMiniprogram.TouchEvent) {
-    this.setData({ 'profile.cover': String(event.currentTarget.dataset.image) });
+  onClearCover() {
+    this.setData({
+      'profile.cover': '',
+      coverFromAlbum: false,
+    });
   },
 
   onPickAlbumCover() {
-    wx.chooseMedia({
-      count: 1,
-      mediaType: ['image'],
-      success: (res) => {
-        const path = res.tempFiles[0] && res.tempFiles[0].tempFilePath;
-        if (path) {
-          this.setData({ 'profile.cover': path });
-        }
+    this.createSelectorQuery()
+      .select('.hero')
+      .boundingClientRect()
+      .exec((res) => {
+        const rect = res && res[0];
+        const ratio =
+          rect && rect.width && rect.height ? rect.width / rect.height : 1.5;
+        wx.chooseMedia({
+          count: 1,
+          mediaType: ['image'],
+          success: (pick) => {
+            const path = pick.tempFiles[0] && pick.tempFiles[0].tempFilePath;
+            if (!path) {
+              return;
+            }
+            setTabBarHidden(this, true);
+            this.setData({
+              showCoverSheet: false,
+              showCropper: true,
+              cropSrc: path,
+              cropRatio: ratio,
+            });
+          },
+        });
+      });
+  },
+
+  onCropConfirm(event: WechatMiniprogram.CustomEvent<{ path: string }>) {
+    const path = event.detail && event.detail.path;
+    setTabBarHidden(this, false);
+    this.setData(
+      {
+        showCropper: false,
+        cropSrc: '',
+        showCoverSheet: false,
+        coverFromAlbum: true,
+        'profile.cover': path || this.data.profile.cover,
       },
+      () => {
+        wx.nextTick(() => this.drawRadar());
+      },
+    );
+  },
+
+  onCropCancel() {
+    setTabBarHidden(this, false);
+    this.setData({
+      showCropper: false,
+      cropSrc: '',
+      showCoverSheet: true,
     });
   },
 

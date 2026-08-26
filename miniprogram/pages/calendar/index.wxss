@@ -3,16 +3,7 @@
  * 赛事日历页样式
  * ============================================================================
  * 数值来自 Figma node 17:93 及其子节点。
- * V5 页沿用原节点 17:92。草稿 228:954（Prototype / Cut Assets）是旧终稿拷贝，未换皮。
- * 场馆行若出现（venueLink），跳店铺页，不改日历版式。
- *
- * 【这一页的头部下缘不是波浪，是椭圆】
- * 其他页面头部下缘是一条不规则波浪曲线（SVG 路径），但日历页设计里用的是
- * 一个 930×170 的大椭圆，两侧超出屏幕，露出中间那段弧线。所以这里不用 SVG，
- * 用 border-radius: 50% 就能实现，更简单也更省。
- *
- * 想让弧线更平缓 → 加大椭圆 width（比如 1200rpx）并把 left 调成负更多；
- * 想让弧线更弯   → 减小 width 或加大 height。
+ * 旧绿头、椭圆白浪已经删掉，occupy 吸顶栏。月份条和选中日走主题强调色。
  *
  * 【日历格子的尺寸是算出来的】
  * 日历总宽 686rpx ÷ 7 列 = 98rpx，所以每个格子宽 98rpx。
@@ -22,38 +13,19 @@
 .calendar {
   min-height: 100vh;
   padding-bottom: 40rpx;
-  background: #f8faf2;
+  background: var(--page-bg);
 }
 
-/* ---------- 头部 ---------- */
-
-.header {
-  position: relative;
-  background: linear-gradient(90deg, #a8e00a 6.82%, #ccf233 55.68%, #f0f7b8 106.82%);
-}
-
-.header__inner {
-  height: 345rpx;
-}
-
-/* node 17:95：930x170 的椭圆，两侧超出屏幕，形成宽缓的弧线下缘 */
-.header__ellipse {
-  position: absolute;
-  left: -90rpx;
-  top: 262rpx;
-  width: 930rpx;
-  height: 170rpx;
-  border-radius: 50%;
-  background: #f8faf2;
+.month-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 30rpx 8rpx;
 }
 
 .month-controls {
-  position: absolute;
-  left: 30rpx;
-  top: 104rpx;
   display: flex;
   align-items: center;
-  width: 690rpx;
   height: 64rpx;
   color: #0f1408;
 }
@@ -78,35 +50,22 @@
 }
 
 .today-btn {
-  position: absolute;
-  left: 481rpx;
-  top: 101rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 108rpx;
   height: 50rpx;
-  border: 2rpx solid rgba(255, 255, 255, 0.9);
   border-radius: 25rpx;
-  background: rgba(204, 240, 56, 0.55);
+  background: var(--accent);
   font-size: 22rpx;
-  color: #0f1408;
-}
-
-.header__ball {
-  position: absolute;
-  left: 548rpx;
-  top: 160rpx;
-  z-index: 0;
-  width: 120rpx;
-  height: 105rpx;
+  color: var(--accent-text);
 }
 
 /* ---------- 月视图 ---------- */
 
 .grid {
   padding: 17rpx 0;
-  background: #f8faf2;
+  background: var(--page-bg);
 }
 
 .grid__inner {
@@ -161,7 +120,7 @@
   width: 52rpx;
   height: 52rpx;
   border-radius: 50%;
-  background: #b2e01a;
+  background: var(--accent);
 }
 
 .cell__day {
@@ -190,7 +149,7 @@
   width: 10rpx;
   height: 10rpx;
   border-radius: 50%;
-  background: #abd914;
+  background: var(--accent);
 }
 
 /* ---------- 选中日期的赛事 ---------- */
@@ -202,8 +161,9 @@
   height: 48rpx;
   margin: 0 auto;
   padding: 0 38rpx;
+  border: 2rpx solid #cfd2c6;
   border-radius: 24rpx;
-  background: #eef8cb;
+  background: #ffffff;
 }
 
 .day-heading__text {

@@ -1,24 +1,14 @@
-<view class="info info--gold">
-  <page-nav title="{{page.title}}" variant="gold" />
-  <view class="sub-header sub-header--gold" style="padding-top:{{statusBarHeight}}px">
-    <view class="sub-header__inner">
-      <view class="sub-header__wave"></view>
-      <image class="sub-header__ball" src="/assets/images/hero-tennis-ball.png" mode="aspectFit" />
-    </view>
-  </view>
+<view class="info theme-{{theme}}" style="{{themeVars}};background:{{headerGradientDown}}">
+  <!-- occupy 垫高吸顶栏，不再画波浪头和圆形图标 -->
+  <page-nav title="{{page.title}}" occupy="{{true}}" />
 
-  <image
-    class="hero-icon {{page.mirrored ? 'hero-icon--mirrored' : ''}}"
-    src="{{page.icon}}"
-    mode="aspectFit"
-  />
   <view class="kicker">{{page.kicker}}</view>
 
-  <view class="card card--gold">
+  <view class="card">
     <view class="card__title">{{page.cardTitle}}</view>
     <view class="card__sub">{{page.cardSub}}</view>
-    <view class="qr qr--gold">
-      <text class="qr__hint qr__hint--gold">{{page.qrHint}}</text>
+    <view class="qr">
+      <text class="qr__hint">{{page.qrHint}}</text>
     </view>
     <view class="card__account">{{page.account}}</view>
     <view class="card__hours">{{page.hours}}</view>

@@ -12,6 +12,7 @@
  * 组队不是约球匹配：没有搭档就去详情页组队 Tab，不生成对阵。
  *
  * 去支付只 toast「待接入云开发」，不要接微信支付。
+ * 吸顶栏 occupy 打开，不要再垫波浪头。
  */
 import {
   getEventDetail,
@@ -19,6 +20,7 @@ import {
   SIGNUP_SELF,
 } from '../../mock/event-detail';
 import type { EventDetail, SignupPerson } from '../../mock/event-detail';
+import { themeBehavior } from '../../behaviors/theme';
 
 type SignupStep = 'mode' | 'detail';
 type SignupMode = '单人' | '组队';
@@ -29,8 +31,8 @@ function feeNumber(fee: string): string {
 }
 
 Page({
+  behaviors: [themeBehavior],
   data: {
-    statusBarHeight: 0,
     event: getEventDetail('e-open-1') as EventDetail,
     step: 'mode' as SignupStep,
     mode: '单人' as SignupMode,
@@ -41,10 +43,8 @@ Page({
   },
 
   onLoad(query: Record<string, string | undefined>) {
-    const app = getApp<IAppOption>();
     const event = getEventDetail(query.id ?? '');
     this.setData({
-      statusBarHeight: app.globalData.statusBarHeight,
       event,
       payLabel: `去支付  ¥${feeNumber(event.fee)}`,
     });

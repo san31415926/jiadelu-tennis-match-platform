@@ -1,3 +1,5 @@
+import { getJoinedClub } from '../mock/club';
+
 /**
  * ============================================================================
  * 页面跳转守卫 —— 控制哪些入口能点进去
@@ -64,4 +66,41 @@ export function navigateToPage(path: string): void {
   // navigateTo 会保留当前页面（能返回）；如果想替换当前页用 redirectTo，
   // 但底部 Tab 页之间的切换必须用 switchTab，见 custom-tab-bar/index.ts
   wx.navigateTo({ url: path });
+}
+
+const EVENTS_TAB = '/pages/events/index';
+
+/** 球员榜底部「去参赛」：赛事是 Tab 页，必须 switchTab，navigateTo 会报错 */
+export function switchToEvents(): void {
+  wx.switchTab({ url: EVENTS_TAB });
+}
+
+/**
+ * 「我的俱乐部」入口。
+ * 已登录且 mock 里有 joined 的俱乐部 → 直接进那家主页；
+ * 未登录或还没入会 → 俱乐部中心找俱乐部。
+ */
+export function openMyClub(): void {
+  const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
+  if (isLoggedIn) {
+    const mine = getJoinedClub();
+    if (mine) {
+      navigateToPage(`/pages/club-home/index?id=${mine.id}`);
+      return;
+    }
+  }
+  navigateToPage('/pages/clubs/index');
+}
+
+/**
+ * 二级页左上角「返回」。栈里还有上一页就退一层；
+ * 没有（开发者工具直接编译本页、或从分享卡进来）就回到赛事 Tab。
+ */
+export function navigateBackOrHome(): void {
+  wx.navigateBack({
+    delta: 1,
+    fail: () => {
+      switchToEvents();
+    },
+  });
 }

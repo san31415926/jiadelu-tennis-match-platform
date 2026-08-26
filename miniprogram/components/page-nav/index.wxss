@@ -1,9 +1,10 @@
 /**
- * 吸顶条本身不占文档流（fixed），绿头页靠下面的装饰头把内容顶开。
- * occupy 打开时才用 .page-nav__spacer 垫出同等高度。
+ * 吸顶条本身不占文档流（fixed）。occupy 打开时用 .page-nav__spacer 垫同等高度，
+ * 下面的内容才不会被挡住。现页二级页都应打开 occupy，不要再垫一层装饰头。
  *
  * 背景必须是实色：滚到白底内容上时，字才不会糊进去。
  * 高度跟右上角胶囊对齐（navBarHeight，单位 px），不要再写一套 rpx 去估。
+ * z-index 500，压过赛事 / 超级杯钉住的顶栏（200），返回才点得到。
  */
 
 .page-nav {
@@ -11,36 +12,37 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 200;
-  background: #b2e514;
+  /* 高于 Tab 页钉住的顶栏（200）。上一页 hide 后 fixed 层有时还在吃点击 */
+  z-index: 500;
+  background: var(--page-nav-bg);
 }
 
-.page-nav--gold {
-  background: #edc71f;
-}
-
+.page-nav--gold,
 .page-nav--mint {
-  background: #b8eddc;
+  background: var(--page-nav-bg);
 }
 
 .page-nav--plain {
-  background: #ffffff;
+  background: var(--page-bg);
 }
 
 .page-nav__bar {
   position: relative;
+  min-height: 44px;
 }
 
 /**
- * 返回和标题都绝对定位在栏里，不要走 flex。
- * 标题若 width:100% 再跟返回并排，返回会被挤成「返 / 回」两行。
+ * 标题只占中间一条，不要 left:0; right:0 再靠 padding 让字居中——
+ * padding 也在点击热区里，微信里 pointer-events: none 经常不生效，
+ * 点「返回」其实打在标题上，看起来按钮坏了。
+ * 返回在文档流里、z-index 更高，热区就是「‹ 返回」那一块。
  */
 .page-nav .page-back {
-  position: absolute;
-  left: 24rpx;
-  top: 0;
+  position: relative;
   z-index: 4;
   height: 100%;
+  min-width: 120rpx;
+  padding: 0 28rpx 0 24rpx;
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -50,14 +52,17 @@
   color: #1c1f21;
 }
 
+.page-back--pressed {
+  opacity: 0.55;
+}
+
 .page-nav__title {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 160rpx;
+  right: 200rpx;
   top: 0;
-  z-index: 3;
+  z-index: 1;
   height: 100%;
-  padding: 0 180rpx;
   display: flex;
   align-items: center;
   justify-content: center;

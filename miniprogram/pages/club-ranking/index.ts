@@ -9,6 +9,7 @@ import {
 } from '../../mock/club-ranking';
 import type { ClubPodiumPlayer, ClubRankingRow } from '../../mock/club-ranking';
 import { navigateToPage } from '../../utils/navigate';
+import { themeBehavior } from '../../behaviors/theme';
 
 /**
  * ============================================================================
@@ -21,10 +22,11 @@ import { navigateToPage } from '../../utils/navigate';
  *   3. 点领奖台 / 列表行 / 底部条，进俱乐部主页并带 from=super-cup
  *
  * 排序在 mock/club-ranking.ts 的 rankClubs()。接云开发后换成查已注册俱乐部即可。
+ * 波浪头已去掉，occupy 吸顶栏。本月 / 累计选中走主题强调色。
  */
 Page({
+  behaviors: [themeBehavior],
   data: {
-    statusBarHeight: 0,
     periods: CLUB_RANKING_PERIODS,
     activePeriod: '本月',
     metrics: CLUB_RANKING_METRICS,
@@ -34,12 +36,10 @@ Page({
     rows: [] as ClubRankingRow[],
     totalRows: 0,
     totalCount: 0,
-    myRanking: myClubRanking('积分', '本月'),
+    myRanking: { summary: '', actionText: '', clubId: '' },
   },
 
   onLoad() {
-    const app = getApp<IAppOption>();
-    this.setData({ statusBarHeight: app.globalData.statusBarHeight });
     this.refresh();
   },
 
@@ -48,12 +48,15 @@ Page({
     const clubs = rankClubs(activeMetric, activePeriod);
     const allRows = toClubRows(clubs, activeMetric, activePeriod);
 
+    const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
     this.setData({
       podium: toClubPodium(clubs, activeMetric, activePeriod),
       rows: expanded ? allRows : allRows.slice(0, COLLAPSED_ROW_COUNT),
       totalRows: allRows.length,
       totalCount: clubs.length,
-      myRanking: myClubRanking(activeMetric, activePeriod),
+      myRanking: isLoggedIn
+        ? myClubRanking(activeMetric, activePeriod)
+        : { summary: '', actionText: '', clubId: '' },
     });
   },
 
@@ -87,6 +90,9 @@ Page({
 
   onMineTap() {
     const id = this.data.myRanking.clubId;
+    if (!id) {
+      return;
+    }
     navigateToPage(`/pages/club-home/index?id=${id}&from=super-cup`);
   },
 });

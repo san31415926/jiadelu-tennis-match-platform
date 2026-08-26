@@ -1,4 +1,4 @@
-<view class="tabbar">
+<view class="tabbar {{hidden ? 'is-hidden' : ''}}" style="{{themeVars}}">
   <view
     class="tabbar__item"
     wx:for="{{tabs}}"
@@ -6,13 +6,20 @@
     data-index="{{index}}"
     bindtap="onTap"
   >
-    <view class="tabbar__halo" wx:if="{{selected === index}}"></view>
+    <view
+      class="tabbar__halo"
+      wx:if="{{selected === index}}"
+      style="background:{{accent}}"
+    ></view>
     <image
       class="tabbar__icon"
       src="{{item.icon}}"
       mode="aspectFit"
       style="{{item.iconStyle}};opacity:{{selected === index ? 1 : idleOpacity}}"
     />
-    <text class="tabbar__label {{selected === index ? 'is-active' : ''}}">{{item.text}}</text>
+    <text
+      class="tabbar__label {{selected === index ? 'is-active' : ''}}"
+      style="{{selected === index ? 'color:' + accent : ''}}"
+    >{{item.text}}</text>
   </view>
 </view>

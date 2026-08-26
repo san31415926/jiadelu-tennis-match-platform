@@ -3,16 +3,12 @@
  * 俱乐部页样式
  * ============================================================================
  * 数值来自 Figma node 23:343 及其子节点。
- * V5 草稿 228:310 仍是 Prototype 拷贝（浅绿头 + 旗子 + 搜索 + 胶囊筛选），
- * 和本页一致，未换皮。筛选逻辑仍走 filterClubs。
- *
- * 【头部下缘和日历页一样是椭圆】
- * 900×170 的大椭圆，两侧超出屏幕。见 .header__ellipse。
+ * 旧绿头、旗子、椭圆白浪已经删掉，和「我的资料」一样 occupy 吸顶栏。
+ * 筛选选中、申请加入、创建俱乐部都走主题强调色，不要写死青柠。
  *
  * 【列表行的横向空间分配】
  *   logo 128 + 详情 330 + 按钮 150 = 608rpx，容器内容宽 642rpx，
  *   用 justify-content: space-between 让三者两端对齐、中间自动留白。
- *   这样比写死间距更稳，屏幕宽度变化时也不会挤。
  *
  * 【想让列表更紧凑】
  * 减小 .list__row 的 height（当前 148rpx），并相应减小 logo 尺寸。
@@ -20,56 +16,12 @@
 
 .clubs {
   min-height: 100vh;
-  background: #fbfcf9;
+  background: var(--page-bg);
 }
 
-/* ---------- 头部 ---------- */
-
-.header {
-  position: relative;
-  background: linear-gradient(90deg, #b7e91b 0%, #d8f65e 52%, #f5fac7 100%);
-}
-
-.header__inner {
-  height: 360rpx;
-}
-
-/* node 23:351：900x190 的椭圆，两侧超出屏幕 */
-.header__ellipse {
-  position: absolute;
-  left: -75rpx;
-  top: 278rpx;
-  width: 900rpx;
-  height: 190rpx;
-  border-radius: 50%;
-  background: #fbfcf9;
-}
-
-.header__flag {
-  position: absolute;
-  left: 414rpx;
-  top: 82rpx;
-  z-index: 0;
-  width: 320rpx;
-  height: 268rpx;
-}
-
-.header__heading {
-  position: absolute;
-  left: 72rpx;
-  top: 154rpx;
-  height: 70rpx;
-  font-size: 48rpx;
-  font-weight: 700;
-  line-height: 70rpx;
-  color: #11150b;
-}
-
-.header__summary {
-  position: absolute;
-  left: 74rpx;
-  top: 226rpx;
-  height: 34rpx;
+.kicker {
+  margin-top: 8rpx;
+  padding: 0 54rpx 4rpx;
   font-size: 22rpx;
   line-height: 34rpx;
   color: #5a6250;
@@ -134,16 +86,19 @@
   justify-content: center;
   height: 52rpx;
   padding: 0 26rpx;
-  border: 1rpx solid #e0e3d9;
+  border: 2rpx solid #cfd2c6;
   border-radius: 26rpx;
-  background: #fbfcf9;
+  background: #ffffff;
   font-size: 19rpx;
+  font-weight: 600;
   color: #151a12;
 }
 
 .filters__chip.is-active {
-  border-color: #b5e51a;
-  background: #b5e51a;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+  box-shadow: 0 4rpx 10rpx rgba(20, 24, 16, 0.16);
 }
 
 /* ---------- 列表 ---------- */
@@ -198,9 +153,9 @@
   width: 104rpx;
   height: 34rpx;
   border-radius: 8rpx;
-  background: #eef7d3;
+  background: var(--accent);
   font-size: 16rpx;
-  color: #72a315;
+  color: var(--accent-text);
 }
 
 .list__meta {
@@ -219,9 +174,9 @@
   width: 150rpx;
   height: 54rpx;
   border-radius: 27rpx;
-  background: #b5e51a;
+  background: var(--accent);
   font-size: 18rpx;
-  color: #10150c;
+  color: var(--accent-text);
 }
 
 /**
@@ -233,7 +188,7 @@
  */
 .list__action--joined {
   border: 1.5rpx solid #d0a63e;
-  background: #fbfcf9;
+  background: var(--page-bg);
   color: #b18b36;
 }
 
@@ -262,14 +217,10 @@
   width: 594rpx;
   height: 82rpx;
   border-radius: 41rpx;
-  background: linear-gradient(
-    90deg,
-    rgba(181, 229, 26, 0.6) 0%,
-    rgba(216, 246, 94, 0.6) 100%
-  );
-  box-shadow: 0 10rpx 18rpx rgba(125, 141, 93, 0.25);
+  background: var(--accent);
+  box-shadow: 0 10rpx 18rpx rgba(20, 24, 16, 0.18);
   font-size: 24rpx;
-  color: #11150b;
+  color: var(--accent-text);
 }
 
 /* node 23:426：30x30 的加号 */
@@ -285,7 +236,7 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  background: #11150b;
+  background: currentColor;
 }
 
 .create-btn__plus::before {

@@ -1,21 +1,11 @@
-<view class="club-home {{fromSuperCup ? 'club-home--super' : ''}}">
-  <page-nav title="俱乐部主页" />
-  <view class="sub-header {{fromSuperCup ? 'sub-header--canvas' : ''}}" style="padding-top:{{statusBarHeight}}px">
-    <view class="sub-header__inner">
-      <view class="sub-header__wave"></view>
-      <image
-        wx:if="{{fromSuperCup}}"
-        class="sub-header__pavilion"
-        src="/assets/images/club/header-pavilion.png"
-        mode="aspectFit"
-      />
-      <image
-        wx:else
-        class="sub-header__ball"
-        src="/assets/images/hero-tennis-ball.png"
-        mode="aspectFit"
-      />
-    </view>
+<view class="club-home {{fromSuperCup ? 'club-home--super' : ''}} theme-{{theme}}" style="{{themeVars}}">
+  <page-nav title="俱乐部主页" occupy="{{true}}" />
+  <view wx:if="{{fromSuperCup}}" class="canvas-strip" style="background:{{headerGradientDown}}">
+    <image
+      class="canvas-strip__pavilion"
+      src="/assets/images/club/header-pavilion.png"
+      mode="aspectFit"
+    />
   </view>
 
   <view class="hero">
@@ -23,7 +13,7 @@
     <view class="hero__name">{{club.name}}</view>
     <view class="hero__pills">
       <view class="pill">{{club.city}}</view>
-      <view class="pill pill--lime" wx:if="{{club.recruiting}}">招新中</view>
+      <view class="pill pill--lime" style="background:{{accent}};color:{{accentText}}" wx:if="{{club.recruiting}}">招新中</view>
     </view>
   </view>
 
@@ -31,7 +21,7 @@
     <block wx:for="{{stats}}" wx:key="label">
       <view class="stats__divider" wx:if="{{index > 0}}"></view>
       <view class="stats__col">
-        <view class="stats__value {{item.lime ? 'stats__value--lime' : ''}}">{{item.value}}</view>
+        <view class="stats__value {{item.lime ? 'stats__value--lime' : ''}}" style="{{item.lime ? 'color:' + accent : ''}}">{{item.value}}</view>
         <view class="stats__label">{{item.label}}</view>
       </view>
     </block>
@@ -48,7 +38,7 @@
       <view class="row__info">
         <view class="row__name-line">
           <text class="row__name">{{item.nickname}}</text>
-          <view class="row__captain" wx:if="{{item.captain}}">队长</view>
+          <view class="row__captain" style="background:{{accent}};color:{{accentText}}" wx:if="{{item.captain}}">队长</view>
         </view>
         <view class="row__join">{{item.joinedAt}}</view>
       </view>
@@ -63,6 +53,7 @@
   <view class="cta">
     <view
       class="cta__btn {{club.joined ? 'cta__btn--joined' : ''}}"
+      style="{{club.joined ? '' : 'background:' + accent + ';color:' + accentText}}"
       bindtap="onJoin"
     >{{club.joined ? '已加入' : '申请加入'}}</view>
   </view>

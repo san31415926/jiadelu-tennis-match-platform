@@ -26,6 +26,8 @@ interface IAppOption {
     isLoggedIn: boolean;
     userProfile: UserProfile | null;
     cloudReady: boolean;
+    /** 全站壳色。我的页「更换背景」写入，默认 mint */
+    theme: string;
   };
   initSystemMetrics(): void;
   initCloud(): void;

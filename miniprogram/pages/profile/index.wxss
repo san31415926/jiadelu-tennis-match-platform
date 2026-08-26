@@ -7,54 +7,55 @@
  *
  * 【这一页的块】
  *   1. 薄荷霜化头图：封面模糊 + 半透明色罩，头像 120，四列数据
- *   2. VIP 条 #66c4b4
+ *   2. VIP 条走主题强调色 --accent，不要写死青绿
  *   3. 战力图白卡 + canvas 雷达
  *   4. 我的生涯两列 + 参赛记录通栏
  *   5. 更多服务三列
  *   6. 更换背景底部抽屉
  *
  * 旧绿波浪头、金圈领奖台、七项菜单列表已经删掉。
- * 换主题只改 .profile--* 的霜化色，封面图仍是 profile.cover。
+ * 换主题只改 .profile--* 的霜化色。没有封面时走 .hero--plain，只显示纯色。
+ * 相册打球照走 .hero--album：只轻轻一糊，名字和「更换背景」中间的空位把图漏出来。
  */
 
 .profile {
   min-height: 100vh;
-  background: #f0fcf7;
+  background: var(--page-bg);
 }
 
 .profile--mint {
   --frost: rgba(184, 237, 220, 0.82);
-  --fade-end: #f0fcf7;
+  --fade-end: var(--page-bg);
   --page-tint: #b8eddc;
 }
 
 .profile--lime {
   --frost: rgba(212, 243, 74, 0.72);
-  --fade-end: #f7fbe8;
+  --fade-end: var(--page-bg);
   --page-tint: #d4f34a;
 }
 
 .profile--gold {
   --frost: rgba(226, 177, 90, 0.55);
-  --fade-end: #fbf4e4;
+  --fade-end: var(--page-bg);
   --page-tint: #e2b15a;
 }
 
 .profile--sky {
   --frost: rgba(110, 180, 224, 0.58);
-  --fade-end: #eef7fc;
+  --fade-end: var(--page-bg);
   --page-tint: #6eb4e0;
 }
 
 .profile--dusk {
   --frost: rgba(224, 138, 170, 0.5);
-  --fade-end: #fceef4;
+  --fade-end: var(--page-bg);
   --page-tint: #e08aaa;
 }
 
 .profile--photo {
-  --frost: rgba(184, 237, 220, 0.18);
-  --fade-end: #f0fcf7;
+  --frost: rgba(184, 237, 220, 0.28);
+  --fade-end: var(--page-bg);
   --page-tint: #b8eddc;
 }
 
@@ -62,16 +63,29 @@
   position: relative;
   overflow: hidden;
   background: var(--page-tint);
+  padding-top: env(safe-area-inset-top);
 }
 
-.hero__cover {
+/**
+ * 封面铺满头图这一块，高度跟着内容走，不要写死 1120rpx。
+ * 写死会把正方形头像放大到整屏高，中间空位只剩眼睛和发带。
+ * 相册照再走 .hero--album，糊得更轻。
+ */
+.hero__cover-clip {
   position: absolute;
   left: 0;
   top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.hero__cover {
   width: 100%;
-  height: 1120rpx;
-  filter: blur(17px);
-  transform: scale(1.08);
+  height: 100%;
+  filter: blur(12px);
+  /* 只为糊边留一丁点，再大就会把人放大到只剩五官 */
+  transform: scale(1.04);
 }
 
 .hero__frost {
@@ -79,17 +93,51 @@
   left: 0;
   top: 0;
   right: 0;
-  height: 1120rpx;
-  background: var(--frost);
+  bottom: 0;
+  /* 左右罩住名字和「更换背景」，中间空位把封面漏出来 */
+  background: linear-gradient(
+    90deg,
+    var(--frost) 0%,
+    var(--frost) 22%,
+    rgba(255, 255, 255, 0.12) 38%,
+    rgba(255, 255, 255, 0.12) 70%,
+    var(--frost) 100%
+  );
+}
+
+/**
+ * 自己选的打球照：只虚一点点，还能认出人。
+ * 霜化改成横向渐变——头像/名字左侧、更换背景右侧略罩，
+ * 中间那一大块空位几乎不罩，照片从这里漏出来。
+ */
+.hero--album .hero__cover {
+  filter: blur(6px);
+  transform: scale(1.03);
+}
+
+.hero--album .hero__frost {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.28) 22%,
+    rgba(255, 255, 255, 0.04) 36%,
+    rgba(255, 255, 255, 0.04) 72%,
+    rgba(255, 255, 255, 0.36) 100%
+  );
+}
+
+/* 没有封面图时不要横向漏空，否则纯色中间会发白 */
+.hero--plain .hero__frost {
+  background: transparent;
 }
 
 .hero__fade {
   position: absolute;
   left: 0;
   right: 0;
-  top: 420rpx;
-  height: 280rpx;
-  background: linear-gradient(180deg, rgba(184, 237, 220, 0) 0%, var(--fade-end) 100%);
+  bottom: 0;
+  height: 200rpx;
+  background: linear-gradient(180deg, transparent 0%, var(--fade-end) 100%);
 }
 
 .hero__inner {
@@ -108,10 +156,23 @@
 }
 
 .identity__avatar {
+  flex-shrink: 0;
   width: 120rpx;
   height: 120rpx;
-  border-radius: 60rpx;
+  overflow: hidden;
+  border-radius: 50%;
   background: #ffffff;
+}
+
+/**
+ * 微信里 image 自己写 border-radius 经常裁不圆。
+ * 外圈负责圆形，图用 aspectFit 完整放进圆里，避免上传后脑袋被切掉。
+ * 竖图左右会留白、横图上下会留白，这是「看全图」的代价。
+ */
+.identity__avatar-img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .identity__info {
@@ -123,7 +184,7 @@
   font-size: 36rpx;
   font-weight: 700;
   line-height: 46rpx;
-  color: #1f1f1f;
+  color: #000000;
 }
 
 .identity__name--guest {
@@ -134,7 +195,7 @@
   margin-top: 6rpx;
   font-size: 22rpx;
   line-height: 28rpx;
-  color: #373939;
+  color: #111111;
 }
 
 .identity__cover-btn {
@@ -157,7 +218,7 @@
 .bio {
   font-size: 24rpx;
   line-height: 31rpx;
-  color: #373838;
+  color: #111111;
 }
 
 .tags {
@@ -173,7 +234,7 @@
   font-size: 22rpx;
   font-weight: 500;
   line-height: 28rpx;
-  color: #404747;
+  color: #1a1a1a;
 }
 
 .stats {
@@ -193,13 +254,13 @@
   font-size: 38rpx;
   font-weight: 700;
   line-height: 46rpx;
-  color: #1f1f1f;
+  color: #000000;
 }
 
 .stat__label {
   font-size: 20rpx;
   line-height: 26rpx;
-  color: #373838;
+  color: #111111;
 }
 
 .vip {
@@ -211,7 +272,9 @@
   margin: 0 24rpx 12rpx;
   padding: 20rpx 20rpx 20rpx 24rpx;
   border-radius: 32rpx;
-  background: #66c4b4;
+  /* 底色和字色由内联 accent / accentText 写入，这里只是默认薄荷 */
+  background: var(--accent);
+  color: var(--accent-text);
 }
 
 .vip--pressed {
@@ -233,14 +296,15 @@
   font-size: 28rpx;
   font-weight: 700;
   line-height: 36rpx;
-  color: #1f1f1f;
+  color: inherit;
 }
 
 .vip__sub {
   margin-top: 4rpx;
   font-size: 20rpx;
   line-height: 26rpx;
-  color: #475252;
+  color: inherit;
+  opacity: 0.72;
 }
 
 .vip__cta {
@@ -305,6 +369,7 @@
 .radar__canvas {
   width: 100%;
   height: 380rpx;
+  /* 原生 canvas 不吃 z-index。抽屉打开时 wxml 里 wx:if 卸掉它 */
 }
 
 .radar-label {
@@ -532,7 +597,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 16rpx 0 calc(40rpx + env(safe-area-inset-bottom));
+  /* 底栏是独立一层，页面 z-index 压不住。底部垫上底栏高度，「完成」才露出来，整块也会往上长一截 */
+  padding: 32rpx 0 calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 24rpx);
   border-radius: 36rpx 36rpx 0 0;
   background: #ffffff;
 }
@@ -546,7 +612,7 @@
 }
 
 .sheet__title {
-  padding: 16rpx 32rpx 0;
+  padding: 24rpx 32rpx 0;
   font-size: 36rpx;
   font-weight: 700;
   line-height: 49rpx;
@@ -561,7 +627,7 @@
 }
 
 .sheet__label {
-  padding: 20rpx 32rpx 12rpx;
+  padding: 28rpx 32rpx 16rpx;
   font-size: 26rpx;
   font-weight: 700;
   line-height: 35rpx;
@@ -616,6 +682,10 @@
   background: #ffffff;
 }
 
+.swatch__fill--empty {
+  background: #e8e8e4;
+}
+
 .covers {
   display: flex;
   flex-wrap: wrap;
@@ -625,7 +695,7 @@
 
 .cover-pick {
   width: 162.5rpx;
-  height: 110rpx;
+  height: 156rpx;
   overflow: hidden;
   border-radius: 16rpx;
 }
@@ -649,13 +719,23 @@
   color: #737a76;
 }
 
+.cover-pick--solid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--page-tint);
+  border: 2rpx solid #d8d8d4;
+  font-size: 22rpx;
+  color: #1c1f21;
+}
+
 .sheet__done {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 686rpx;
   height: 80rpx;
-  margin: 28rpx auto 0;
+  margin: 40rpx auto 0;
   border-radius: 24rpx;
   background: #83d414;
   font-size: 30rpx;

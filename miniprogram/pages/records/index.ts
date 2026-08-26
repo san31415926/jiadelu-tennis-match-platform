@@ -4,7 +4,7 @@
  * ============================================================================
  *
  * 「我的」菜单点参赛记录进来。已对照草稿 Figma「参赛记录 / V5」(419:359)：
- * 薄荷头、生涯汇总卡、全部/胜/负芯片。结构和筛选逻辑保持原样。
+ * occupy 吸顶栏、生涯汇总卡、全部/胜/负芯片。筛选选中和胜场标走主题强调色。
  *
  * 【筛选只看胜负】
  * 三个芯片：全部 / 胜 / 负。切的时候不过滤项目或日期，只按 result 字段。
@@ -16,10 +16,11 @@
 import { filterRecords, RECORD_FILTERS, RECORDS_SUMMARY } from '../../mock/records';
 import type { MatchRecord, RecordFilter } from '../../mock/records';
 import { navigateToEventDetail } from '../../utils/navigate';
+import { themeBehavior } from '../../behaviors/theme';
 
 Page({
+  behaviors: [themeBehavior],
   data: {
-    statusBarHeight: 0,
     summary: RECORDS_SUMMARY,
     filters: RECORD_FILTERS,
     activeFilter: '全部' as RecordFilter,
@@ -27,9 +28,7 @@ Page({
   },
 
   onLoad() {
-    const app = getApp<IAppOption>();
     this.setData({
-      statusBarHeight: app.globalData.statusBarHeight,
       records: filterRecords('全部'),
     });
   },

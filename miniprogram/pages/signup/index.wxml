@@ -10,10 +10,10 @@
     <view class="sheet">
       <view class="sheet__handle"></view>
       <view class="sheet__title">选择参赛方式</view>
-      <view class="sheet__desc">单人报名后由赛事组分配搭档；组队报名需先有搭档，不是约球匹配。</view>
+      <view class="sheet__desc">{{allowTeam ? '单人报名后由赛事组分配搭档；组队报名需先有搭档，不是约球匹配。' : '本场是单打，报名后单独进入签表，无需搭档。'}}</view>
       <view class="modes">
         <view class="mode {{mode === '单人' ? 'is-on' : ''}}" style="{{mode === '单人' ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}" data-mode="单人" bindtap="onPickMode">单人</view>
-        <view class="mode {{mode === '组队' ? 'is-on' : ''}}" style="{{mode === '组队' ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}" data-mode="组队" bindtap="onPickMode">组队</view>
+        <view class="mode {{mode === '组队' ? 'is-on' : ''}}" wx:if="{{allowTeam}}" style="{{mode === '组队' ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}" data-mode="组队" bindtap="onPickMode">组队</view>
       </view>
 
       <view class="who" wx:if="{{mode === '单人' || hasTeam}}">
@@ -53,12 +53,12 @@
     <view class="card">
       <view class="card__h">报名信息</view>
       <view class="kv">
-        <view class="kv__val">{{mode}}</view>
         <view class="kv__key">参赛方式</view>
+        <view class="kv__val">{{mode}}</view>
       </view>
       <view class="kv">
-        <view class="kv__val">{{event.eventType}}</view>
         <view class="kv__key">参赛项目</view>
+        <view class="kv__val">{{event.eventType}}</view>
       </view>
       <view class="who who--in">
         <image class="who__av who__av--sm" src="{{self.avatar}}" mode="aspectFill" />
@@ -79,24 +79,24 @@
     <view class="card">
       <view class="card__h">关于赛事</view>
       <view class="kv">
-        <view class="kv__val">{{event.grade}}{{event.title}}</view>
         <view class="kv__key">赛事</view>
+        <view class="kv__val">{{event.grade}}{{event.title}}</view>
       </view>
       <view class="kv">
-        <view class="kv__val">{{event.signupTime}}</view>
         <view class="kv__key">报名时间</view>
+        <view class="kv__val">{{event.signupTime}}</view>
       </view>
       <view class="kv">
-        <view class="kv__val">{{event.matchTime}}</view>
         <view class="kv__key">比赛时间</view>
+        <view class="kv__val">{{event.matchTime}}</view>
       </view>
       <view class="kv">
-        <view class="kv__val">{{event.venueName}}</view>
         <view class="kv__key">比赛地点</view>
+        <view class="kv__val">{{event.venueName}}</view>
       </view>
       <view class="kv">
-        <view class="kv__val kv__val--fee">{{event.fee}}</view>
         <view class="kv__key">报名费用</view>
+        <view class="kv__val kv__val--fee">{{event.fee}}</view>
       </view>
     </view>
     <view class="pay-tip">支付完成后即完成报名，可在「我的报名」查看</view>

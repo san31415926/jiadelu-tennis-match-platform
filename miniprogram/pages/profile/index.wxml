@@ -1,5 +1,5 @@
 <view class="profile profile--{{profile.theme}} theme-{{theme}}" style="{{themeVars}}">
-  <view class="hero {{coverFromAlbum ? 'hero--album' : ''}} {{profile.cover ? '' : 'hero--plain'}}" style="padding-top:{{statusBarHeight}}px">
+  <view class="hero {{coverFromAlbum ? 'hero--album' : ''}} {{profile.cover ? '' : 'hero--plain'}}" style="padding-top:{{statusBarHeight + navBarHeight}}px">
     <view class="hero__cover-clip" wx:if="{{profile.cover}}">
       <image
         class="hero__cover"
@@ -39,7 +39,7 @@
       </view>
 
       <view class="tags">
-        <view class="tag" wx:for="{{tags}}" wx:key="*this">{{item}}</view>
+        <view class="tag" wx:for="{{tags}}" wx:key="*this" bindtap="onAddTag">{{item}}</view>
         <view class="tag tag--add" bindtap="onAddTag">+ 添加个性标签</view>
       </view>
 
@@ -92,7 +92,7 @@
       <view class="radar-card">
         <view class="radar">
           <canvas
-            wx:if="{{!showCoverSheet && !showCropper}}"
+            wx:if="{{!showCoverSheet && !showCropper && !showEditSheet && !showLoginSheet && !showMemberSheet}}"
             type="2d"
             id="radarCanvas"
             class="radar__canvas"
@@ -161,31 +161,45 @@
     <view class="block">
       <view class="block__title">更多服务</view>
       <view class="services">
-        <view class="service" bindtap="onOpenBusiness" hover-class="service--pressed" hover-stay-time="60">
-          <image class="service__icon service__icon--flip" src="/assets/icons/profile/business-handshake.png" mode="aspectFit" />
-          <text class="service__label">商务合作</text>
+        <view class="services__row">
+          <view class="service" bindtap="onOpenBusiness" hover-class="service--pressed" hover-stay-time="60">
+            <image class="service__icon service__icon--flip" src="/assets/icons/profile/business-handshake.png" mode="aspectFit" />
+            <text class="service__label">商务合作</text>
+          </view>
+          <view class="service" bindtap="onOpenAbout" hover-class="service--pressed" hover-stay-time="60">
+            <image class="service__icon service__icon--flip" src="/assets/icons/profile/about-us.png" mode="aspectFit" />
+            <text class="service__label">关于我们</text>
+          </view>
         </view>
-        <view class="service" bindtap="onOpenAbout" hover-class="service--pressed" hover-stay-time="60">
-          <image class="service__icon service__icon--flip" src="/assets/icons/profile/about-us.png" mode="aspectFit" />
-          <text class="service__label">关于我们</text>
-        </view>
-        <view class="service" bindtap="onOpenService" hover-class="service--pressed" hover-stay-time="60">
-          <image class="service__icon" src="/assets/icons/profile/customer-service.png" mode="aspectFit" />
-          <text class="service__label">联系客服</text>
+        <view class="services__row">
+          <view class="service" bindtap="onOpenService" hover-class="service--pressed" hover-stay-time="60">
+            <image class="service__icon" src="/assets/icons/profile/customer-service.png" mode="aspectFit" />
+            <text class="service__label">联系客服</text>
+          </view>
+          <!-- 分享必须用 button open-type="share"，叠在这一格上 -->
+          <view class="service">
+            <image class="service__icon" src="/assets/icons/profile/share-friends.png" mode="aspectFit" />
+            <text class="service__label">分享好友</text>
+            <button
+              wx:if="{{isLoggedIn}}"
+              class="service__hit"
+              open-type="share"
+              hover-class="service--pressed"
+              hover-stay-time="60"
+            ></button>
+            <view wx:else class="service__hit" bindtap="onNeedLogin"></view>
+          </view>
         </view>
       </view>
-      <!-- 分享必须用 button open-type="share"，设计没单独格子，叠在生涯区下面一行 -->
-      <view class="share-row">
-        <image class="share-row__icon" src="/assets/icons/profile/share-friends.png" mode="aspectFit" />
-        <text>分享好友</text>
-        <button
-          wx:if="{{isLoggedIn}}"
-          class="share-row__hit"
-          open-type="share"
-          hover-class="share-row--pressed"
-          hover-stay-time="60"
-        ></button>
-        <view wx:else class="share-row__hit" bindtap="onNeedLogin"></view>
+      <view
+        wx:if="{{isLoggedIn}}"
+        class="logout-row"
+        bindtap="onLogout"
+        hover-class="logout-row--pressed"
+        hover-stay-time="60"
+      >
+        <view class="logout-row__icon"></view>
+        <text>退出登录</text>
       </view>
     </view>
   </view>
@@ -240,6 +254,172 @@
         <view class="cover-pick cover-pick--album" bindtap="onPickAlbumCover">+ 相册</view>
       </view>
       <view class="sheet__done" bindtap="onCloseCoverSheet">完成</view>
+    </view>
+  </view>
+
+  <!-- 介绍 / 个性标签抽屉。不要用系统 showModal，那套深色框和本页对不上。 -->
+  <view class="sheet" wx:if="{{showEditSheet}}">
+    <view class="sheet__dim" bindtap="onCloseEditSheet"></view>
+    <view class="sheet__panel" catchtouchmove="onPreventMove">
+      <view class="sheet__handle"></view>
+      <block wx:if="{{showEditSheet === 'bio'}}">
+        <view class="sheet__title">编辑介绍</view>
+        <textarea
+          class="sheet-field"
+          value="{{bioDraft}}"
+          maxlength="120"
+          auto-height="{{true}}"
+          cursor-spacing="120"
+          bindinput="onBioDraftInput"
+        />
+      </block>
+      <block wx:else>
+        <view class="sheet__title">个性标签</view>
+        <view class="sheet-pills">
+          <view
+            wx:for="{{tagChoices}}"
+            wx:key="label"
+            class="sheet-pill {{item.on ? 'sheet-pill--on' : ''}}"
+            style="{{item.on ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}"
+            data-value="{{item.label}}"
+            bindtap="onSheetTagTap"
+          >{{item.label}}</view>
+          <view
+            wx:for="{{customTags}}"
+            wx:key="*this"
+            class="sheet-pill sheet-pill--on"
+            style="background:{{accent}};color:{{accentText}};border-color:{{accent}}"
+            data-value="{{item}}"
+            bindtap="onSheetTagTap"
+          >{{item}}</view>
+        </view>
+        <input
+          wx:if="{{selectedTags.length < maxTags}}"
+          class="sheet-input"
+          value="{{tagDraft}}"
+          maxlength="8"
+          confirm-type="done"
+          cursor-spacing="120"
+          bindinput="onTagDraftInput"
+          bindconfirm="onSheetTagConfirm"
+        />
+      </block>
+      <view
+        class="sheet__done"
+        style="background:{{accent}};color:{{accentText}}"
+        bindtap="onConfirmEditSheet"
+      >完成</view>
+    </view>
+  </view>
+
+  <!-- 登录抽屉。协议勾选是我们画的；选手机号那一层才是微信自带 getPhoneNumber。 -->
+  <view class="sheet" wx:if="{{showLoginSheet}}">
+    <view class="sheet__dim" bindtap="onCloseLoginSheet"></view>
+    <view class="sheet__panel" catchtouchmove="onPreventMove">
+      <view class="sheet__handle"></view>
+      <block wx:if="{{loginDoc}}">
+        <view class="login-back" bindtap="onCloseLoginDoc">‹ 返回</view>
+        <view class="sheet__title">{{loginDocTitle}}</view>
+        <scroll-view scroll-y class="login-doc" show-scrollbar="{{false}}">
+          <text class="login-doc__text">{{loginDocText}}</text>
+        </scroll-view>
+      </block>
+      <block wx:else>
+        <view class="sheet__title">登录 LTJIMMY</view>
+        <view class="sheet__sub">登录后报名赛事、保存资料、加入俱乐部</view>
+        <view class="login-agree" bindtap="onToggleLoginAgree">
+          <view
+            class="login-check {{loginAgreed ? 'login-check--on' : ''}}"
+            style="{{loginAgreed ? 'background:' + accent + ';border-color:' + accent + ';color:' + accentText : ''}}"
+          >{{loginAgreed ? '✓' : ''}}</view>
+          <view class="login-agree__text">
+            我已阅读并同意
+            <text class="login-agree__link" catchtap="onOpenLoginDoc" data-doc="terms">《服务条款》</text>
+            和
+            <text class="login-agree__link" catchtap="onOpenLoginDoc" data-doc="privacy">《隐私协议》</text>
+          </view>
+        </view>
+        <button
+          wx:if="{{loginAgreed}}"
+          class="login-btn"
+          style="background:{{accent}};color:{{accentText}}"
+          hover-class="login-btn--pressed"
+          open-type="getPhoneNumber"
+          bindgetphonenumber="onGetPhoneNumber"
+        >授权手机号并登录</button>
+        <view
+          wx:else
+          class="login-btn login-btn--off"
+          bindtap="onNeedAgree"
+        >授权手机号并登录</view>
+        <view class="login-cancel" bindtap="onCloseLoginSheet">取消</view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 开通会员：本页抽屉，不要跳 membership 页。点蒙层关闭，不要「返回」。 -->
+  <view class="sheet" wx:if="{{showMemberSheet}}">
+    <view class="sheet__dim" bindtap="onCloseMemberSheet"></view>
+    <view class="sheet__panel sheet__panel--mint" catchtouchmove="onPreventMove">
+      <view class="sheet__handle"></view>
+      <view class="sheet__title">开通会员</view>
+      <view class="sheet__sub">一种会员，按时长选择套餐</view>
+      <scroll-view class="member-plans" scroll-x show-scrollbar="{{false}}">
+        <view
+          wx:for="{{memberPlans}}"
+          wx:key="key"
+          class="member-plan {{activePlan === item.key ? 'is-active' : ''}}"
+          data-key="{{item.key}}"
+          bindtap="onSelectPlan"
+        >
+          <view class="member-plan__flag" wx:if="{{item.recommended}}">推荐</view>
+          <view class="member-plan__name">{{item.name}}</view>
+          <view class="member-plan__badge">{{item.badge}}</view>
+          <view class="member-plan__price">
+            <text class="member-plan__yen">¥</text>
+            <text class="member-plan__num">{{item.price}}</text>
+          </view>
+          <view class="member-plan__origin" wx:if="{{item.origin}}">¥ {{item.origin}}</view>
+        </view>
+      </scroll-view>
+      <view class="member-hint">
+        <text>到期 299 元/年自动续费，可随时取消</text>
+        <view class="member-hint__q">?</view>
+      </view>
+      <view class="sheet__label">支付方式</view>
+      <view class="member-pays">
+        <view
+          wx:for="{{memberPays}}"
+          wx:key="key"
+          class="member-pay {{activePay === item.key ? 'is-active' : ''}}"
+          data-key="{{item.key}}"
+          bindtap="onSelectPay"
+        >
+          <view wx:if="{{item.key === 'wechat'}}" class="wx-mark">
+            <view class="wx-mark__big">
+              <view class="wx-mark__eye wx-mark__eye--l1"></view>
+              <view class="wx-mark__eye wx-mark__eye--l2"></view>
+              <view class="wx-mark__tail wx-mark__tail--l"></view>
+            </view>
+            <view class="wx-mark__small">
+              <view class="wx-mark__eye wx-mark__eye--s1"></view>
+              <view class="wx-mark__eye wx-mark__eye--s2"></view>
+              <view class="wx-mark__tail wx-mark__tail--s"></view>
+            </view>
+          </view>
+          <view wx:else class="member-pay__mark member-pay__mark--{{item.key}}">{{item.mark}}</view>
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+      <view
+        class="sheet__done"
+        style="background:{{accent}};color:{{accentText}}"
+        bindtap="onMemberCheckout"
+      >
+        <text>{{payLabel}}</text>
+        <text class="member-save" wx:if="{{saveHint}}">{{saveHint}}</text>
+      </view>
+      <view class="member-agree">开通会员代表同意《会员服务协议》和《自动续费服务规则》</view>
     </view>
   </view>
 

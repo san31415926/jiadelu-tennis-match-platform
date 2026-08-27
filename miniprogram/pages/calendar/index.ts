@@ -1,4 +1,5 @@
-import { CALENDAR_EVENTS, WEEKDAY_LABELS } from '../../mock/calendar';
+import { listCalendarMonth } from '../../api/events';
+import { WEEKDAY_LABELS } from '../../mock/calendar';
 import type { EventItem } from '../../mock/home';
 import {
   buildMonthCells,
@@ -26,12 +27,8 @@ import { themeBehavior } from '../../behaviors/theme';
  *
  * 【默认打开当前月】
  * 页面加载时调 jumpToToday()，所以打开就是今天所在的月份。
- * 如果你的手机日期不在 2026 年 8 月，看不到示例赛事的小圆点，
- * 需要手动翻月过去，或者改 mock/calendar.ts 里的日期键。
+ * 赛事日期来自云库的 dateKey（开关关上后）；假数据仍是 2026 年 8 月。
  */
-
-/** 从赛事数据里提取出"哪些天有赛事"，用 Set 是为了查找快 */
-const EVENT_DAYS = new Set(Object.keys(CALENDAR_EVENTS));
 
 /** 月份标签，如「2026 / 08」。想改成「2026年8月」就改这里 */
 function monthLabelOf(year: number, month: number): string {
@@ -49,23 +46,42 @@ Page({
     selectedKey: '',
     dayHeading: '',
     events: [] as EventItem[],
+    eventsByDay: {} as Record<string, EventItem[]>,
   },
 
   onLoad() {
-    this.jumpToToday();
+    const boot = getApp<IAppOption>().globalData.cloudBoot || Promise.resolve();
+    boot.then(() => this.jumpToToday());
   },
 
   /** 重建月视图并同步选中日期的赛事列表 */
   render(year: number, month: number, selectedKey: string) {
-    this.setData({
-      year,
-      month,
-      monthLabel: monthLabelOf(year, month),
-      weeks: buildMonthCells(year, month, EVENT_DAYS),
-      selectedKey,
-      dayHeading: formatDayHeading(selectedKey),
-      events: CALENDAR_EVENTS[selectedKey] ?? [],
-    });
+    listCalendarMonth(year, month)
+      .then(({ dateKeys, eventsByDay }) => {
+        this.setData({
+          year,
+          month,
+          monthLabel: monthLabelOf(year, month),
+          weeks: buildMonthCells(year, month, new Set(dateKeys)),
+          selectedKey,
+          dayHeading: formatDayHeading(selectedKey),
+          events: eventsByDay[selectedKey] ?? [],
+          eventsByDay,
+        });
+      })
+      .catch(() => {
+        this.setData({
+          year,
+          month,
+          monthLabel: monthLabelOf(year, month),
+          weeks: buildMonthCells(year, month, new Set()),
+          selectedKey,
+          dayHeading: formatDayHeading(selectedKey),
+          events: [],
+          eventsByDay: {},
+        });
+        wx.showToast({ title: '日历加载失败', icon: 'none' });
+      });
   },
 
   jumpToToday() {
@@ -104,8 +120,11 @@ Page({
     navigateToEventDetail(event.detail.id);
   },
 
-  onSignupTap() {
-    wx.showToast({ title: '报名流程待接入云开发', icon: 'none' });
+  onSignupTap(event: WechatMiniprogram.CustomEvent<{ id?: string }>) {
+    const id = event.detail && event.detail.id;
+    if (id) {
+      navigateToPage(`/pages/signup/index?id=${id}`);
+    }
   },
 
   onVenueTap(event: WechatMiniprogram.CustomEvent<{ id?: string }>) {

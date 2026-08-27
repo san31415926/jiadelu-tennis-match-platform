@@ -1,4 +1,6 @@
 import { CLOUD_ENV_ID } from './config/env';
+import { restoreSession, writeSession } from './api/auth';
+import { ensureEventsSeeded } from './api/events';
 import { measureHeaderMetrics } from './utils/header';
 import { getAppTheme, paintWindow } from './utils/theme';
 
@@ -8,10 +10,11 @@ import { getAppTheme, paintWindow } from './utils/theme';
  * ============================================================================
  *
  * 【这个文件是干什么的】
- * 小程序启动时最先执行的地方。做三件事：
+ * 小程序启动时最先执行的地方。做四件事：
  * 1. 量一遍手机的状态栏高度、安全区高度，存到 globalData 供所有页面使用
  * 2. 如果配了云开发环境 ID，就初始化云能力
  * 3. 读出全站主题（默认薄荷），把窗口露底色刷成对应色
+ * 4. 恢复上次的登录、按 mock 覆盖写赛事示例数据（见 api/auth.ts、api/events.ts）
  *
  * 【globalData 是什么】
  * 全局共享的数据仓库。任何页面都可以用 getApp().globalData.xxx 读写。
@@ -39,14 +42,15 @@ App<IAppOption>({
     screenWidth: 375,
     /**
      * 微信登录态。首页与超级杯的「我的报名」筛选、我的页的资料展示都依赖它。
-     * 现在由「我的」页点击登录后置为 true；接入云开发后应改为
-     * 调云函数校验 openid 的结果。
+     * 点「我的」登录后为 true；下次启动会调 login(create:false) 自动恢复。
+     * 点了「退出登录」会写本地标记，启动就不再自动接上，直到再登录。
      */
     isLoggedIn: false,
-    /** 登录后的用户资料，目前未使用，接云开发后存真实资料 */
+    /** 登录后的用户资料，来自云函数 login */
     userProfile: null,
     /** 云开发是否已就绪，页面调云函数前可以先检查这个 */
     cloudReady: false,
+    cloudBoot: Promise.resolve(),
     /** 全站壳色，默认薄荷。我的页「更换背景」会改它 */
     theme: 'mint',
   },
@@ -85,10 +89,12 @@ App<IAppOption>({
    */
   initCloud() {
     if (!CLOUD_ENV_ID) {
+      this.globalData.cloudBoot = Promise.resolve();
       return;
     }
     if (!wx.cloud) {
       console.warn('当前基础库不支持云开发，请在开发者工具里把基础库调到 2.2.3 以上');
+      this.globalData.cloudBoot = Promise.resolve();
       return;
     }
     wx.cloud.init({
@@ -97,5 +103,22 @@ App<IAppOption>({
       traceUser: true,
     });
     this.globalData.cloudReady = true;
+    this.globalData.cloudBoot = this.bootCloud();
+  },
+
+  async bootCloud() {
+    try {
+      const profile = await restoreSession();
+      if (profile) {
+        writeSession(profile);
+      }
+    } catch (error) {
+      console.warn('恢复登录失败（云函数还没上传时会出现）', error);
+    }
+    try {
+      await ensureEventsSeeded();
+    } catch (error) {
+      console.warn('灌入示例数据失败（云函数还没上传时会出现）', error);
+    }
   },
 });

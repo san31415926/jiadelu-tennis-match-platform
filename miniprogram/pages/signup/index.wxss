@@ -216,30 +216,40 @@
   color: #1c1f21;
 }
 
+/**
+ * 键值行跟赛事详情概览同一套：左边固定宽标签，右边内容。
+ * 标签宽 160rpx，正好放下「报名时间」四个字（赛事详情 .row__label 也是这个值）。
+ * 微信里长日期的 min-width:auto 会把短标签挤到右边，所以右栏用 flex:1 + width:0
+ * 锁死剩余宽度，长文案在右栏里换行，不要把整行顶出卡片。
+ */
 .kv {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start;
   padding: 22rpx 0;
+}
+
+.kv__key {
+  flex-shrink: 0;
+  width: 160rpx;
+  padding-top: 4rpx;
+  font-size: 22rpx;
+  line-height: 36rpx;
+  color: #9aa0a6;
 }
 
 .kv__val {
   flex: 1;
-  min-width: 0;
-  padding-right: 16rpx;
+  width: 0;
   font-size: 26rpx;
   font-weight: 700;
+  line-height: 40rpx;
+  text-align: right;
+  word-break: break-all;
   color: #1a2744;
 }
 
 .kv__val--fee {
   font-size: 28rpx;
-}
-
-.kv__key {
-  flex-shrink: 0;
-  font-size: 22rpx;
-  color: #9aa0a6;
 }
 
 .pay-tip {

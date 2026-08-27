@@ -1,8 +1,16 @@
 import {
-  GUEST_PROFILE,
-  MOCK_PROFILE,
-  PROFILE_THEMES,
-} from '../../mock/profile';
+  guestProfile,
+  loginWithWeChat,
+  logout,
+  readSession,
+  saveProfile,
+  writeSession,
+} from '../../api/auth';
+import type { CloudProfile } from '../../api/auth';
+import { parseTags, joinTags, buildTagView, appendDraftTag, MAX_PROFILE_TAGS } from '../../mock/profile-edit';
+import { TERMS_TITLE, PRIVACY_TITLE, TERMS_TEXT, PRIVACY_TEXT } from '../../mock/legal';
+import { PAY_METHODS, PLANS } from '../../mock/membership';
+import { PROFILE_THEMES } from '../../mock/profile';
 import type { ProfileSummary } from '../../mock/profile';
 import { headerMetrics } from '../../utils/header';
 import { navigateToPage, openMyClub } from '../../utils/navigate';
@@ -16,8 +24,8 @@ import { themeBehavior } from '../../behaviors/theme';
  * ============================================================================
  *
  * 【两种状态共用一套布局】
- * 未登录用 GUEST_PROFILE，登录后换成 MOCK_PROFILE。登录写在
- * app.globalData.isLoggedIn，首页「我的报名」也读它。
+ * 未登录用游客占位，登录后换成云函数返回的资料（开关仍开 mock 时用示例「帆」）。
+ * 登录写在 app.globalData.isLoggedIn，首页「我的报名」也读它。
  *
  * 【更换背景是同一页的抽屉，不是新路由】
  * 对应画板 401:359。选中的色会写入 utils/theme.ts，全站顶栏和页底一起换，
@@ -36,17 +44,36 @@ import { themeBehavior } from '../../behaviors/theme';
  * 选完图会按当前头图窗口的宽高比打开通用裁剪器，框里就是头图会铺到的那一块。
  * 取消不改封面；完成才写入 profile.cover，并走相册轻糊。
  *
- * 【分享好友】
- * 设计里没有单独菜单行，放在「更多服务」右侧透明热区不够，所以在生涯卡
- * 下方留了一颗分享按钮，必须用 button open-type="share"。
+ * 【开通会员】
+ * 同一页底部抽屉（Figma 355:361），不要 navigateTo 会员页。点蒙层关掉。
+ * 抽屉打开时卸掉雷达 canvas。
+ *
+ * 【登录】
+ * 未登录点头像/「登录」先出本页底部抽屉（协议勾选 + 按钮），这层是我们自己画的。
+ * 勾了协议再点按钮，才会弹出微信自带的「申请获取并验证你的手机号」（button getPhoneNumber）。
+ * wx.login 没有界面，不能拿来当登录弹窗。
+ * 抽屉打开时要卸掉雷达 canvas。
+ *
+ * 【个性标签 / 介绍】
+ * 点介绍或「+ 添加个性标签」打开本页底部抽屉，不要用系统 wx.showModal。
+ * 那套深色框和本页白卡 / 28 圆角对不上。标签备选和上限跟资料页同一套 PRESET_TAGS。
+ * 抽屉打开时要卸掉雷达 canvas，否则原生层会盖住抽屉。
+ *
+ * 【分享好友 / 退出登录】
+ * 「更多服务」四格 2×2：商务合作、关于我们、联系客服、分享好友。
+ * 两行写死，不要用 calc 半宽（模拟器会把格子撑成通栏）。
+ * 分享必须用 button open-type="share"，叠在第四格上。
+ * 退出登录单独通栏，设计稿没有。点退出只清本机会话，云端 users 还在。
+ * 退出图标是线框 SVG，不要再生成 3D 图去硬配素材板。
  */
 
 Page({
   behaviors: [themeBehavior],
   data: {
     statusBarHeight: 0,
+    navBarHeight: 0,
     isLoggedIn: false,
-    profile: GUEST_PROFILE as ProfileSummary,
+    profile: guestProfile() as ProfileSummary,
     themes: PROFILE_THEMES,
     showCoverSheet: false,
     showCropper: false,
@@ -55,11 +82,32 @@ Page({
     /** 封面来自相册时为 true，头图要糊得更厉害 */
     coverFromAlbum: false,
     tags: [] as string[],
+    showEditSheet: '' as '' | 'bio' | 'tags',
+    bioDraft: '',
+    selectedTags: [] as string[],
+    tagChoices: [] as { label: string; on: boolean }[],
+    customTags: [] as string[],
+    tagDraft: '',
+    maxTags: MAX_PROFILE_TAGS,
+    showLoginSheet: false,
+    loginAgreed: false,
+    loginDoc: '' as '' | 'terms' | 'privacy',
+    loginDocTitle: '',
+    loginDocText: '',
+    showMemberSheet: false,
+    memberPlans: PLANS,
+    memberPays: PAY_METHODS,
+    activePlan: 'year',
+    activePay: 'wechat',
+    payLabel: '立即支付 ¥199',
+    saveHint: '立省 100 元',
   },
 
-  onLoad() {
+  async onLoad() {
     this.setData(headerMetrics());
-    this.applyProfile(getApp<IAppOption>().globalData.isLoggedIn);
+    await getApp<IAppOption>().globalData.cloudBoot;
+    const session = readSession();
+    this.applyProfile(!!session, session);
   },
 
   onReady() {
@@ -71,10 +119,13 @@ Page({
     if (this.data.showCropper) {
       setTabBarHidden(this, true);
     }
-    const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
-    if (isLoggedIn !== this.data.isLoggedIn) {
-      this.applyProfile(isLoggedIn);
+    if (this.data.showEditSheet || this.data.showLoginSheet || this.data.showMemberSheet) {
+      return;
     }
+    // Tab 页不会重新 onLoad。从「我的资料」保存头像/昵称回来，
+    // 登录态没变，只比对 isLoggedIn 会继续显示旧图。每次 onShow 都按 session 刷一遍。
+    const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
+    this.applyProfile(isLoggedIn, readSession());
     const theme = getAppTheme();
     if (this.data.profile.theme !== theme) {
       this.setData({ 'profile.theme': theme });
@@ -89,15 +140,31 @@ Page({
     return false;
   },
 
-  applyProfile(isLoggedIn: boolean) {
+  applyProfile(isLoggedIn: boolean, profile?: CloudProfile | null) {
     const stored = this.data.profile;
-    const next = {
-      ...(isLoggedIn ? MOCK_PROFILE : GUEST_PROFILE),
-      cover: stored.cover,
-      theme: getAppTheme(),
-    };
-    getApp<IAppOption>().globalData.isLoggedIn = isLoggedIn;
-    this.setData({ isLoggedIn, profile: next }, () => this.drawRadar());
+    const loggedInProfile = profile || readSession();
+    const next = isLoggedIn && loggedInProfile
+      ? {
+          ...loggedInProfile,
+          cover: loggedInProfile.cover || stored.cover,
+          theme: getAppTheme(),
+        }
+      : {
+          ...guestProfile(),
+          cover: stored.cover,
+          theme: getAppTheme(),
+        };
+    if (isLoggedIn && loggedInProfile) {
+      writeSession({ ...loggedInProfile, ...next });
+    }
+    const shown = (isLoggedIn && readSession()) || next;
+    const tags = isLoggedIn && shown ? parseTags(shown.tags) : [];
+    this.setData({
+      isLoggedIn,
+      profile: shown,
+      tags,
+      ...buildTagView(tags),
+    }, () => this.drawRadar());
   },
 
   onAvatarTap() {
@@ -109,12 +176,92 @@ Page({
       navigateToPage('/pages/profile-edit/index');
       return;
     }
+    this.setData({
+      showLoginSheet: true,
+      loginAgreed: false,
+      loginDoc: '',
+    });
+  },
+
+  onToggleLoginAgree() {
+    this.setData({ loginAgreed: !this.data.loginAgreed });
+  },
+
+  onNeedAgree() {
+    wx.showToast({ title: '请先勾选协议', icon: 'none' });
+  },
+
+  onOpenLoginDoc(event: WechatMiniprogram.TouchEvent) {
+    const kind = String(event.currentTarget.dataset.doc || '');
+    if (kind === 'privacy') {
+      this.setData({
+        loginDoc: 'privacy',
+        loginDocTitle: PRIVACY_TITLE,
+        loginDocText: PRIVACY_TEXT,
+      });
+      return;
+    }
+    this.setData({
+      loginDoc: 'terms',
+      loginDocTitle: TERMS_TITLE,
+      loginDocText: TERMS_TEXT,
+    });
+  },
+
+  onCloseLoginDoc() {
+    this.setData({ loginDoc: '', loginDocTitle: '', loginDocText: '' });
+  },
+
+  onCloseLoginSheet() {
+    this.setData({
+      showLoginSheet: false,
+      loginDoc: '',
+    }, () => {
+      wx.nextTick(() => this.drawRadar());
+    });
+  },
+
+  /**
+   * 微信自带选号层点完会走到这里。detail.code 交给云函数换手机号。
+   * 用户点「不允许」就停在抽屉。模拟器没有选号能力时退回纯微信身份登录。
+   */
+  onGetPhoneNumber(event: { detail?: { code?: string; errMsg?: string } }) {
+    const detail = event.detail || {};
+    if (detail.code) {
+      this.finishLogin(detail.code);
+      return;
+    }
+    const msg = String(detail.errMsg || '');
+    if (msg.indexOf('deny') >= 0 || msg.indexOf('cancel') >= 0) {
+      wx.showToast({ title: '未授权手机号', icon: 'none' });
+      return;
+    }
+    this.finishLogin();
+  },
+
+  finishLogin(phoneCode?: string) {
+    wx.showLoading({ title: '登录中', mask: true });
+    const run = () => {
+      loginWithWeChat(phoneCode ? { phoneCode } : undefined)
+        .then((profile) => {
+          wx.hideLoading();
+          writeSession(profile);
+          this.setData({ showLoginSheet: false, loginDoc: '' });
+          this.applyProfile(true, profile);
+          wx.showToast({ title: '登录成功', icon: 'none' });
+        })
+        .catch((error: { message?: string }) => {
+          wx.hideLoading();
+          wx.showToast({
+            title: (error && error.message) || '登录失败，请确认已上传 login 云函数',
+            icon: 'none',
+          });
+        });
+    };
     wx.login({
-      success: () => {
-        this.applyProfile(true);
-        wx.showToast({ title: '已载入示例资料，登录待接入云开发', icon: 'none' });
-      },
+      success: run,
       fail: () => {
+        wx.hideLoading();
         wx.showToast({ title: '微信登录失败，请重试', icon: 'none' });
       },
     });
@@ -124,16 +271,9 @@ Page({
     if (!this.requireLogin()) {
       return;
     }
-    wx.showModal({
-      title: '编辑介绍',
-      editable: true,
-      placeholderText: '写一句球场介绍',
-      content: this.data.profile.bio,
-      success: (res) => {
-        if (res.confirm && typeof res.content === 'string') {
-          this.setData({ 'profile.bio': res.content.trim() });
-        }
-      },
+    this.setData({
+      showEditSheet: 'bio',
+      bioDraft: this.data.profile.bio || '',
     });
   },
 
@@ -141,25 +281,160 @@ Page({
     if (!this.requireLogin()) {
       return;
     }
-    wx.showModal({
-      title: '添加个性标签',
-      editable: true,
-      placeholderText: '例如 双手反拍',
-      success: (res) => {
-        if (!res.confirm || !res.content) {
-          return;
-        }
-        const tag = res.content.trim();
-        if (!tag) {
-          return;
-        }
-        this.setData({ tags: this.data.tags.concat(tag) });
-      },
+    this.setData({
+      showEditSheet: 'tags',
+      tagDraft: '',
+      ...buildTagView(this.data.tags),
+    });
+  },
+
+  onBioDraftInput(event: WechatMiniprogram.Input) {
+    this.setData({ bioDraft: event.detail.value });
+  },
+
+  onTagDraftInput(event: WechatMiniprogram.Input) {
+    this.setData({ tagDraft: event.detail.value });
+  },
+
+  onSheetTagTap(event: WechatMiniprogram.TouchEvent) {
+    const value = String(event.currentTarget.dataset.value || '');
+    if (!value) {
+      return;
+    }
+    const selected = this.data.selectedTags.slice();
+    const index = selected.indexOf(value);
+    if (index >= 0) {
+      selected.splice(index, 1);
+      this.setData(buildTagView(selected));
+      return;
+    }
+    if (selected.length >= MAX_PROFILE_TAGS) {
+      wx.showToast({ title: '最多选 5 个', icon: 'none' });
+      return;
+    }
+    selected.push(value);
+    this.setData(buildTagView(selected));
+  },
+
+  onSheetTagConfirm() {
+    const next = appendDraftTag(this.data.selectedTags, this.data.tagDraft);
+    if (next.blocked) {
+      wx.showToast({ title: '最多选 5 个', icon: 'none' });
+      return;
+    }
+    this.setData({
+      ...buildTagView(next.selected),
+      tagDraft: '',
+    });
+  },
+
+  onCloseEditSheet() {
+    this.setData({
+      showEditSheet: '',
+      tagDraft: '',
+    }, () => {
+      wx.nextTick(() => this.drawRadar());
+    });
+  },
+
+  onConfirmEditSheet() {
+    if (this.data.showEditSheet === 'bio') {
+      this.saveBioDraft();
+      return;
+    }
+    this.saveTagDraft();
+  },
+
+  saveBioDraft() {
+    const bio = String(this.data.bioDraft || '').trim();
+    const session = readSession();
+    if (session) {
+      writeSession({ ...session, bio });
+      saveProfile({ bio }).catch(() => {
+        wx.showToast({ title: '介绍已改，云端保存失败', icon: 'none' });
+      });
+    }
+    const complete = (readSession() && readSession().profileComplete) || this.data.profile.profileComplete;
+    this.setData({
+      'profile.bio': bio,
+      'profile.profileComplete': complete,
+      showEditSheet: '',
+    }, () => {
+      wx.nextTick(() => this.drawRadar());
+    });
+  },
+
+  saveTagDraft() {
+    const next = appendDraftTag(this.data.selectedTags, this.data.tagDraft);
+    const selected = next.selected;
+    const tagsText = joinTags(selected);
+    const session = readSession();
+    if (session) {
+      writeSession({ ...session, tags: tagsText });
+      saveProfile({ tags: tagsText }).catch(() => {
+        wx.showToast({ title: '标签已改，云端保存失败', icon: 'none' });
+      });
+    }
+    const complete = (readSession() && readSession().profileComplete) || this.data.profile.profileComplete;
+    this.setData({
+      ...buildTagView(selected),
+      tags: selected,
+      tagDraft: '',
+      showEditSheet: '',
+      'profile.profileComplete': complete,
+    }, () => {
+      wx.nextTick(() => this.drawRadar());
     });
   },
 
   onOpenMembership() {
-    navigateToPage('/pages/membership/index');
+    if (!this.requireLogin()) {
+      return;
+    }
+    this.syncMemberPay('year');
+    this.setData({
+      showMemberSheet: true,
+      activePlan: 'year',
+      activePay: 'wechat',
+    });
+  },
+
+  onCloseMemberSheet() {
+    this.setData({ showMemberSheet: false }, () => {
+      wx.nextTick(() => this.drawRadar());
+    });
+  },
+
+  syncMemberPay(planKey: string) {
+    const plan = PLANS.find((item) => item.key === planKey);
+    const origin = plan ? Number(plan.origin) : 0;
+    const price = plan ? Number(plan.price) : 0;
+    const saved = origin > price ? origin - price : 0;
+    this.setData({
+      payLabel: plan ? `立即支付 ¥${plan.price}` : '立即支付',
+      saveHint: saved > 0 ? `立省 ${saved} 元` : '',
+    });
+  },
+
+  onSelectPlan(event: WechatMiniprogram.TouchEvent) {
+    const key = String(event.currentTarget.dataset.key);
+    if (key === this.data.activePlan) {
+      return;
+    }
+    this.setData({ activePlan: key });
+    this.syncMemberPay(key);
+  },
+
+  onSelectPay(event: WechatMiniprogram.TouchEvent) {
+    this.setData({ activePay: String(event.currentTarget.dataset.key) });
+  },
+
+  onMemberCheckout() {
+    const plan = PLANS.find((item) => item.key === this.data.activePlan);
+    wx.showToast({
+      title: plan ? `${plan.name}购买待接入支付` : '购买待接入支付',
+      icon: 'none',
+    });
   },
 
   onOpenEdit() {
@@ -205,6 +480,22 @@ Page({
     this.requireLogin();
   },
 
+  onLogout() {
+    wx.showModal({
+      title: '退出登录',
+      content: '退出后本机回到游客。云端资料还在，再登录会接上。',
+      confirmText: '退出',
+      success: (res) => {
+        if (!res.confirm) {
+          return;
+        }
+        logout();
+        this.applyProfile(false);
+        wx.showToast({ title: '已退出', icon: 'none' });
+      },
+    });
+  },
+
   onOpenCoverSheet() {
     if (!this.requireLogin()) {
       return;
@@ -225,6 +516,11 @@ Page({
   onPickTheme(event: WechatMiniprogram.TouchEvent) {
     const theme = setAppTheme(String(event.currentTarget.dataset.key));
     this.setData({ 'profile.theme': theme });
+    const session = readSession();
+    if (session) {
+      writeSession({ ...session, theme });
+      saveProfile({ theme }).catch(() => undefined);
+    }
   },
 
   onClearCover() {

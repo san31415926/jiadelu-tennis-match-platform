@@ -13,6 +13,7 @@
  *
  * 想改示例值 → 改 MOCK_PROFILE_EDIT
  * 想改选项文案 → 改 GENDER_OPTIONS / HAND_OPTIONS / PLAY_OPTIONS
+ * 想改个性标签备选 → 改 PRESET_TAGS（10 个）；上限改 MAX_PROFILE_TAGS
  */
 
 export type GenderOption = '男' | '女';
@@ -43,6 +44,75 @@ export interface ProfileEditForm {
 export const GENDER_OPTIONS: GenderOption[] = ['男', '女'];
 export const HAND_OPTIONS: HandOption[] = ['右手', '左手'];
 export const PLAY_OPTIONS: PlayOption[] = ['单打', '双打', '混双'];
+
+/** 资料页一排可点的备选。点选和手输加起来不能超过 MAX_PROFILE_TAGS。 */
+export const PRESET_TAGS: string[] = [
+  '底线型',
+  '发球好',
+  '网前主动',
+  '双手反拍',
+  '夜场常客',
+  '周末球员',
+  '进攻型',
+  '防守型',
+  '力量型',
+  '旋转好',
+];
+
+export const MAX_PROFILE_TAGS = 5;
+
+export function parseTags(raw: string): string[] {
+  if (!raw) {
+    return [];
+  }
+  const seen: Record<string, boolean> = {};
+  const list: string[] = [];
+  String(raw)
+    .split(/[\s·,，、]+/)
+    .forEach((piece) => {
+      const tag = piece.trim();
+      if (!tag || seen[tag]) {
+        return;
+      }
+      seen[tag] = true;
+      list.push(tag);
+    });
+  return list.slice(0, MAX_PROFILE_TAGS);
+}
+
+export function joinTags(tags: string[]): string {
+  return tags.join(' ');
+}
+
+export function buildTagView(selected: string[]) {
+  const picked = selected.slice(0, MAX_PROFILE_TAGS);
+  return {
+    selectedTags: picked,
+    tagChoices: PRESET_TAGS.map((label) => ({
+      label,
+      on: picked.indexOf(label) >= 0,
+    })),
+    customTags: picked.filter((tag) => PRESET_TAGS.indexOf(tag) < 0),
+  };
+}
+
+/** 手写标签：空的或已有的直接过；满 5 个返回 blocked，调用方自己决定提示还是丢掉。 */
+export function appendDraftTag(
+  selected: string[],
+  draft: string,
+): { selected: string[]; blocked: boolean } {
+  const tag = String(draft || '').trim();
+  if (!tag) {
+    return { selected, blocked: false };
+  }
+  if (selected.indexOf(tag) >= 0) {
+    return { selected, blocked: false };
+  }
+  if (selected.length >= MAX_PROFILE_TAGS) {
+    return { selected, blocked: true };
+  }
+  return { selected: selected.concat(tag), blocked: false };
+}
 
 export const MOCK_PROFILE_EDIT: ProfileEditForm = {
   avatar: '/assets/images/avatars/anime-01.jpg',

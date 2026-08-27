@@ -189,9 +189,28 @@ export const RECORDS_SUMMARY: RecordsSummary = {
 };
 
 /** 顶上三个筛选项，切「胜 / 负」只看 result 字段 */
-export function filterRecords(filter: RecordFilter): MatchRecord[] {
+export function filterRecordList(
+  records: MatchRecord[],
+  filter: RecordFilter,
+): MatchRecord[] {
   if (filter === '全部') {
-    return RECORDS;
+    return records;
   }
-  return RECORDS.filter((row) => row.result === filter);
+  return records.filter((row) => row.result === filter);
+}
+
+export function filterRecords(filter: RecordFilter): MatchRecord[] {
+  return filterRecordList(RECORDS, filter);
+}
+
+/** 按列表重算生涯卡。改完 RECORDS 可调用一次，核对顶上数字。 */
+export function buildRecordsSummary(records: MatchRecord[]): RecordsSummary {
+  const wins = records.filter((row) => row.result === '胜').length;
+  const losses = records.filter((row) => row.result === '负').length;
+  return {
+    matches: records.length,
+    wins,
+    losses,
+    recent: records[0] ? `最近：${records[0].title}` : '暂无参赛记录',
+  };
 }

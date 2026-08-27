@@ -361,14 +361,6 @@
   color: #777b80;
 }
 
-.signup-link {
-  margin-top: 10rpx;
-  font-size: 20rpx;
-  font-weight: 500;
-  color: #467010;
-  text-decoration: underline;
-}
-
 .notice {
   width: 694rpx;
   margin: 12rpx 28rpx 0;
@@ -485,15 +477,6 @@
 .player__time {
   font-size: 18rpx;
   color: #777b80;
-}
-
-.player__tag {
-  padding: 2rpx 8rpx;
-  border: 1rpx solid #467010;
-  border-radius: 6rpx;
-  font-size: 16rpx;
-  font-weight: 500;
-  color: #467010;
 }
 
 .player__pts {

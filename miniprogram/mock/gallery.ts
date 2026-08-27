@@ -143,11 +143,18 @@ export const GALLERY_SECTIONS: GallerySection[] = [
  * 想加空状态提示，在 pages/gallery/index.wxml 末尾加一个
  * wx:if="{{sections.length === 0}}" 的提示块即可。
  */
-export function filterSections(filter: string): GallerySection[] {
+export function filterSectionList(
+  sections: GallerySection[],
+  filter: string,
+): GallerySection[] {
   if (filter === '全部') {
-    return GALLERY_SECTIONS;
+    return sections;
   }
-  return GALLERY_SECTIONS.filter((section) => section.category === filter);
+  return sections.filter((section) => section.category === filter);
+}
+
+export function filterSections(filter: string): GallerySection[] {
+  return filterSectionList(GALLERY_SECTIONS, filter);
 }
 
 /**

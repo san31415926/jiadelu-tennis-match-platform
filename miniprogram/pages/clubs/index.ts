@@ -1,10 +1,6 @@
-import {
-  CLUB_FILTERS,
-  CLUB_LIST,
-  CLUB_SUMMARY,
-  clubsForViewer,
-  filterClubs,
-} from '../../mock/club';
+import { createClub, joinClub, listClubs } from '../../api/catalog';
+import { readSession } from '../../api/auth';
+import { CLUB_FILTERS, CLUB_SUMMARY } from '../../mock/club';
 import type { ClubItem } from '../../mock/club';
 import { navigateToPage } from '../../utils/navigate';
 import { themeBehavior } from '../../behaviors/theme';
@@ -18,13 +14,7 @@ import { themeBehavior } from '../../behaviors/theme';
  * 改 occupy 吸顶栏。申请加入 / 创建俱乐部 / 筛选选中走主题强调色。
  * 「已加入」只在登录后出现；未登录当俱乐部中心逛，不会显示已经加入任何一家。
  *
- * 【筛选和搜索是叠加的】
- * 所以两个交互都调同一个 apply(filter, keyword) 方法，把两个条件一起传给
- * filterClubs()。如果分开处理，会出现"选了同城再搜索，同城条件被冲掉"的 bug。
- *
- * 【搜索是实时的】
- * 用的是 bindinput（每输入一个字就触发），不是 confirm（按回车才触发）。
- * 数据量大时可能需要加防抖，但本地过滤六条数据不用担心性能。
+ * 列表从 api/catalog.ts 读云库 clubs，筛选仍在本地叠加（同城 / 招新 / 搜索）。
  */
 Page({
   behaviors: [themeBehavior],
@@ -36,7 +26,8 @@ Page({
     clubs: [] as ClubItem[],
   },
 
-  onLoad() {
+  async onLoad() {
+    await getApp<IAppOption>().globalData.cloudBoot;
     this.refreshList();
   },
 
@@ -44,24 +35,17 @@ Page({
     this.refreshList();
   },
 
-  refreshList() {
-    const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
-    this.setData({
-      clubs: clubsForViewer(
-        filterClubs(this.data.activeFilter || '全部', this.data.keyword || ''),
-        isLoggedIn,
-      ),
-    });
+  async refreshList() {
+    const clubs = await listClubs(
+      this.data.activeFilter || '全部',
+      this.data.keyword || '',
+    );
+    this.setData({ clubs });
   },
 
-  /** 筛选与关键词叠加生效；接入云开发后改为服务端查询 */
+  /** 筛选与关键词叠加生效 */
   apply(filter: string, keyword: string) {
-    const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
-    this.setData({
-      activeFilter: filter,
-      keyword,
-      clubs: clubsForViewer(filterClubs(filter, keyword), isLoggedIn),
-    });
+    this.setData({ activeFilter: filter, keyword }, () => this.refreshList());
   },
 
   onKeywordInput(event: WechatMiniprogram.Input) {
@@ -81,17 +65,33 @@ Page({
     navigateToPage(`/pages/club-home/index?id=${id}`);
   },
 
-  onJoinTap(event: WechatMiniprogram.TouchEvent) {
+  async onJoinTap(event: WechatMiniprogram.TouchEvent) {
     if (!getApp<IAppOption>().globalData.isLoggedIn) {
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
     const id = String(event.currentTarget.dataset.id);
-    const club = CLUB_LIST.find((item) => item.id === id);
-    wx.showToast({
-      title: club?.joined ? '你已经是该俱乐部成员' : '申请流程待接入云开发',
-      icon: 'none',
-    });
+    const club = this.data.clubs.find((item) => item.id === id);
+    if (club?.joined) {
+      wx.showToast({ title: '你已经是该俱乐部成员', icon: 'none' });
+      return;
+    }
+    try {
+      wx.showLoading({ title: '提交中', mask: true });
+      const res = await joinClub(id);
+      wx.hideLoading();
+      wx.showToast({
+        title: res.already ? '你已经是该俱乐部成员' : '已加入',
+        icon: 'none',
+      });
+      this.refreshList();
+    } catch (error) {
+      wx.hideLoading();
+      wx.showToast({
+        title: error instanceof Error ? error.message : '加入失败',
+        icon: 'none',
+      });
+    }
   },
 
   onCreateClub() {
@@ -99,6 +99,35 @@ Page({
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
-    wx.showToast({ title: '创建俱乐部待接入云开发', icon: 'none' });
+    wx.showModal({
+      title: '创建俱乐部',
+      editable: true,
+      placeholderText: '俱乐部名称',
+      success: (res) => {
+        if (!res.confirm) {
+          return;
+        }
+        const name = String(res.content || '').trim();
+        if (!name) {
+          wx.showToast({ title: '请填写名称', icon: 'none' });
+          return;
+        }
+        const city = readSession()?.city || '';
+        wx.showLoading({ title: '创建中', mask: true });
+        createClub(name, city)
+          .then((created) => {
+            wx.hideLoading();
+            wx.showToast({ title: '已创建', icon: 'success' });
+            navigateToPage(`/pages/club-home/index?id=${created.clubId}`);
+          })
+          .catch((error: unknown) => {
+            wx.hideLoading();
+            wx.showToast({
+              title: error instanceof Error ? error.message : '创建失败',
+              icon: 'none',
+            });
+          });
+      },
+    });
   },
 });

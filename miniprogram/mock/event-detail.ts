@@ -10,16 +10,16 @@
  * 不是八个独立页面。组队是「赛事组队招募」，不是约球匹配，没有 VS / H2H。
  *
  * 【常见改动】
- * 想改首页概览 / 资讯     → 改 DETAIL_EXTRAS 对应场次
- * 想改报名预览名单       → 改 SIGNUP_PAIRS / SIGNUP_SINGLES
- * 想改组队招募卡片       → 改 TEAM_RECRUITS
+ * 想改首页概览 / 资讯     → 改 DETAIL_EXTRAS 对应场次（测试卡 e-open-1 单打、e-open-2 双打）
+ * 想改报名预览名单       → 改 SIGNUP_PAIRS / SIGNUP_SINGLES，按 isSinglesEvent 自动切
+ * 想改组队招募卡片       → 改 TEAM_RECRUITS；单打场强制空数组
  * 想改签表 / 成绩 / 赛程 → 改 BRACKET_GROUPS / RESULT_ROWS / SCHEDULE_MATCHES
  * 成绩选手的 club 不填（或空字符串）时，成绩 Tab 显示「个人」
  * 想改精选图             → 改 FEATURED_PHOTOS，复用相册和球场照
  */
 import { CALENDAR_EVENTS } from './calendar';
 import { expandAlbumPhotos, GALLERY_SECTIONS } from './gallery';
-import { MOCK_EVENTS } from './home';
+import { MOCK_EVENTS, eventTypeLabel, isSinglesEvent } from './home';
 import type { EventItem } from './home';
 import { SUPER_CUP_EVENTS } from './super-cup';
 
@@ -58,7 +58,6 @@ export interface EventPlayer {
   avatar: string;
   time?: string;
   points?: string;
-  groupTag?: string;
   ratingDelta?: string;
   /**
    * 所在俱乐部。成绩 Tab 用来填「俱乐部」列。
@@ -261,7 +260,6 @@ const SIGNUP_PAIRS: EventSignupPair[] = [
         gender: 'male',
         avatar: av(0),
         time: '8月19日 21:16',
-        groupTag: '0积分 组',
         points: '0 积分',
       },
       {
@@ -282,7 +280,6 @@ const SIGNUP_PAIRS: EventSignupPair[] = [
         gender: 'male',
         avatar: av(2),
         time: '8月18日 19:02',
-        groupTag: '200积分 组',
         points: '120 积分',
       },
       {
@@ -303,7 +300,6 @@ const SIGNUP_PAIRS: EventSignupPair[] = [
         gender: 'male',
         avatar: av(0),
         time: '8月17日 10:41',
-        groupTag: '260积分 组',
         points: '200 积分',
       },
       {
@@ -322,10 +318,11 @@ const SIGNUP_SINGLES: EventSignupPair[] = SIGNUP_PAIRS.map((pair) => ({
   players: [pair.players[0]],
 }));
 
+/** 双打测试卡 e-open-2 组队 Tab 用。单打 e-open-1 保持空数组。 */
 const TEAM_RECRUITS: EventTeamRecruit[] = [
-  { id: 't-atai', name: '阿泰', avatar: av(2), need: '缺女搭档 · 7.0混双', points: 1540 },
-  { id: 't-ahao', name: '阿豪', avatar: av(0), need: '缺男搭档 · 7.0混双', points: 1280 },
-  { id: 't-lin', name: '林林', avatar: av(1), need: '不限性别 · 8月25日前组好', points: 960 },
+  { id: 't-atai', name: '阿泰', avatar: av(2), need: '缺男搭档 · 6.5男双', points: 1540 },
+  { id: 't-ahao', name: '阿豪', avatar: av(0), need: '缺男搭档 · 6.5男双', points: 1280 },
+  { id: 't-zhou', name: '老周', avatar: av(1), need: '不限等级 · 9月5日前组好', points: 960 },
 ];
 
 const RESULT_ROWS: EventResultRow[] = [
@@ -530,7 +527,24 @@ type DetailExtra = Pick<
 
 const PHOTO_POOL = collectPhotos();
 
-/** 草稿画板上那一场，其余赛事用 EventItem 拼一份同结构的详情 */
+function signupPreviewOf(item: EventItem): EventSignupPreview {
+  const singles = isSinglesEvent(item);
+  return {
+    signed: singles ? '8/16' : '12/16',
+    waitlist: '0/6',
+    deadline: '< 2天 2小时',
+    slotHint: singles ? '按积分高低分配 16 签位' : '按积分高低分配 16 签位',
+    maxHint: singles ? '(最多可报名 48)' : '(最多可报名 32)',
+    notice: '该页等级为报名时等级，可能与其他页面等级存在差异',
+    format: singles ? 'singles' : 'doubles',
+    pairs: singles ? SIGNUP_SINGLES : SIGNUP_PAIRS,
+  };
+}
+
+/**
+ * 单打 / 双打测试卡把概览、报名名单、组队写全，不要只改首页卡片。
+ * 其余赛事走 fallbackExtra，按 category 自动切单打 / 双打。
+ */
 const DETAIL_EXTRAS: Record<string, Partial<DetailExtra>> = {
   'e-open-1': {
     status: '报名中',
@@ -539,8 +553,20 @@ const DETAIL_EXTRAS: Record<string, Partial<DetailExtra>> = {
     signupTime: '08月16日(周日)-08月25日(周二)',
     matchTime: '08月29日(周六) 16:00-21:00',
     venueName: '佛山球球热网球禅城店',
-    eventType: '混合双打',
-    fee: '108 元',
+    eventType: '男子单打',
+    fee: '158 元',
+    ctaHint: '报名需先登录成为赛事球员',
+    teamRecruits: [],
+  },
+  'e-open-2': {
+    status: '报名中',
+    series: DEFAULT_SERIES,
+    news: { title: '赛事规则（点击查看）', date: '2026-08-16' },
+    signupTime: '08月20日(周四)-09月04日(周五)',
+    matchTime: '09月06日(周日) 09:00-18:00',
+    venueName: '广州润盈网球中心',
+    eventType: '男子双打',
+    fee: '138 元',
     ctaHint: '报名需先登录成为赛事球员',
     teamRecruits: TEAM_RECRUITS,
   },
@@ -577,15 +603,14 @@ function listEvents(): { item: EventItem; status: EventStatus }[] {
 }
 
 function isSingles(item: EventItem): boolean {
-  const cat = `${item.category || ''}${item.title || ''}`;
-  return cat.indexOf('单') >= 0;
+  return isSinglesEvent(item);
 }
 
 function fallbackExtra(item: EventItem, status: EventStatus): DetailExtra {
   const needSignup = status === '报名中';
   const singles = isSingles(item);
   const venueName = (item.venue || '').replace(/\s+/g, '');
-  const typeFromCaption = (item.slotCaption || '').split('·')[0];
+  const typeLabel = eventTypeLabel(item.category);
   const price = (item.price || '¥108').replace('¥', '');
   return {
     status,
@@ -595,28 +620,19 @@ function fallbackExtra(item: EventItem, status: EventStatus): DetailExtra {
     matchTime: item.time,
     venueName,
     venueThumb: COURT_PHOTO,
-    eventType: singles ? item.category || item.title : typeFromCaption || item.category || '混合双打',
+    eventType: typeLabel,
     fee: needSignup ? `${price} 元` : '—',
     overview: [
       { label: '报名时间', value: '详见赛事通知' },
       { label: '比赛时间', value: item.time },
-      { label: '赛事类型', value: item.category },
+      { label: '赛事类型', value: typeLabel },
       { label: '报名费用', value: needSignup ? `${price} 元` : '—' },
     ],
     ctaHint: needSignup ? '报名需先登录成为赛事球员' : '',
     rewards: REWARDS,
     files: FILES,
-    signupPreview: {
-      signed: singles ? '8/16' : '14/32',
-      waitlist: '0/6',
-      deadline: '< 2天 2小时',
-      slotHint: singles ? '按积分高低分配 16 签位' : '按积分高低分配 32 签位',
-      maxHint: singles ? '(最多可报名 48)' : '(最多可报名 96)',
-      notice: '该页等级为报名时等级，可能与其他页面等级存在差异',
-      format: singles ? 'singles' : 'doubles',
-      pairs: singles ? SIGNUP_SINGLES : SIGNUP_PAIRS,
-    },
-    teamRecruits: status === '报名中' ? [] : TEAM_RECRUITS,
+    signupPreview: signupPreviewOf(item),
+    teamRecruits: singles ? [] : TEAM_RECRUITS,
     featuredPhotos: FEATURED_PHOTOS,
     photos: PHOTO_POOL,
     photoCount: '共 12 张',
@@ -652,6 +668,8 @@ export function getEventDetail(id: string): EventDetail {
       { label: '赛事类型', value: eventType },
       { label: '报名费用', value: fee },
     ];
+  const signupPreview = extra.signupPreview ?? signupPreviewOf(hit.item);
+  const teamRecruits = extra.teamRecruits ?? base.teamRecruits;
   return {
     ...hit.item,
     ...base,
@@ -662,6 +680,8 @@ export function getEventDetail(id: string): EventDetail {
     eventType,
     fee,
     overview,
+    signupPreview,
+    teamRecruits,
     venueThumb: extra.venueThumb ?? base.venueThumb,
   };
 }

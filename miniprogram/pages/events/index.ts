@@ -1,3 +1,4 @@
+import { listEventsByFilter } from '../../api/events';
 import {
   AREA_BY_CITY,
   CATEGORY_LEFT,
@@ -10,7 +11,6 @@ import {
   HOME_FEATURES,
   HOME_HOT_EVENTS,
   LEVEL_LABELS,
-  MOCK_EVENTS,
   SLOT_ROWS,
   UNLIMITED,
   defaultMoreFilters,
@@ -243,7 +243,12 @@ Page({
 
   onLoad() {
     this.setData(headerMetrics());
-    this.applyFilter(DEFAULT_FILTER);
+    const boot = getApp<IAppOption>().globalData.cloudBoot;
+    if (boot) {
+      boot.then(() => this.applyFilter(DEFAULT_FILTER));
+    } else {
+      this.applyFilter(DEFAULT_FILTER);
+    }
   },
 
   /**
@@ -284,13 +289,14 @@ Page({
    * 登录态存在 app.globalData.isLoggedIn（由「我的」页登录后写入），
    * 这样跨页面共享。未登录看「我的报名」时给空列表 + 引导文案，
    * 而不是直接弹登录框——弹框太打扰，先让用户看到"这里有什么"。
+   *
+   * 列表来自 api/events.ts：开关关上后读云库，我的报名读 registrations。
    */
   applyFilter(filter: string, nextListValues?: ListFilters, keyword?: string, city?: string) {
     const nextKeyword = keyword ?? this.data.keyword;
     const nextCity = city ?? this.data.city;
     const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
     const needLogin = filter === LOGIN_REQUIRED_FILTER && !isLoggedIn;
-    const pool = needLogin ? [] : MOCK_EVENTS[filter] ?? [];
     const values = nextListValues
       ? {
           ...nextListValues,
@@ -302,26 +308,40 @@ Page({
           dates: this.data.listFilterValues.dates.slice(),
           more: cloneMore(this.data.listFilterValues.more),
         };
-    const events = pool.filter((item) =>
-      matchListFilters(item, values, nextCity, nextKeyword),
-    );
-    const filteredEmpty = pool.length > 0 && events.length === 0;
 
-    this.setData({
-      activeFilter: filter,
-      statusPool: pool,
-      events,
-      keyword: nextKeyword,
-      city: nextCity,
-      cityLabel: nextCity === '全部' ? '城市' : nextCity,
-      listFilterValues: values,
-      listFilters: listFilterChips(values),
-      emptyHint: needLogin
-        ? '登录后查看你报名的赛事'
-        : filteredEmpty
-          ? '没有符合条件的赛事'
-          : '该分类下暂无赛事',
-    });
+    const applyPool = (pool: EventItem[]) => {
+      const events = pool.filter((item) =>
+        matchListFilters(item, values, nextCity, nextKeyword),
+      );
+      const filteredEmpty = pool.length > 0 && events.length === 0;
+      this.setData({
+        activeFilter: filter,
+        statusPool: pool,
+        events,
+        keyword: nextKeyword,
+        city: nextCity,
+        cityLabel: nextCity === '全部' ? '城市' : nextCity,
+        listFilterValues: values,
+        listFilters: listFilterChips(values),
+        emptyHint: needLogin
+          ? '登录后查看你报名的赛事'
+          : filteredEmpty
+            ? '没有符合条件的赛事'
+            : '该分类下暂无赛事',
+      });
+    };
+
+    if (needLogin) {
+      applyPool([]);
+      return;
+    }
+
+    listEventsByFilter(filter, 'personal')
+      .then(applyPool)
+      .catch(() => {
+        applyPool([]);
+        wx.showToast({ title: '赛事加载失败', icon: 'none' });
+      });
   },
 
   onSwiperChange(event: WechatMiniprogram.SwiperChange) {

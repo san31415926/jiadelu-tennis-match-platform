@@ -8,8 +8,9 @@
  *
  * 【常见改动】
  * 改套餐名字/价格  → 改 PLANS
- * 改默认选中套餐  → pages/membership/index.ts 的 activePlan
+ * 改默认选中套餐  → pages/profile/index.ts 的 activePlan
  * 改支付方式文案  → 改 PAY_METHODS
+ * 微信支付左侧图标按官方绿底白气泡来画，不要绿线空心泡
  */
 export interface MemberPlan {
   key: string;

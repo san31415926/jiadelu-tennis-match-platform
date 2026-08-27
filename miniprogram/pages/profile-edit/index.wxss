@@ -10,11 +10,14 @@
  *
  * 想改选中胶囊颜色 → 改 .pill--on 的 background / border-color
  * 想改保存按钮     → 改 .save 的 background
+ * 想改输入框底色   → 改 .row__input / .bio__field 的 background（#f4f8f4，目视取自卡片旁的浅薄荷，设计稿未单独标注）
+ *
+ * 「保存资料」钉在屏幕底部（和报名页 .cta 同一做法），改头像/昵称不用滑到底。
+ * 改按钮高度或底栏内边距时，同步改 .save-spacer，否则最后一张卡片会被挡住。
  */
 
 .edit {
   min-height: 100vh;
-  padding-bottom: 48rpx;
   background: var(--header-gradient-down);
 }
 
@@ -83,6 +86,66 @@
   padding: 22rpx 0;
 }
 
+/**
+ * 个性标签单独占一块：上面 10 个备选胶囊（可多选，上限 5），
+ * 下面一条空白输入用来手写自定义。不要再塞回 .row 的左右布局，
+ * 10 个胶囊会挤出屏幕。
+ */
+.tag-block {
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #e5ebe5;
+}
+
+.tag-block .row__label {
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.tag-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  justify-content: flex-start;
+}
+
+.tag-input {
+  width: 100%;
+  height: 56rpx;
+  margin-top: 12rpx;
+  padding: 0 16rpx;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 12rpx;
+  background: #f4f8f4;
+  font-size: 26rpx;
+  font-weight: 500;
+  line-height: 56rpx;
+  color: #1c1f21;
+}
+
+.bio {
+  padding: 18rpx 0 8rpx;
+}
+
+.bio .row__label {
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.bio__field {
+  width: 100%;
+  min-height: 120rpx;
+  padding: 16rpx;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 12rpx;
+  background: #f4f8f4;
+  font-size: 26rpx;
+  font-weight: 500;
+  line-height: 36rpx;
+  color: #1c1f21;
+}
+
 .row__label {
   flex-shrink: 0;
   font-size: 26rpx;
@@ -96,6 +159,31 @@
   align-items: center;
   min-width: 0;
   margin-left: 16rpx;
+}
+
+/**
+ * 行内输入。浅薄荷底、右对齐，和卡片里原来的数值同一字号。
+ * 不要系统弹窗：那套灰框和本页白卡 / 28 圆角对不上。
+ */
+.row__input {
+  flex: 1;
+  min-width: 0;
+  height: 56rpx;
+  margin-left: 16rpx;
+  padding: 0 16rpx;
+  border: none;
+  border-radius: 12rpx;
+  background: #f4f8f4;
+  font-size: 26rpx;
+  font-weight: 500;
+  line-height: 56rpx;
+  color: #1c1f21;
+  text-align: right;
+}
+
+.row__ph {
+  color: #738078;
+  font-weight: 500;
 }
 
 .row__value {
@@ -147,12 +235,29 @@
   color: #1c1f21;
 }
 
+/**
+ * 16 内边距 + 72 按钮 + 12 间距 + 28 脚注 + 16 内边距 ≈ 144，
+ * 再留一点空隙。改 .save-bar 高度时这里一起改。
+ */
+.save-spacer {
+  height: calc(168rpx + env(safe-area-inset-bottom));
+}
+
+.save-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  padding: 16rpx 32rpx calc(16rpx + env(safe-area-inset-bottom));
+  background: var(--page-bg);
+}
+
 .save {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 72rpx;
-  margin: 0 32rpx;
   border-radius: 16rpx;
   background: var(--accent);
   font-size: 28rpx;
@@ -161,8 +266,7 @@
 }
 
 .footnote {
-  margin-top: 16rpx;
-  padding: 0 32rpx;
+  margin-top: 12rpx;
   font-size: 20rpx;
   line-height: 28rpx;
   color: #738078;

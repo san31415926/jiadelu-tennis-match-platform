@@ -147,12 +147,20 @@ export function formatMetric(value: number, metric: string): string {
  * 【排序方向】
  * b - a 是从大到小（降序）。想改成从小到大就写 a - b。
  */
-export function rankPlayers(scope: string, metric: string): RankedPlayer[] {
+export function rankGivenPlayers(
+  players: RankedPlayer[],
+  scope: string,
+  metric: string,
+): RankedPlayer[] {
   const pool =
     scope === '城市榜'
-      ? PLAYERS.filter((player) => player.city === CURRENT_CITY)
-      : PLAYERS;
+      ? players.filter((player) => player.city === CURRENT_CITY)
+      : players;
   return [...pool].sort((a, b) => valueOf(b, metric) - valueOf(a, metric));
+}
+
+export function rankPlayers(scope: string, metric: string): RankedPlayer[] {
+  return rankGivenPlayers(PLAYERS, scope, metric);
 }
 
 /**

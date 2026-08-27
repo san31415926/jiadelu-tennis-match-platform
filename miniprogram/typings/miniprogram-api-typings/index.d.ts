@@ -156,6 +156,35 @@ declare namespace WechatMiniprogram {
 
   interface WxCloud {
     init(options: { env: string; traceUser?: boolean }): void;
+    callFunction(options: {
+      name: string;
+      data?: Record<string, unknown>;
+      /** 毫秒。传头像 base64 时 updateProfile 给 60 秒 */
+      timeout?: number;
+    }): Promise<{ result: unknown }>;
+    database(): {
+      command: {
+        in(list: unknown[]): unknown;
+        gte(value: unknown): unknown;
+        lte(value: unknown): unknown;
+        and(...args: unknown[]): unknown;
+      };
+      collection(name: string): {
+        where(query: Record<string, unknown>): {
+          limit(n: number): {
+            get(): Promise<{ data: Record<string, unknown>[] }>;
+          };
+          get(): Promise<{ data: Record<string, unknown>[] }>;
+        };
+        limit(n: number): {
+          get(): Promise<{ data: Record<string, unknown>[] }>;
+        };
+        get(): Promise<{ data: Record<string, unknown>[] }>;
+        doc(id: string): {
+          get(): Promise<{ data: Record<string, unknown> }>;
+        };
+      };
+    };
   }
 
   /**
@@ -174,6 +203,8 @@ declare namespace WechatMiniprogram {
       duration?: number;
       mask?: boolean;
     }): void;
+    showLoading(options: { title: string; mask?: boolean }): void;
+    hideLoading(): void;
     showActionSheet(options: {
       itemList: string[];
       success?: (res: ShowActionSheetSuccessCallbackResult) => void;

@@ -1,9 +1,5 @@
-import {
-  GALLERY_FILTERS,
-  GALLERY_SECTIONS,
-  GALLERY_SUMMARY,
-  filterSections,
-} from '../../mock/gallery';
+import { galleriesOfFilter, listGalleries } from '../../api/catalog';
+import { GALLERY_FILTERS, GALLERY_SUMMARY } from '../../mock/gallery';
 import type { GallerySection } from '../../mock/gallery';
 import { navigateToPage } from '../../utils/navigate';
 import { themeBehavior } from '../../behaviors/theme';
@@ -15,14 +11,7 @@ import { themeBehavior } from '../../behaviors/theme';
  * 版式来自终稿 23:272。V5 草稿 228:883 几乎同构图，已去掉波浪头和相机装饰，
  * 改 occupy 吸顶栏。筛选选中走主题强调色。
  *
- * 【照片预览用的是微信原生能力】
- * wx.previewImage 会打开系统级的图片查看器，支持双指缩放、左右滑动切换、
- * 长按保存，不需要我们自己写。传 urls（同组所有照片）和 current（当前点的那张），
- * 用户就能在这一组里滑动浏览。
- *
- * 【为什么传的是同组而不是全部照片】
- * 如果传全部，用户在"超级杯"的照片里往右滑会滑到"评级赛"的照片，
- * 逻辑上很混乱。按分组隔离更符合预期。
+ * 分组从云库 galleries 读。点照片仍用微信原生 wx.previewImage，只在同组内滑。
  */
 Page({
   behaviors: [themeBehavior],
@@ -30,12 +19,16 @@ Page({
     summary: GALLERY_SUMMARY,
     filters: GALLERY_FILTERS,
     activeFilter: '全部',
+    allSections: [] as GallerySection[],
     sections: [] as GallerySection[],
   },
 
-  onLoad() {
+  async onLoad() {
+    await getApp<IAppOption>().globalData.cloudBoot;
+    const allSections = await listGalleries();
     this.setData({
-      sections: filterSections('全部'),
+      allSections,
+      sections: galleriesOfFilter(allSections, '全部'),
     });
   },
 
@@ -44,14 +37,17 @@ Page({
     if (filter === this.data.activeFilter) {
       return;
     }
-    this.setData({ activeFilter: filter, sections: filterSections(filter) });
+    this.setData({
+      activeFilter: filter,
+      sections: galleriesOfFilter(this.data.allSections, filter),
+    });
   },
 
   /** 在所属分组内预览，可左右滑动切换同组照片 */
   onPreview(event: WechatMiniprogram.TouchEvent) {
     const current = String(event.currentTarget.dataset.src);
     const groupId = String(event.currentTarget.dataset.group);
-    const group = GALLERY_SECTIONS.find((section) => section.id === groupId);
+    const group = this.data.allSections.find((section) => section.id === groupId);
     if (!group) {
       wx.previewImage({ urls: [current] });
       return;

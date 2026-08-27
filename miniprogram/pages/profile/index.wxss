@@ -10,8 +10,10 @@
  *   2. VIP 条走主题强调色 --accent，不要写死青绿
  *   3. 战力图白卡 + canvas 雷达
  *   4. 我的生涯两列 + 参赛记录通栏
- *   5. 更多服务三列
+ *   5. 更多服务 2×2 宫格（分享也占一格），底下通栏退出登录
  *   6. 更换背景底部抽屉
+ *   7. 编辑介绍 / 个性标签也走同一套抽屉，输入框浅薄荷底 #f4f8f4（和资料页一致）
+ *   8. 登录抽屉：协议勾选是自制的；选手机号才是微信 getPhoneNumber
  *
  * 旧绿波浪头、金圈领奖台、七项菜单列表已经删掉。
  * 换主题只改 .profile--* 的霜化色。没有封面时走 .hero--plain，只显示纯色。
@@ -63,7 +65,7 @@
   position: relative;
   overflow: hidden;
   background: var(--page-tint);
-  padding-top: env(safe-area-inset-top);
+  /* 实际顶距由 wxml 写成状态栏 + 胶囊条，避免「更换背景」贴着退出 */
 }
 
 /**
@@ -492,13 +494,26 @@
   color: #508c10;
 }
 
+/**
+ * 2×2 宫格。两行各 flex:1，不要用 calc 算半宽——开发者工具对 rpx 的 calc 经常失效，
+ * 格子会变成通栏，图标被拉得巨大。
+ */
 .services {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.services__row {
   display: flex;
   gap: 10rpx;
 }
 
 .service {
+  position: relative;
   flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 8rpx;
@@ -529,26 +544,7 @@
   color: #1c1f21;
 }
 
-.share-row {
-  position: relative;
-  display: flex;
-  gap: 10rpx;
-  align-items: center;
-  justify-content: center;
-  height: 72rpx;
-  margin-top: 4rpx;
-  border-radius: 20rpx;
-  background: #ffffff;
-  font-size: 24rpx;
-  color: #1c1f21;
-}
-
-.share-row__icon {
-  width: 40rpx;
-  height: 40rpx;
-}
-
-.share-row__hit {
+.service__hit {
   position: absolute;
   left: 0;
   top: 0;
@@ -560,11 +556,39 @@
   background: transparent;
 }
 
-.share-row__hit::after {
+.service__hit::after {
   border: none;
 }
 
-.share-row--pressed {
+/**
+ * 退出通栏。设计稿没有。
+ * 图标用线框 SVG，不要再塞生成的 3D 门——跟素材板上切出来的粘土图标对不上。
+ * 描边色 #1c1f21，跟这一行字一个色。
+ */
+.logout-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 72rpx;
+  box-sizing: border-box;
+  border-radius: 20rpx;
+  background: #ffffff;
+  font-size: 24rpx;
+  color: #1c1f21;
+}
+
+.logout-row__icon {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 10rpx;
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3' stroke='%231c1f21' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M16 17l5-5-5-5' stroke='%231c1f21' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21 12H9' stroke='%231c1f21' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 36rpx 36rpx;
+}
+
+.logout-row--pressed {
   opacity: 0.82;
 }
 
@@ -601,6 +625,277 @@
   padding: 32rpx 0 calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 24rpx);
   border-radius: 36rpx 36rpx 0 0;
   background: #ffffff;
+}
+
+.sheet__panel--mint {
+  background: var(--page-bg);
+}
+
+.member-plans {
+  width: 100%;
+  margin-top: 24rpx;
+  white-space: nowrap;
+}
+
+.member-plan {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200rpx;
+  height: 248rpx;
+  margin-left: 12rpx;
+  padding: 28rpx 12rpx 20rpx;
+  overflow: hidden;
+  vertical-align: top;
+  border: 2rpx solid #e8e8e5;
+  border-radius: 20rpx;
+  background: #ffffff;
+}
+
+.member-plan:first-child {
+  margin-left: 32rpx;
+}
+
+.member-plan:last-child {
+  margin-right: 32rpx;
+}
+
+.member-plan.is-active {
+  border-color: var(--accent);
+  background: #f7fbe8;
+}
+
+.member-plan__flag {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4rpx 10rpx;
+  border-radius: 0 0 8rpx 8rpx;
+  background: var(--accent);
+  font-size: 16rpx;
+  font-weight: 700;
+  line-height: 19rpx;
+  color: #1a1f16;
+}
+
+.member-plan__name {
+  margin-top: 36rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  line-height: 29rpx;
+  color: #1f211c;
+}
+
+.member-plan__badge {
+  margin-top: 10rpx;
+  padding: 3rpx 10rpx;
+  border-radius: 6rpx;
+  background: #f3f3f1;
+  font-size: 16rpx;
+  line-height: 19rpx;
+  color: #73786b;
+}
+
+.member-plan.is-active .member-plan__badge {
+  background: rgba(131, 212, 20, 0.22);
+  color: #3a6b08;
+}
+
+.member-plan__price {
+  display: flex;
+  align-items: flex-end;
+  margin-top: 10rpx;
+  color: #1f211c;
+}
+
+.member-plan__yen {
+  margin-bottom: 6rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.member-plan__num {
+  font-size: 40rpx;
+  font-weight: 800;
+  line-height: 48rpx;
+}
+
+.member-plan__origin {
+  margin-top: 10rpx;
+  font-size: 18rpx;
+  line-height: 22rpx;
+  color: #9b9e96;
+  text-decoration: line-through;
+}
+
+.member-hint {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-top: 24rpx;
+  padding: 0 32rpx;
+  font-size: 20rpx;
+  line-height: 24rpx;
+  color: #73786b;
+}
+
+.member-hint__q {
+  width: 26rpx;
+  height: 26rpx;
+  border: 1rpx solid #c8cbc3;
+  border-radius: 50%;
+  font-size: 18rpx;
+  line-height: 24rpx;
+  color: #9b9e96;
+  text-align: center;
+}
+
+.member-pays {
+  display: flex;
+  gap: 12rpx;
+  padding: 0 32rpx;
+}
+
+.member-pay {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  height: 68rpx;
+  border: 2rpx solid #e8e8e5;
+  border-radius: 16rpx;
+  background: #ffffff;
+  font-size: 22rpx;
+  color: #1f211c;
+}
+
+.member-pay.is-active {
+  border-color: var(--accent);
+  background: #f7fbe8;
+}
+
+.member-pay__mark {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 8rpx;
+  font-size: 18rpx;
+  font-weight: 700;
+  line-height: 36rpx;
+  color: #ffffff;
+  text-align: center;
+}
+
+.member-pay__mark--alipay {
+  background: #1677ff;
+}
+
+/**
+ * 微信支付图标按官方标志来：绿圆角方、两只白气泡、绿点眼睛、小尾巴。
+ * 用 view 拼，不要绿线空心泡，也不要 data URI SVG。
+ */
+.wx-mark {
+  position: relative;
+  flex-shrink: 0;
+  width: 36rpx;
+  height: 36rpx;
+  overflow: hidden;
+  border-radius: 10rpx;
+  background: #07c160;
+}
+
+.wx-mark__big,
+.wx-mark__small {
+  position: absolute;
+  background: #ffffff;
+}
+
+.wx-mark__big {
+  left: 4rpx;
+  top: 6rpx;
+  width: 21rpx;
+  height: 15rpx;
+  border-radius: 8rpx;
+}
+
+.wx-mark__small {
+  right: 3rpx;
+  top: 14rpx;
+  z-index: 1;
+  width: 16rpx;
+  height: 12rpx;
+  border-radius: 6rpx;
+}
+
+.wx-mark__tail {
+  position: absolute;
+  width: 6rpx;
+  height: 6rpx;
+  background: #ffffff;
+}
+
+.wx-mark__tail--l {
+  left: 2rpx;
+  bottom: -2rpx;
+  border-radius: 1rpx;
+  transform: rotate(48deg);
+}
+
+.wx-mark__tail--s {
+  right: 1rpx;
+  bottom: -2rpx;
+  border-radius: 1rpx;
+  transform: rotate(-18deg);
+}
+
+.wx-mark__eye {
+  position: absolute;
+  width: 3rpx;
+  height: 3rpx;
+  border-radius: 50%;
+  background: #07c160;
+}
+
+.wx-mark__eye--l1 {
+  left: 5rpx;
+  top: 4rpx;
+}
+
+.wx-mark__eye--l2 {
+  left: 11rpx;
+  top: 4rpx;
+}
+
+.wx-mark__eye--s1 {
+  left: 4rpx;
+  top: 3rpx;
+}
+
+.wx-mark__eye--s2 {
+  left: 9rpx;
+  top: 3rpx;
+}
+
+.sheet__panel--mint .sheet__done {
+  gap: 12rpx;
+  margin-top: 32rpx;
+}
+
+.member-save {
+  font-size: 20rpx;
+  font-weight: 500;
+  opacity: 0.78;
+}
+
+.member-agree {
+  margin-top: 12rpx;
+  padding: 0 32rpx;
+  font-size: 18rpx;
+  line-height: 22rpx;
+  color: #9b9e96;
+  text-align: center;
 }
 
 .sheet__handle {
@@ -741,5 +1036,166 @@
   font-size: 30rpx;
   font-weight: 700;
   line-height: 41rpx;
+  color: #1c1f21;
+}
+
+/**
+ * 介绍 / 标签抽屉里的输入。浅薄荷底、16 圆角，对齐资料页 .row__input。
+ * 不要 placeholder：标题已经说明这是什么。
+ */
+.sheet-field {
+  width: 686rpx;
+  min-height: 160rpx;
+  margin: 24rpx auto 0;
+  padding: 20rpx;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 16rpx;
+  background: #f4f8f4;
+  font-size: 28rpx;
+  font-weight: 500;
+  line-height: 40rpx;
+  color: #1c1f21;
+}
+
+.sheet-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  padding: 24rpx 32rpx 0;
+}
+
+.sheet-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10rpx 28rpx;
+  border: 1rpx solid #e5ebe5;
+  border-radius: 24rpx;
+  background: #ffffff;
+  font-size: 24rpx;
+  font-weight: 500;
+  color: #738078;
+}
+
+.sheet-pill--on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #1c1f21;
+}
+
+.sheet-input {
+  width: 686rpx;
+  height: 56rpx;
+  margin: 16rpx auto 0;
+  padding: 0 16rpx;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 12rpx;
+  background: #f4f8f4;
+  font-size: 26rpx;
+  font-weight: 500;
+  line-height: 56rpx;
+  color: #1c1f21;
+}
+
+/**
+ * 登录抽屉。白卡圆角沿用 .sheet（36）。
+ * 主按钮必须是原生 <button open-type="getPhoneNumber">，
+ * 普通 view 调不起来微信选号层。未勾协议时换成 view，点了只提示。
+ */
+.login-agree {
+  display: flex;
+  gap: 12rpx;
+  align-items: flex-start;
+  margin: 32rpx 32rpx 0;
+}
+
+.login-check {
+  flex-shrink: 0;
+  width: 36rpx;
+  height: 36rpx;
+  margin-top: 2rpx;
+  border: 2rpx solid #d8d8d4;
+  border-radius: 8rpx;
+  box-sizing: border-box;
+  font-size: 22rpx;
+  font-weight: 700;
+  line-height: 32rpx;
+  text-align: center;
+  color: transparent;
+}
+
+.login-check--on {
+  color: #1c1f21;
+}
+
+.login-agree__text {
+  flex: 1;
+  font-size: 24rpx;
+  line-height: 36rpx;
+  color: #737a76;
+}
+
+.login-agree__link {
+  color: #2f6fed;
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 686rpx;
+  height: 80rpx;
+  margin: 32rpx auto 0;
+  padding: 0;
+  border: none;
+  border-radius: 24rpx;
+  background: var(--accent);
+  font-size: 30rpx;
+  font-weight: 700;
+  line-height: 80rpx;
+  color: #1c1f21;
+}
+
+.login-btn::after {
+  border: none;
+}
+
+.login-btn--off {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d8d8d4;
+  color: #737a76;
+}
+
+.login-btn--pressed {
+  opacity: 0.88;
+}
+
+.login-cancel {
+  margin: 16rpx 0 8rpx;
+  font-size: 26rpx;
+  line-height: 40rpx;
+  color: #737a76;
+  text-align: center;
+}
+
+.login-back {
+  padding: 20rpx 32rpx 0;
+  font-size: 28rpx;
+  line-height: 40rpx;
+  color: #737a76;
+}
+
+.login-doc {
+  height: 360rpx;
+  margin: 16rpx 32rpx 24rpx;
+}
+
+.login-doc__text {
+  font-size: 26rpx;
+  line-height: 40rpx;
   color: #1c1f21;
 }

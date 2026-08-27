@@ -1,0 +1,9 @@
+{
+  "name": "seedMock",
+  "version": "1.0.0",
+  "description": "空集合灌示例数据；赛事可按 id 覆盖写",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

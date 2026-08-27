@@ -8,25 +8,30 @@
  * 旧稿 447:103 的高波浪头、网球、大海报已经拿掉。八宫格选中走主题强调色。
  *
  * 【Tab 怎么切】
- * 八个入口都在本页切 activeTab，不新开页面。报名 Tab 只是预览名单，
+ * 八个入口都在本页切 activeTab，不新开页面。
+ *
+ * 【报名 Tab】
+ * 只预览名单。单打一人一行，双打两人一组（signupPreview.format）。
+ * 不要「查看按积分报名」，球员卡也不要积分组标签。
  * 「立即报名 / 报名参赛」才跳 /pages/signup/index?id=。
  *
  * 【组队不是约球】
- * 空状态 / 招募中 / 发布招募三套 UI。申请加入、发布招募只改本页 mock 或 toast，
+ * 单打：空状态「单打无需组队」，底部不显示发布组队。
+ * 双打：招募中 / 发布招募。申请加入、发布招募写入云库 events / team_applies，
  * 不要做成匹配、不要 VS / H2H。
  *
  * 想改默认打开的 Tab → onLoad 读 ?tab=，或改 data.activeTab。
  */
 import {
   EVENT_NAV,
-  getEventDetail,
   SIGNUP_SELF,
 } from '../../mock/event-detail';
 import type {
   EventDetail,
   EventDetailTab,
-  EventTeamRecruit,
 } from '../../mock/event-detail';
+import { applyTeamRecruit, loadEventDetail, publishTeamRecruit } from '../../api/events';
+import { isSinglesEvent } from '../../mock/home';
 import { venueIdByEventId } from '../../mock/venue';
 import { navigateToPage } from '../../utils/navigate';
 import { themeBehavior } from '../../behaviors/theme';
@@ -49,7 +54,7 @@ function isTab(value: string): value is EventDetailTab {
 Page({
   behaviors: [themeBehavior],
   data: {
-    event: getEventDetail('e-open-1') as EventDetail,
+    event: {} as EventDetail,
     displayTitle: '赛事详情',
     nav: EVENT_NAV,
     activeTab: 'home' as EventDetailTab,
@@ -65,18 +70,30 @@ Page({
     recruitNeed: '女搭档',
     recruitLevel: '同级优先',
     recruitDeadline: '2026年8月25日',
+    recruitDeadlineValue: '2026-08-25',
     recruitNote: '',
     emptyAvatars: [SIGNUP_SELF.avatar, '/assets/images/avatars/anime-02.jpg'],
+    /** 单打场组队 Tab / CTA 用。跟 isSinglesEvent(category) 走，不要看标题。 */
+    singles: false,
   },
 
   onLoad(query: Record<string, string | undefined>) {
-    const event = getEventDetail(query.id ?? '');
     const tab = query.tab && isTab(query.tab) ? query.tab : 'home';
-    this.setData({
-      event,
-      displayTitle: event.grade ? `${event.grade}${event.title}` : event.title,
-    });
-    this.applyTab(tab, event);
+    const boot = getApp<IAppOption>().globalData.cloudBoot || Promise.resolve();
+    boot
+      .then(() => loadEventDetail(query.id ?? ''))
+      .then((event) => {
+        this.setData({
+          event,
+          singles: isSinglesEvent(event),
+          displayTitle: event.grade ? `${event.grade}${event.title}` : event.title,
+          recruitNeed: isSinglesEvent(event) ? '女搭档' : '男搭档',
+        });
+        this.applyTab(tab, event);
+      })
+      .catch(() => {
+        wx.showToast({ title: '赛事详情加载失败', icon: 'none' });
+      });
   },
 
   applyTab(tab: EventDetailTab, source?: EventDetail) {
@@ -90,9 +107,14 @@ Page({
       ctaLabel = '报名参赛';
       ctaHint = event.status === '报名中' ? '报名需先登录成为赛事球员' : '';
     } else if (tab === 'team') {
-      ctaLabel = '发布组队';
-      ctaHint = '发布后，其他球员可以申请加入';
-      ctaHintGray = true;
+      if (isSinglesEvent(event)) {
+        showCta = false;
+        ctaHint = '';
+      } else {
+        ctaLabel = '发布组队';
+        ctaHint = '发布后，其他球员可以申请加入';
+        ctaHintGray = true;
+      }
     } else if (tab === 'photos') {
       ctaLabel = '查看全部相册';
       ctaHint = '';
@@ -132,8 +154,9 @@ Page({
     this.setData({ filesOpen: !this.data.filesOpen });
   },
 
-  onFileTap() {
-    wx.showToast({ title: '文件待接入云开发', icon: 'none' });
+  onFileTap(event: WechatMiniprogram.TouchEvent) {
+    const name = String(event.currentTarget.dataset.name || '赛事文件');
+    wx.showToast({ title: name, icon: 'none' });
   },
 
   onVenueTap() {
@@ -151,12 +174,7 @@ Page({
   },
 
   onBracketTab(event: WechatMiniprogram.TouchEvent) {
-    const name = String(event.currentTarget.dataset.name);
-    if (name !== '小组赛') {
-      wx.showToast({ title: `${name}签表待接入云开发`, icon: 'none' });
-      return;
-    }
-    this.setData({ bracketTab: name });
+    this.setData({ bracketTab: String(event.currentTarget.dataset.name) });
   },
 
   onFullscreen() {
@@ -165,7 +183,21 @@ Page({
 
   onJoinTeam(event: WechatMiniprogram.TouchEvent) {
     const name = String(event.currentTarget.dataset.name);
-    wx.showToast({ title: `已申请加入${name}的招募`, icon: 'none' });
+    const recruitId = String(event.currentTarget.dataset.id || '');
+    applyTeamRecruit({
+      eventId: this.data.event.id,
+      recruitId,
+      recruitName: name,
+    })
+      .then(() => {
+        wx.showToast({ title: `已申请加入${name}的招募`, icon: 'none' });
+      })
+      .catch((error: { message?: string }) => {
+        wx.showToast({
+          title: (error && error.message) || '申请失败',
+          icon: 'none',
+        });
+      });
   },
 
   onOpenRecruit() {
@@ -184,8 +216,16 @@ Page({
     this.setData({ recruitLevel: String(event.currentTarget.dataset.value) });
   },
 
-  onPickDeadline() {
-    wx.showToast({ title: '日期选择待接入', icon: 'none' });
+  onDeadlineChange(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
+    const value = String(event.detail.value || '');
+    const parts = value.split('-');
+    if (parts.length < 3) {
+      return;
+    }
+    this.setData({
+      recruitDeadlineValue: value,
+      recruitDeadline: `${parts[0]}年${Number(parts[1])}月${Number(parts[2])}日`,
+    });
   },
 
   onNoteInput(event: WechatMiniprogram.Input) {
@@ -193,32 +233,35 @@ Page({
   },
 
   onPublishRecruit() {
-    const event = this.data.event;
-    const needMap: Record<string, string> = {
-      女搭档: `缺女搭档 · ${event.grade}${event.category}`,
-      男搭档: `缺男搭档 · ${event.grade}${event.category}`,
-      不限: `不限性别 · ${this.data.recruitDeadline}前组好`,
-    };
-    const row: EventTeamRecruit = {
-      id: `t-self-${Date.now()}`,
-      name: SIGNUP_SELF.name,
-      avatar: SIGNUP_SELF.avatar,
-      need: needMap[this.data.recruitNeed] || needMap['不限'],
-      points: 1650,
-    };
-    const teamRecruits = [row, ...event.teamRecruits];
-    this.setData({
-      'event.teamRecruits': teamRecruits,
-      showRecruitSheet: false,
-      recruitNote: '',
-    });
-    wx.showToast({ title: '已发布招募（示例）', icon: 'none' });
+    publishTeamRecruit({
+      eventId: this.data.event.id,
+      need: this.data.recruitNeed,
+      deadline: this.data.recruitDeadline,
+      note: this.data.recruitNote,
+    })
+      .then((res) => {
+        this.setData({
+          'event.teamRecruits': res.teamRecruits,
+          showRecruitSheet: false,
+          recruitNote: '',
+        });
+        wx.showToast({ title: '已发布招募', icon: 'none' });
+      })
+      .catch((error: { message?: string }) => {
+        wx.showToast({
+          title: (error && error.message) || '发布失败',
+          icon: 'none',
+        });
+      });
   },
 
   onCta() {
     const tab = this.data.activeTab;
     const action = this.data.event.actionText;
     if (tab === 'team') {
+      if (this.data.singles) {
+        return;
+      }
       this.onOpenRecruit();
       return;
     }

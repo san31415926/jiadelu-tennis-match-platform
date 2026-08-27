@@ -1,0 +1,9 @@
+{
+  "name": "createRegistration",
+  "version": "1.0.0",
+  "description": "写入报名，或列出当前用户已报名的赛事",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

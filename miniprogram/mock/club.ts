@@ -155,9 +155,13 @@ export const CLUB_SUMMARY = `找到你的球队 · 共 86 家俱乐部`;
  * 这个函数会被云函数的数据库查询替换，逻辑一样但在服务端执行，
  * 因为真实数据可能有几百个俱乐部，不适合全部下发到手机上再筛。
  */
-export function filterClubs(filter: string, keyword: string): ClubItem[] {
+export function filterClubList(
+  clubs: ClubItem[],
+  filter: string,
+  keyword: string,
+): ClubItem[] {
   const trimmed = keyword.trim();
-  return CLUB_LIST.filter((club) => {
+  return clubs.filter((club) => {
     if (filter === '同城' && club.city !== CURRENT_CITY) return false;
     if (filter === '招新中' && !club.recruiting) return false;
     if (filter === '战力榜前50' && club.powerRank > 50) return false;
@@ -166,6 +170,10 @@ export function filterClubs(filter: string, keyword: string): ClubItem[] {
     }
     return true;
   });
+}
+
+export function filterClubs(filter: string, keyword: string): ClubItem[] {
+  return filterClubList(CLUB_LIST, filter, keyword);
 }
 
 /** 已登录示例账号加入的那一家。没有 joined 就是还没入会 */
@@ -230,7 +238,7 @@ function memberOf(
  * 总人数仍以 CLUB_LIST 的 members 为准，所以会出现「6 / 26 人」。
  * 改名单就改这里；头像循环复用榜单那四张示例图。
  */
-const CLUB_MEMBERS: Record<string, ClubMember[]> = {
+export const CLUB_MEMBERS: Record<string, ClubMember[]> = {
   'club-1': [
     memberOf('m1-1', '豆豆龙', '加入 2026-08-06', 1620, 0, true),
     memberOf('m1-2', '阿宽', '加入 2026-08-08', 1200, 1),

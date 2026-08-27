@@ -3,33 +3,67 @@
  * 会员开通页样式 —— 视觉刷新草稿 V5
  * ============================================================================
  *
- * 数值来自 Figma node 355:361（Sheet / Checkout）。
- * 真机里这是独立一页，不是压在「我的」上的抽屉，所以加了吸顶返回。
+ * 数值来自 Figma node 355:361（Sheet / Checkout），画板 750×740，
+ * 是贴在「我的」底下的结算抽屉，不是铺满屏幕的一页。
  * 设计稿 1px = 1rpx。
  *
+ * 支付按钮跟在支付方式下面，不要 position:fixed 钉屏幕底，否则中间会空一大截。
  * 想改开通按钮颜色 → 改 .checkout__btn 的 background
  * 想改选中套餐描边 → 改 .plan.is-active 的 border-color
  */
 
 .membership {
   min-height: 100vh;
-  background: var(--page-bg);
+  background: transparent;
+}
+
+.membership__dim {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 9;
+  background: rgba(0, 0, 0, 0.32);
 }
 
 .sheet {
-  padding: 16rpx 0 24rpx;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: 16rpx 0 calc(24rpx + env(safe-area-inset-bottom));
+  border-radius: 36rpx 36rpx 0 0;
+  background: var(--page-bg);
 }
 
 .sheet__handle {
   width: 77rpx;
   height: 8rpx;
-  margin: 0 auto 16rpx;
+  margin: 0 auto;
   border-radius: 4rpx;
   background: #d8d8d4;
 }
 
+.sheet__back {
+  padding: 16rpx 32rpx 0;
+  font-size: 26rpx;
+  font-weight: 500;
+  line-height: 36rpx;
+  color: #1c1f21;
+}
+
+.sheet__title {
+  padding: 8rpx 32rpx 0;
+  font-size: 36rpx;
+  font-weight: 700;
+  line-height: 49rpx;
+  color: #1c1f21;
+}
+
 .sheet__kicker {
-  padding: 0 32rpx;
+  padding: 8rpx 32rpx 0;
   font-size: 22rpx;
   line-height: 26rpx;
   color: #73786b;
@@ -210,18 +244,8 @@
   background: #1677ff;
 }
 
-.checkout-spacer {
-  height: calc(200rpx + env(safe-area-inset-bottom));
-}
-
 .checkout {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
-  background: #ffffff;
+  padding: 32rpx 32rpx 0;
 }
 
 .checkout__btn {

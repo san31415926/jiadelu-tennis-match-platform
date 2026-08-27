@@ -1,10 +1,10 @@
+import { listEventsByFilter } from '../../api/events';
 import { EVENT_FILTERS } from '../../mock/home';
 import type { EventItem } from '../../mock/home';
 import {
   SUPER_CUP_BANNERS,
   SUPER_CUP_CLUB_CENTER,
   SUPER_CUP_EVENT_TYPES,
-  SUPER_CUP_EVENTS,
   SUPER_CUP_FEED_TITLES,
   SUPER_CUP_HONORS,
 } from '../../mock/super-cup';
@@ -91,7 +91,12 @@ Page({
 
   onLoad() {
     this.setData(headerMetrics());
-    this.applyFilter(DEFAULT_FILTER);
+    const boot = getApp<IAppOption>().globalData.cloudBoot;
+    if (boot) {
+      boot.then(() => this.applyFilter(DEFAULT_FILTER));
+    } else {
+      this.applyFilter(DEFAULT_FILTER);
+    }
   },
 
   onShow() {
@@ -111,12 +116,34 @@ Page({
     const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
     const needLogin = filter === LOGIN_REQUIRED_FILTER && !isLoggedIn;
 
-    this.setData({
-      activeFilter: filter,
-      feedTitle: feedTitleOf(filter),
-      events: needLogin ? [] : SUPER_CUP_EVENTS[filter] ?? [],
-      emptyHint: needLogin ? '登录后查看你报名的赛事' : '该分类下暂无赛事',
-    });
+    if (needLogin) {
+      this.setData({
+        activeFilter: filter,
+        feedTitle: feedTitleOf(filter),
+        events: [],
+        emptyHint: '登录后查看你报名的赛事',
+      });
+      return;
+    }
+
+    listEventsByFilter(filter, 'super-cup')
+      .then((events) => {
+        this.setData({
+          activeFilter: filter,
+          feedTitle: feedTitleOf(filter),
+          events,
+          emptyHint: '该分类下暂无赛事',
+        });
+      })
+      .catch(() => {
+        this.setData({
+          activeFilter: filter,
+          feedTitle: feedTitleOf(filter),
+          events: [],
+          emptyHint: '该分类下暂无赛事',
+        });
+        wx.showToast({ title: '赛事加载失败', icon: 'none' });
+      });
   },
 
   onSwiperChange(event: WechatMiniprogram.SwiperChange) {

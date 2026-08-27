@@ -1,9 +1,9 @@
+import { getMyClub, listRankedClubs, myClubBoard } from '../../api/catalog';
 import {
   COLLAPSED_ROW_COUNT,
   CLUB_RANKING_METRICS,
   CLUB_RANKING_PERIODS,
-  myClubRanking,
-  rankClubs,
+  rankGivenClubs,
   toClubPodium,
   toClubRows,
 } from '../../mock/club-ranking';
@@ -21,7 +21,7 @@ import { themeBehavior } from '../../behaviors/theme';
  *   2. 指标只有积分、战力（俱乐部没有身价）
  *   3. 点领奖台 / 列表行 / 底部条，进俱乐部主页并带 from=super-cup
  *
- * 排序在 mock/club-ranking.ts 的 rankClubs()。接云开发后换成查已注册俱乐部即可。
+ * 名单从云库 clubs 读，排序仍用 rankGivenClubs()。
  * 波浪头已去掉，occupy 吸顶栏。本月 / 累计选中走主题强调色。
  */
 Page({
@@ -39,24 +39,28 @@ Page({
     myRanking: { summary: '', actionText: '', clubId: '' },
   },
 
-  onLoad() {
+  async onLoad() {
+    await getApp<IAppOption>().globalData.cloudBoot;
     this.refresh();
   },
 
-  refresh() {
+  async refresh() {
     const { activeMetric, activePeriod, expanded } = this.data;
-    const clubs = rankClubs(activeMetric, activePeriod);
+    const pool = await listRankedClubs();
+    const clubs = rankGivenClubs(pool, activeMetric, activePeriod);
     const allRows = toClubRows(clubs, activeMetric, activePeriod);
-
     const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
+    const mine = isLoggedIn ? await getMyClub() : undefined;
+
     this.setData({
       podium: toClubPodium(clubs, activeMetric, activePeriod),
       rows: expanded ? allRows : allRows.slice(0, COLLAPSED_ROW_COUNT),
       totalRows: allRows.length,
       totalCount: clubs.length,
-      myRanking: isLoggedIn
-        ? myClubRanking(activeMetric, activePeriod)
-        : { summary: '', actionText: '', clubId: '' },
+      myRanking:
+        isLoggedIn && mine
+          ? myClubBoard(clubs, mine.id, activeMetric, activePeriod)
+          : { summary: '', actionText: '', clubId: '' },
     });
   },
 

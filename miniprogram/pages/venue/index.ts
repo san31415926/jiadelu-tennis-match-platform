@@ -18,6 +18,7 @@
  * ?id=chancheng 默认禅城店。?tab=album 可直接落到相册。
  * 赛事 / 球员榜 Tab 自己量 statusBarHeight 垫头图上的返回；相册 Tab 改用 page-nav occupy。
  */
+import { loadVenuePage } from '../../api/catalog';
 import type { EventItem } from '../../mock/home';
 import type { RankingRow } from '../../mock/ranking';
 import {
@@ -26,10 +27,6 @@ import {
   RANKING_BOARDS,
   VENUE_TABS,
   YEAR_OPTIONS,
-  getVenue,
-  getVenueAlbum,
-  getVenueEvents,
-  getVenueRanking,
   scoreHeaderOf,
 } from '../../mock/venue';
 import type {
@@ -71,17 +68,18 @@ Page({
     album: {} as VenueAlbum,
   },
 
-  onLoad(query: Record<string, string | undefined>) {
-    const venue = getVenue(query.id);
+  async onLoad(query: Record<string, string | undefined>) {
+    await getApp<IAppOption>().globalData.cloudBoot;
     const activeTab = asTab(query.tab);
+    const page = await loadVenuePage(query.id, 'points');
     this.setData({
       ...headerMetrics(),
-      venue,
+      venue: page.venue,
       activeTab,
-      heroSrc: venue.hero.featured,
-      events: getVenueEvents(venue.id),
-      ranking: getVenueRanking('points'),
-      album: getVenueAlbum(venue.id),
+      heroSrc: page.venue.hero.featured,
+      events: page.events,
+      ranking: page.ranking,
+      album: page.album,
     });
   },
 
@@ -114,14 +112,15 @@ Page({
     this.setData({ expanded: !this.data.expanded });
   },
 
-  onBoardTap(event: WechatMiniprogram.TouchEvent) {
+  async onBoardTap(event: WechatMiniprogram.TouchEvent) {
     const key = String(event.currentTarget.dataset.key) as RankingBoard;
     if (key === this.data.activeBoard) {
       return;
     }
+    const page = await loadVenuePage(this.data.venue.id, key);
     this.setData({
       activeBoard: key,
-      ranking: getVenueRanking(key),
+      ranking: page.ranking,
       scoreHeader: scoreHeaderOf(key),
     });
   },

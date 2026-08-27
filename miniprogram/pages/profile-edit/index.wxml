@@ -6,24 +6,39 @@
     <view class="avatar-block__frame">
       <image class="avatar-block__photo" src="{{form.avatar}}" mode="aspectFit" />
     </view>
-    <view class="avatar-block__hint">点击更换头像</view>
+    <view class="avatar-block__hint">点击更换头像，保存后生效</view>
   </view>
 
   <view class="card">
     <view class="card__title">账号信息</view>
-    <view class="row" bindtap="onEditNickname">
+    <view class="row">
       <text class="row__label">昵称</text>
-      <view class="row__right">
-        <text class="row__value">{{form.nickname}}</text>
-        <text class="row__arrow">›</text>
-      </view>
+      <input
+        class="row__input"
+        value="{{form.nickname}}"
+        placeholder="请填写"
+        placeholder-class="row__ph"
+        maxlength="20"
+        confirm-type="done"
+        cursor-spacing="120"
+        data-key="nickname"
+        bindinput="onFieldInput"
+      />
     </view>
-    <view class="row" bindtap="onEditPhone">
+    <view class="row">
       <text class="row__label">手机号</text>
-      <view class="row__right">
-        <text class="row__value">{{form.phone}}</text>
-        <text class="row__arrow">›</text>
-      </view>
+      <input
+        class="row__input"
+        type="number"
+        value="{{form.phone}}"
+        placeholder="请填写"
+        placeholder-class="row__ph"
+        maxlength="11"
+        confirm-type="done"
+        cursor-spacing="120"
+        data-key="phone"
+        bindinput="onFieldInput"
+      />
     </view>
     <view class="row row--last" bindtap="onCopyUid">
       <text class="row__label">UID</text>
@@ -36,12 +51,19 @@
 
   <view class="card">
     <view class="card__title">报名资料</view>
-    <view class="row" bindtap="onEditRealName">
+    <view class="row">
       <text class="row__label">真实姓名</text>
-      <view class="row__right">
-        <text class="row__value">{{form.realName}}</text>
-        <text class="row__arrow">›</text>
-      </view>
+      <input
+        class="row__input"
+        value="{{form.realName}}"
+        placeholder="请填写"
+        placeholder-class="row__ph"
+        maxlength="20"
+        confirm-type="done"
+        cursor-spacing="120"
+        data-key="realName"
+        bindinput="onFieldInput"
+      />
     </view>
     <view class="row">
       <text class="row__label">性别</text>
@@ -69,12 +91,19 @@
         >{{item}}</view>
       </view>
     </view>
-    <view class="row" bindtap="onEditCity">
+    <view class="row">
       <text class="row__label">所在城市</text>
-      <view class="row__right">
-        <text class="row__value">{{form.city}}</text>
-        <text class="row__arrow">›</text>
-      </view>
+      <input
+        class="row__input"
+        value="{{form.city}}"
+        placeholder="请填写"
+        placeholder-class="row__ph"
+        maxlength="20"
+        confirm-type="done"
+        cursor-spacing="120"
+        data-key="city"
+        bindinput="onFieldInput"
+      />
     </view>
     <view class="row row--last" bindtap="onEditClub">
       <text class="row__label">所属俱乐部</text>
@@ -100,26 +129,62 @@
         >{{item}}</view>
       </view>
     </view>
-    <view class="row" bindtap="onEditYears">
+    <view class="row">
       <text class="row__label">球龄</text>
-      <view class="row__right">
-        <text class="row__value">{{form.years}}</text>
-        <text class="row__arrow">›</text>
-      </view>
+      <input
+        class="row__input"
+        value="{{form.years}}"
+        maxlength="10"
+        confirm-type="done"
+        cursor-spacing="160"
+        data-key="years"
+        bindinput="onFieldInput"
+      />
     </view>
-    <view class="row" bindtap="onEditTags">
+    <view class="tag-block">
       <text class="row__label">个性标签</text>
-      <view class="row__right">
-        <text class="row__value">{{form.tags}}</text>
-        <text class="row__arrow">›</text>
+      <view class="tag-pills">
+        <view
+          wx:for="{{tagChoices}}"
+          wx:key="label"
+          class="pill {{item.on ? 'pill--on' : ''}}"
+          style="{{item.on ? 'background:' + accent + ';color:' + accentText + ';border-color:' + accent : ''}}"
+          data-value="{{item.label}}"
+          bindtap="onTagTap"
+        >{{item.label}}</view>
+        <view
+          wx:for="{{customTags}}"
+          wx:key="*this"
+          class="pill pill--on"
+          style="background:{{accent}};color:{{accentText}};border-color:{{accent}}"
+          data-value="{{item}}"
+          bindtap="onTagTap"
+        >{{item}}</view>
       </view>
+      <input
+        wx:if="{{selectedTags.length < maxTags}}"
+        class="tag-input"
+        value="{{tagDraft}}"
+        maxlength="8"
+        confirm-type="done"
+        cursor-spacing="160"
+        bindinput="onTagDraftInput"
+        bindconfirm="onTagConfirm"
+      />
     </view>
-    <view class="row row--last" bindtap="onEditBio">
+    <view class="bio">
       <text class="row__label">个人简介</text>
-      <view class="row__right">
-        <text class="row__value {{form.bio ? '' : 'row__value--placeholder'}}">{{form.bio ? form.bio : '点此添加介绍…'}}</text>
-        <text class="row__arrow">›</text>
-      </view>
+      <textarea
+        class="bio__field"
+        value="{{form.bio}}"
+        placeholder="写一句球场介绍"
+        placeholder-class="row__ph"
+        maxlength="120"
+        auto-height="{{true}}"
+        cursor-spacing="160"
+        data-key="bio"
+        bindinput="onFieldInput"
+      />
     </view>
   </view>
 
@@ -147,6 +212,10 @@
     </view>
   </view>
 
-  <view class="save" style="background:{{accent}};color:{{accentText}}" bindtap="onSave">保存资料</view>
-  <view class="footnote">评分 / 积分 / 身价由赛绩更新，其余项均可编辑</view>
+  <!-- 垫出底栏高度，最后一张卡片才不会被挡住 -->
+  <view class="save-spacer"></view>
+  <view class="save-bar">
+    <view class="save" style="background:{{accent}};color:{{accentText}}" bindtap="onSave">保存资料</view>
+    <view class="footnote">评分 / 积分 / 身价由赛绩更新，其余项均可编辑</view>
+  </view>
 </view>

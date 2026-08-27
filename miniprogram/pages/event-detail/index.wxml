@@ -95,6 +95,7 @@
           class="file"
           wx:for="{{event.files}}"
           wx:key="name"
+          data-name="{{item.name}}"
           bindtap="onFileTap"
         >
           <view class="file__icon">{{item.kind === 'doc' ? '📄' : '📎'}}</view>
@@ -121,7 +122,6 @@
         <view class="signup-sub__hint">{{event.signupPreview.slotHint}}</view>
         <view class="signup-sub__max">{{event.signupPreview.maxHint}}</view>
       </view>
-      <view class="signup-link">查看按积分报名</view>
     </view>
     <view class="notice">{{event.signupPreview.notice}}</view>
     <view class="pair" wx:for="{{event.signupPreview.pairs}}" wx:for-index="pairIndex" wx:key="index">
@@ -137,7 +137,6 @@
         </view>
         <view class="player__meta">
           <view class="player__time">{{player.time}}</view>
-          <view class="player__tag" wx:if="{{player.groupTag}}">{{player.groupTag}}</view>
           <view class="player__pts">{{player.points}}</view>
         </view>
       </view>
@@ -151,8 +150,8 @@
         <gold-avatar class="empty__av empty__av--2" src="{{emptyAvatars[1]}}" size="small" />
         <view class="empty__plus">+</view>
       </view>
-      <view class="empty__title">组队安排中...</view>
-      <view class="empty__desc">暂时还没有球员发布招募，有搭档需求时会出现在这里</view>
+      <view class="empty__title">{{singles ? '单打无需组队' : '组队安排中...'}}</view>
+      <view class="empty__desc">{{singles ? '本场是单人项目，报名后直接进入签表，不用找搭档。' : '暂时还没有球员发布招募，有搭档需求时会出现在这里'}}</view>
     </view>
     <block wx:else>
       <view class="team-head">
@@ -171,7 +170,7 @@
         </view>
         <view class="recruit__side">
           <view class="recruit__pts">{{item.points}}</view>
-          <view class="recruit__join" data-name="{{item.name}}" bindtap="onJoinTeam">申请加入</view>
+          <view class="recruit__join" data-id="{{item.id}}" data-name="{{item.name}}" bindtap="onJoinTeam">申请加入</view>
         </view>
       </view>
     </block>
@@ -344,10 +343,12 @@
     </view>
     <view class="field">
       <view class="field__label">组队截止</view>
-      <view class="date-row" bindtap="onPickDeadline">
+    <picker mode="date" value="{{recruitDeadlineValue}}" bindchange="onDeadlineChange">
+      <view class="date-row">
         <view>{{recruitDeadline}}</view>
         <view class="date-row__arrow">›</view>
       </view>
+    </picker>
     </view>
     <view class="field">
       <view class="field__label">备注</view>

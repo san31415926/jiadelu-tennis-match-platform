@@ -1,4 +1,4 @@
-import { getJoinedClub } from '../mock/club';
+import { getMyClub } from '../api/catalog';
 
 /**
  * ============================================================================
@@ -77,13 +77,18 @@ export function switchToEvents(): void {
 
 /**
  * 「我的俱乐部」入口。
- * 已登录且 mock 里有 joined 的俱乐部 → 直接进那家主页；
+ * 已登录且已经加入一家 → 直接进那家主页；
  * 未登录或还没入会 → 俱乐部中心找俱乐部。
  */
 export function openMyClub(): void {
+  void openMyClubAsync();
+}
+
+async function openMyClubAsync(): Promise<void> {
+  await getApp<IAppOption>().globalData.cloudBoot;
   const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
   if (isLoggedIn) {
-    const mine = getJoinedClub();
+    const mine = await getMyClub();
     if (mine) {
       navigateToPage(`/pages/club-home/index?id=${mine.id}`);
       return;

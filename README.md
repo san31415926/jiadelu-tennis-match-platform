@@ -44,11 +44,12 @@ Figma 文件「网球赛事总结」，file key `nzKWauHC37fyjpAtA3rjfd`，已�
 以及「想改什么去动哪个文件」的速查表。代码文件本身每个都有详细注释。
 
 1. 安装[微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/stable.html)稳定版。
-2. 导入 `miniprogram/` 目录，编译类型选「小程序」。
-3. 把 `miniprogram/project.config.json` 里的 `appid` 换成自己的 AppID。
+2. 导入**仓库根目录**（不是 `miniprogram/`），编译类型选「小程序」。根目录的 `project.config.json` 会指向 `miniprogram/` 和 `cloudfunctions/`。
+3. 把根目录 `project.config.json` 里的 `appid` 换成自己的 AppID。
 4. TypeScript 由开发者工具的编译插件处理（`useCompilerPlugins: ["typescript"]`），无需额外构建步骤。
+5. 云函数写好后，在工具里对 `cloudfunctions` 下每个文件夹右键「上传并部署：云端安装依赖」。
 
-云开发环境 ID 填在 `miniprogram/config/env.ts`；留空时全站走 `miniprogram/mock/` 下的假数据。
+云开发环境 ID 填在 `miniprogram/config/env.ts`；各模块是否走假数据看同文件的 `USE_MOCK`。
 
 ### 图像处理脚本
 

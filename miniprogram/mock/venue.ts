@@ -20,10 +20,11 @@
  * 照片全部复用 mock/gallery.ts 已有路径，不新增图。头图 / 店徽来自 Figma 导出。
  */
 import { GALLERY_SECTIONS } from './gallery';
+import type { GallerySection } from './gallery';
 import { MOCK_EVENTS } from './home';
 import type { EventItem } from './home';
-import { formatMetric, rankPlayers } from './ranking';
-import type { RankingRow } from './ranking';
+import { formatMetric, rankGivenPlayers, PLAYERS } from './ranking';
+import type { RankedPlayer, RankingRow } from './ranking';
 import { SUPER_CUP_EVENTS } from './super-cup';
 
 export type VenueTab = 'events' | 'ranking' | 'album';
@@ -94,6 +95,46 @@ const FEATURED_HERO = '/assets/images/banners/banner-06-mixed-doubles-photo.jpg'
 const EVENTS_HERO = '/assets/images/gallery/photo-1.jpg';
 
 const GALLERY_PHOTOS = GALLERY_SECTIONS.flatMap((section) => section.photos);
+
+function photosFrom(sections: GallerySection[], start: number, count: number): string[] {
+  const pool = sections.flatMap((section) => section.photos);
+  const source = pool.length ? pool : GALLERY_PHOTOS;
+  const out: string[] = [];
+  for (let i = 0; i < count; i += 1) {
+    out.push(source[(start + i) % source.length]);
+  }
+  return out;
+}
+
+export function venueAlbumFrom(venue: VenueInfo, sections: GallerySection[]): VenueAlbum {
+  const rating = sections.find((section) => section.id === 'rating-70');
+  const superCup = sections.find((section) => section.id === 'super-cup-1');
+  return {
+    cover: venue.hero.cover,
+    coverUrls: [venue.hero.cover],
+    featured: photosFrom(sections, 0, 6),
+    events: [
+      {
+        id: 'album-rating',
+        title: '7.0混双评级赛',
+        date: '08/24',
+        photos: rating?.photos ?? photosFrom(sections, 2, 3),
+        albumId: rating?.id,
+      },
+      {
+        id: 'album-night',
+        title: '夜间混双公开赛',
+        date: '08/19',
+        photos: superCup?.photos ?? photosFrom(sections, 5, 3),
+        albumId: superCup?.id,
+      },
+    ],
+  };
+}
+
+export function getVenueAlbum(id: string): VenueAlbum {
+  return venueAlbumFrom(getVenue(id), GALLERY_SECTIONS);
+}
 
 export const VENUES: VenueInfo[] = [
   {
@@ -174,11 +215,15 @@ export function venueIdByEventId(eventId?: string): string {
  * 这家店的赛事列表。venueLink 去掉，避免在店铺页再点场馆行绕回来。
  * 缺 grade / tags 的卡（日历那种旧结构）不收，event-card 会缺一块。
  */
-export function getVenueEvents(id: string): EventItem[] {
-  const venue = getVenue(id);
-  return collectEvents()
+export function venueEventsFrom(events: EventItem[], venue: VenueInfo): EventItem[] {
+  return events
     .filter((item) => matchesVenue(item.venue, venue) && item.grade)
     .map((item) => ({ ...item, venueLink: false }));
+}
+
+export function getVenueEvents(id: string): EventItem[] {
+  const venue = getVenue(id);
+  return venueEventsFrom(collectEvents(), venue);
 }
 
 function metricOf(board: RankingBoard): string {
@@ -190,9 +235,12 @@ export function scoreHeaderOf(board: RankingBoard): string {
 }
 
 /** 店铺球员榜不拆领奖台，前几名也走列表。默认取前 8 行，和稿上 5 行同量级 */
-export function getVenueRanking(board: RankingBoard): RankingRow[] {
+export function venueRankingFromPlayers(
+  players: RankedPlayer[],
+  board: RankingBoard,
+): RankingRow[] {
   const metric = metricOf(board);
-  return rankPlayers('全国榜', metric)
+  return rankGivenPlayers(players, '全国榜', metric)
     .slice(0, 8)
     .map((player, index) => ({
       rank: index + 1,
@@ -204,37 +252,6 @@ export function getVenueRanking(board: RankingBoard): RankingRow[] {
     }));
 }
 
-function photosAt(start: number, count: number): string[] {
-  const out: string[] = [];
-  for (let i = 0; i < count; i += 1) {
-    out.push(GALLERY_PHOTOS[(start + i) % GALLERY_PHOTOS.length]);
-  }
-  return out;
-}
-
-export function getVenueAlbum(id: string): VenueAlbum {
-  const venue = getVenue(id);
-  const rating = GALLERY_SECTIONS.find((section) => section.id === 'rating-70');
-  const superCup = GALLERY_SECTIONS.find((section) => section.id === 'super-cup-1');
-  return {
-    cover: venue.hero.cover,
-    coverUrls: [venue.hero.cover],
-    featured: photosAt(0, 6),
-    events: [
-      {
-        id: 'album-rating',
-        title: '7.0混双评级赛',
-        date: '08/24',
-        photos: rating?.photos ?? photosAt(2, 3),
-        albumId: rating?.id,
-      },
-      {
-        id: 'album-night',
-        title: '夜间混双公开赛',
-        date: '08/19',
-        photos: superCup?.photos ?? photosAt(5, 3),
-        albumId: superCup?.id,
-      },
-    ],
-  };
+export function getVenueRanking(board: RankingBoard): RankingRow[] {
+  return venueRankingFromPlayers(PLAYERS, board);
 }

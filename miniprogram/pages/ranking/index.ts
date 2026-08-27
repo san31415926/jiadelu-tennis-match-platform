@@ -1,9 +1,10 @@
+import { listRankedPlayers } from '../../api/catalog';
 import {
   COLLAPSED_ROW_COUNT,
   MY_RANKING,
   RANKING_METRICS,
   RANKING_SCOPES,
-  rankPlayers,
+  rankGivenPlayers,
   toPodium,
   toRows,
 } from '../../mock/ranking';
@@ -22,15 +23,8 @@ import { switchToEvents } from '../../utils/navigate';
  *   范围（城市榜/全国榜）→ 决定参与排名的人有哪些
  *   指标（积分/身价/战力）→ 决定按什么排序、显示什么数值
  *   展开态（收起/展开）  → 决定列表显示 3 行还是全部
- *   展开条文案跟俱乐部榜一样，写成「查看全部 N 名球员」
- *   底部「去参赛」切回赛事 Tab，不要 navigateTo（Tab 页只能 switchTab）
  *
- * 任何一个变了都要重算榜单，所以统一走 refresh() 这一个方法，
- * 避免三处各写一遍排序逻辑。
- *
- * 【排序逻辑不在这里】
- * 在 mock/ranking.ts 的 rankPlayers()。这个文件只负责"什么时候重算"，
- * 不负责"怎么算"。接云开发后 rankPlayers 换成云函数调用，这里几乎不用改。
+ * 名单从云库 players 读，排序仍用 rankGivenPlayers()。
  */
 Page({
   behaviors: [themeBehavior],
@@ -48,14 +42,15 @@ Page({
     myRanking: MY_RANKING,
   },
 
-  onLoad() {
+  async onLoad() {
+    await getApp<IAppOption>().globalData.cloudBoot;
     this.refresh();
   },
 
-  /** 榜单随「范围 × 指标 × 展开态」三个维度重算 */
-  refresh() {
+  async refresh() {
     const { activeScope, activeMetric, expanded } = this.data;
-    const players = rankPlayers(activeScope, activeMetric);
+    const pool = await listRankedPlayers();
+    const players = rankGivenPlayers(pool, activeScope, activeMetric);
     const allRows = toRows(players, activeMetric);
 
     this.setData({
@@ -71,7 +66,6 @@ Page({
     if (scope === this.data.activeScope) {
       return;
     }
-    // 换榜单时收起列表，避免停留在上一个榜单的展开位置
     this.setData({ activeScope: scope, expanded: false }, () => this.refresh());
   },
 

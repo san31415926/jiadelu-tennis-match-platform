@@ -269,6 +269,38 @@ function categoryFamily(category: string): '单打' | '双打' | '' {
   return '';
 }
 
+/** 单打 / 双打。报名名单、组队、项目筛选都认这个，不要再靠标题里有没有「单」字。 */
+export function isSinglesEvent(item: Pick<EventItem, 'category'>): boolean {
+  return categoryFamily(item.category) === '单打';
+}
+
+/** 详情页「赛事类型」、报名页「参赛项目」用完整名称，不要直接写 category 缩写。 */
+const EVENT_TYPE_LABEL: Record<string, string> = {
+  男单: '男子单打',
+  女单: '女子单打',
+  男双: '男子双打',
+  女双: '女子双打',
+  混双: '混合双打',
+  团体: '团体赛',
+};
+
+export function eventTypeLabel(category: string): string {
+  return EVENT_TYPE_LABEL[category] || category;
+}
+
+export function findMockEvent(id: string): EventItem | undefined {
+  const keys = Object.keys(MOCK_EVENTS);
+  for (let i = 0; i < keys.length; i += 1) {
+    const list = MOCK_EVENTS[keys[i]];
+    for (let j = 0; j < list.length; j += 1) {
+      if (list[j].id === id) {
+        return list[j];
+      }
+    }
+  }
+  return undefined;
+}
+
 function courtTypeOf(item: EventItem): string {
   const labels = (item.tags || []).map((tag) => tag.label);
   if (labels.indexOf('室内场') >= 0) {
@@ -536,6 +568,10 @@ const COURT_PHOTO = '/assets/images/court-photo.jpg';
  * 【键名必须和 EVENT_FILTERS 完全一致】否则切到那个筛选会显示空列表。
  * 【空数组是合法的】页面会显示「该分类下暂无赛事」的空状态。
  * 【想看多卡片效果】往某个数组里多加几条，卡片之间会自动留 16rpx 间距。
+ *
+ * 「报名中」前两张是测试用：e-open-1 单打、e-open-2 双打。
+ * 详情页标题 / 赛事类型 / 报名名单 / 组队，以及报名页选方式，都跟
+ * isSinglesEvent(category) 走。改卡片记得同步 mock/event-detail.ts 的 DETAIL_EXTRAS。
  */
 export const MOCK_EVENTS: Record<string, EventItem[]> = {
   我的报名: [
@@ -561,7 +597,7 @@ export const MOCK_EVENTS: Record<string, EventItem[]> = {
   报名中: [
     {
       id: 'e-open-1',
-      title: '混双评级赛',
+      title: '男单评级赛',
       poster: COURT_PHOTO,
       venue: '佛山球球热网球禅城店',
       time: '08月29日 16:00-21:00',
@@ -570,10 +606,10 @@ export const MOCK_EVENTS: Record<string, EventItem[]> = {
       grade: '7.0',
       gradeTone: 'green',
       statusLabel: '报名中',
-      slotCaption: '混双·8/16签',
+      slotCaption: '男单·8/16签',
       tags: [EVENT_TAGS.realname, EVENT_TAGS.indoor, EVENT_TAGS.newbie],
       price: '¥158',
-      category: '混双',
+      category: '男单',
       area: '佛山',
       district: '禅城',
       recommended: true,
@@ -581,7 +617,7 @@ export const MOCK_EVENTS: Record<string, EventItem[]> = {
     },
     {
       id: 'e-open-2',
-      title: '男双积分赛',
+      title: '男双公开赛',
       poster: COURT_PHOTO,
       venue: '广州润盈网球中心',
       time: '09月06日 09:00-18:00',

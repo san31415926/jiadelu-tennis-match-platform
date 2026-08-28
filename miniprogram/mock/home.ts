@@ -21,8 +21,7 @@
  * 想改赛事卡片内容     → 改 MOCK_EVENTS
  * 想改筛选项名字       → 改 EVENT_FILTERS，但要同步改 MOCK_EVENTS 的键名，
  *                        两者必须一致，否则切过去是空列表
- * 想改热门赛事卡     → 改 HOME_HOT_EVENTS；eventId 必须能在
- *                        MOCK_EVENTS 或 SUPER_CUP_EVENTS 里找到，点进去才是那场
+ * 想改热门赛事卡     → 云开发打开后改云库 events；下面 HOME_HOT_EVENTS 只给假数据开关用
  */
 
 /** 顶部轮播的一张 */
@@ -119,6 +118,8 @@ export interface EventItem {
    * 不填则区域筛选选具体区时这条不会出现。
    */
   district?: string;
+  /** 云库场馆 id，点场馆行进店铺时优先用它，不要再反查 mock 赛事表 */
+  venueId?: string;
   /** 桃底推荐卡。为 true 时卡片背景换成 #fff5ed，并画出底部三点 */
   featured?: boolean;
   /** 海报右上角「推荐」角标 */
@@ -450,10 +451,19 @@ export const HOME_BANNERS: HomeBanner[] = [
 
 /**
  * 首页「热门赛事」横滑卡（Figma 145:199 写的是热门赛事，不是热门活动）。
- * 点卡进赛事详情，eventId 必须能在 MOCK_EVENTS / SUPER_CUP_EVENTS 里找到。
- * 序号角标 1～4 是稿上画的，不是排名。
+ * 点卡进赛事详情。云开发打开后由 api/events.listHotEvents 按云库现算，
+ * 下面这份只给 USE_MOCK.events 还开着时用。
  */
-export const HOME_HOT_EVENTS = [
+export interface HomeHotEvent {
+  id: string;
+  rank: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  eventId: string;
+}
+
+export const HOME_HOT_EVENTS: HomeHotEvent[] = [
   {
     id: 'hot-club-union',
     rank: '1',

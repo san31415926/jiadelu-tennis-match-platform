@@ -13,16 +13,17 @@
  * 报名由云函数写入，客户端直接查库经常是空的，所以列表走
  * createRegistration({ action: 'list' })。
  *
- * 启动时 seedMock 带 upsertEvents，按 mock 覆盖写 events，标题 / 单打双打
- * 和卡片一致。俱乐部等其它表仍是空才灌。报名记录不会被清掉。
+ * 启动时 seedMock 只在集合为空时灌一次，不要每次用 mock 覆盖已有赛事。
+ * 列表 / 热门 / 详情读云库原文，读失败就空着，不要再回落示例表。
  */
 import { USE_MOCK } from '../config/env';
 import { CALENDAR_EVENTS } from '../mock/calendar';
 import { getEventDetail } from '../mock/event-detail';
-import type { EventDetail } from '../mock/event-detail';
-import { MOCK_EVENTS, findMockEvent } from '../mock/home';
-import type { EventItem } from '../mock/home';
-import { SUPER_CUP_EVENTS } from '../mock/super-cup';
+import type { EventDetail, EventSignupPreview } from '../mock/event-detail';
+import { HOME_BANNERS, HOME_HOT_EVENTS, MOCK_EVENTS } from '../mock/home';
+import type { EventItem, HomeBanner, HomeHotEvent } from '../mock/home';
+import { SUPER_CUP_BANNERS, SUPER_CUP_EVENTS } from '../mock/super-cup';
+import type { SuperCupBanner } from '../mock/super-cup';
 import { collectCatalogSeed } from './catalog';
 import { callCloud, cloudDb } from './cloud';
 
@@ -37,37 +38,55 @@ function useMockEvents(): boolean {
 }
 
 function asEventItem(row: Record<string, unknown>): EventItem {
-  return row as unknown as EventItem;
+  const item = row as unknown as EventItem;
+  const id = String(item.id || row._id || '').trim();
+  return id ? { ...item, id } : item;
 }
 
 function asEventDetail(row: Record<string, unknown>): EventDetail {
   return row as unknown as EventDetail;
 }
 
-/**
- * 云库文档可能只有 _id、业务 id 在 id 字段。点卡片、读详情都要对上 mock。
- */
-function bizIdOf(row: EventItem & { _id?: string }): string {
-  return String(row.id || row._id || '').trim();
+function emptySignupPreview(): EventSignupPreview {
+  return {
+    signed: '0',
+    waitlist: '0',
+    deadline: '',
+    slotHint: '',
+    maxHint: '',
+    notice: '',
+    format: 'doubles',
+    pairs: [],
+  };
 }
 
-/**
- * 云库灌过后改 mock 不会立刻写回。列表遇到 mock 里有的 id，用 mock 盖一层，
- * 和详情页同一套标题。启动 upsert 之后两边本应已经一致。
- */
-function overlayFromMock(item: EventItem): EventItem {
-  const id = bizIdOf(item as EventItem & { _id?: string });
-  const mock = findMockEvent(id);
-  if (!mock) {
-    return item.id ? item : { ...item, id };
-  }
-  return { ...item, ...mock, id: mock.id };
-}
-
-/** mock 里有这场，详情直接走 getEventDetail，不要读云库里灌进去的旧概览。 */
-function mockDetailIfPresent(id: string) {
-  const trimmed = String(id || '').trim();
-  return findMockEvent(trimmed) ? getEventDetail(trimmed) : null;
+function normalizeDetail(row: EventDetail, id: string): EventDetail {
+  const status =
+    row.status === '进行中' || row.status === '已结束' ? row.status : '报名中';
+  return {
+    ...row,
+    id: String(row.id || id),
+    status,
+    photos: Array.isArray(row.photos) ? row.photos : [],
+    featuredPhotos: Array.isArray(row.featuredPhotos) ? row.featuredPhotos : [],
+    teamRecruits: Array.isArray(row.teamRecruits) ? row.teamRecruits : [],
+    files: Array.isArray(row.files) ? row.files : [],
+    overview: Array.isArray(row.overview) ? row.overview : [],
+    bracketTabs: Array.isArray(row.bracketTabs) ? row.bracketTabs : ['小组赛'],
+    bracketGroups: Array.isArray(row.bracketGroups) ? row.bracketGroups : [],
+    schedule: Array.isArray(row.schedule) ? row.schedule : [],
+    results: Array.isArray(row.results) ? row.results : [],
+    signupPreview: row.signupPreview || emptySignupPreview(),
+    news: row.news || { title: '', date: '' },
+    rewards: row.rewards || {
+      headline: '',
+      champion: '',
+      runnerUp: '',
+      gift: '',
+      rules: [],
+    },
+    venueName: row.venueName || row.venue || '',
+  };
 }
 
 function parseDateKey(time: string, year = 2026): string {
@@ -143,6 +162,8 @@ export function collectSeedEvents(): Record<string, unknown>[] {
 }
 
 let seedPromise: Promise<void> | null = null;
+/** 本次启动灌数已经失败过，不要每次切筛选再卡 20 秒。 */
+let seedGaveUp = false;
 
 function shouldSkipSeed(): boolean {
   if (!getApp<IAppOption>().globalData.cloudReady) {
@@ -153,30 +174,50 @@ function shouldSkipSeed(): boolean {
 
 /** 空集合才灌；启动时按 mock 覆盖写赛事和俱乐部/榜单/相册等示例，报名和用户资料不清。 */
 export function ensureEventsSeeded(): Promise<void> {
-  if (shouldSkipSeed()) {
+  if (shouldSkipSeed() || seedGaveUp) {
     return Promise.resolve();
   }
   if (!seedPromise) {
-    seedPromise = callCloud<{ skipped?: boolean }>('seedMock', {
-      upsertEvents: true,
-      upsertCatalog: true,
-      events: collectSeedEvents(),
-      ...collectCatalogSeed(),
-    })
+    seedPromise = callCloud<{ skipped?: boolean }>(
+      'seedMock',
+      {
+        upsertEvents: false,
+        upsertCatalog: false,
+        events: collectSeedEvents(),
+        ...collectCatalogSeed(),
+      },
+      60000,
+    )
       .then(() => undefined)
       .catch((error) => {
+        seedGaveUp = true;
         seedPromise = null;
-        throw error;
+        console.warn('灌示例数据失败，继续读云库', error);
       });
   }
   return seedPromise;
 }
 
+function mockList(filter: string, line: EventLine): EventItem[] {
+  const table = line === 'super-cup' ? SUPER_CUP_EVENTS : MOCK_EVENTS;
+  return (table[filter] || []).slice();
+}
+
 async function queryEvents(where: Record<string, unknown>): Promise<EventItem[]> {
   await ensureEventsSeeded();
   const db = cloudDb();
-  const res = await db.collection('events').where(where).limit(20).get();
-  return (res.data || []).map((row) => overlayFromMock(asEventItem(row as Record<string, unknown>)));
+  const res = await db.collection('events').where(where).limit(50).get();
+  let rows = (res.data || []).map((row) => asEventItem(row as Record<string, unknown>));
+  const line = where.line as EventLine | undefined;
+  if (rows.length === 0 && line) {
+    const rest = { ...where };
+    delete rest.line;
+    const fallback = await db.collection('events').where(rest).limit(50).get();
+    rows = (fallback.data || [])
+      .map((row) => asEventItem(row as Record<string, unknown>))
+      .filter((item) => lineOf(item.id) === line);
+  }
+  return rows;
 }
 
 async function queryMyEvents(line: EventLine): Promise<EventItem[]> {
@@ -185,11 +226,99 @@ async function queryMyEvents(line: EventLine): Promise<EventItem[]> {
     action: 'list',
   });
   return (res.events || [])
-    .map((row) => overlayFromMock(asEventItem(row)))
+    .map((row) => asEventItem(row))
     .filter((item) => {
       const rec = item as EventItem & { line?: EventLine };
       return (rec.line || lineOf(item.id)) === line;
     });
+}
+
+function toHotCard(item: EventItem, index: number): HomeHotEvent {
+  const title = item.grade ? `${item.grade}${item.title}` : item.title;
+  const subtitle =
+    [item.time, item.area || item.district].filter(Boolean).join(' · ') ||
+    item.slotCaption ||
+    item.venue ||
+    '';
+  return {
+    id: `hot-${item.id}`,
+    rank: String(index + 1),
+    title,
+    subtitle,
+    image: item.poster,
+    eventId: item.id,
+  };
+}
+
+async function pickEventCards(line: EventLine, max: number): Promise<HomeHotEvent[]> {
+  const open = await queryEvents({ line, status: '报名中' });
+  const extra = open.length >= max ? [] : await queryEvents({ line, status: '进行中' });
+  const seen: Record<string, true> = {};
+  const picked: EventItem[] = [];
+  const push = (item: EventItem) => {
+    if (!item.id || seen[item.id] || picked.length >= max) {
+      return;
+    }
+    seen[item.id] = true;
+    picked.push(item);
+  };
+  open.concat(extra).forEach(push);
+  if (picked.length < Math.min(3, max)) {
+    (await queryEvents({ line, status: '已结束' })).forEach(push);
+  }
+  return picked.map(toHotCard);
+}
+
+function toBanners(cards: HomeHotEvent[]): HomeBanner[] {
+  return cards.map((card) => ({
+    id: card.id,
+    title: card.title,
+    subtitle: card.subtitle,
+    image: card.image,
+    target: `/pages/event-detail/index?id=${card.eventId}`,
+  }));
+}
+
+/** 首页热门横滑：报名中优先，不够再补进行中，最多 4 张，和列表同一批云库赛事。 */
+export async function listHotEvents(): Promise<HomeHotEvent[]> {
+  if (useMockEvents()) {
+    return HOME_HOT_EVENTS.slice();
+  }
+  try {
+    return await pickEventCards('personal', 4);
+  } catch (error) {
+    console.warn('读热门赛事失败', error);
+    return [];
+  }
+}
+
+/** 首页顶部轮播：用同一批云库赛事，点进去是这场详情，不是写死的宣传卡。 */
+export async function listHomeBanners(): Promise<HomeBanner[]> {
+  if (useMockEvents()) {
+    return HOME_BANNERS.slice();
+  }
+  try {
+    return toBanners(await pickEventCards('personal', 5));
+  } catch (error) {
+    console.warn('读首页轮播失败', error);
+    return [];
+  }
+}
+
+/** 超级杯头图：俱乐部线赛事，点进去是这场详情。 */
+export async function listSuperCupBanners(): Promise<SuperCupBanner[]> {
+  if (useMockEvents()) {
+    return SUPER_CUP_BANNERS.slice();
+  }
+  try {
+    return toBanners(await pickEventCards('super-cup', 5)).map((item) => ({
+      ...item,
+      eyebrow: '俱乐部联赛',
+    }));
+  } catch (error) {
+    console.warn('读超级杯轮播失败', error);
+    return [];
+  }
 }
 
 export async function listEventsByFilter(
@@ -197,16 +326,20 @@ export async function listEventsByFilter(
   line: EventLine,
 ): Promise<EventItem[]> {
   if (useMockEvents()) {
-    const table = line === 'super-cup' ? SUPER_CUP_EVENTS : MOCK_EVENTS;
-    return (table[filter] || []).slice();
+    return mockList(filter, line);
   }
-  if (filter === '我的报名') {
-    return queryMyEvents(line);
+  try {
+    if (filter === '我的报名') {
+      return await queryMyEvents(line);
+    }
+    return await queryEvents({
+      line,
+      status: statusOfFilter(filter),
+    });
+  } catch (error) {
+    console.warn('读赛事列表失败', error);
+    return [];
   }
-  return queryEvents({
-    line,
-    status: statusOfFilter(filter),
-  });
 }
 
 export async function loadEventDetail(id: string): Promise<EventDetail> {
@@ -216,25 +349,23 @@ export async function loadEventDetail(id: string): Promise<EventDetail> {
   }
   await ensureEventsSeeded();
   try {
-    const res = await cloudDb().collection('events').doc(trimmed).get();
-    if (res.data) {
-      const row = asEventDetail(res.data as Record<string, unknown>);
-      const mockId = String(row.id || row._id || trimmed);
-      const mock = mockDetailIfPresent(mockId);
-      if (!mock) {
-        return { ...row, id: mockId };
-      }
-      return {
-        ...mock,
-        ...row,
-        id: mockId,
-        teamRecruits: Array.isArray(row.teamRecruits) ? row.teamRecruits : mock.teamRecruits,
-      };
+    const byDoc = await cloudDb().collection('events').doc(trimmed).get();
+    if (byDoc.data) {
+      return normalizeDetail(asEventDetail(byDoc.data as Record<string, unknown>), trimmed);
     }
   } catch (error) {
-    console.warn('读赛事详情失败，回落到 mock', error);
+    console.warn('按 _id 读赛事详情失败，改查 id 字段', error);
   }
-  return getEventDetail(trimmed);
+  try {
+    const found = await cloudDb().collection('events').where({ id: trimmed }).limit(1).get();
+    const row = found.data && found.data[0];
+    if (row) {
+      return normalizeDetail(asEventDetail(row as Record<string, unknown>), trimmed);
+    }
+  } catch (error) {
+    console.warn('读赛事详情失败', error);
+  }
+  throw new Error('找不到这场赛事');
 }
 
 export async function listCalendarMonth(
@@ -248,37 +379,45 @@ export async function listCalendarMonth(
     };
   }
 
-  await ensureEventsSeeded();
-  const mm = month < 10 ? `0${month}` : String(month);
-  const start = `${year}-${mm}-01`;
-  const end = `${year}-${mm}-31`;
-  const db = cloudDb();
-  const _ = db.command;
-  const res = await db
-    .collection('events')
-    .where({
-      dateKey: _.and(_.gte(start), _.lte(end)),
-    })
-    .limit(20)
-    .get();
+  try {
+    await ensureEventsSeeded();
+    const mm = month < 10 ? `0${month}` : String(month);
+    const start = `${year}-${mm}-01`;
+    const end = `${year}-${mm}-31`;
+    const db = cloudDb();
+    const _ = db.command;
+    const res = await db
+      .collection('events')
+      .where({
+        dateKey: _.and(_.gte(start), _.lte(end)),
+      })
+      .limit(50)
+      .get();
 
-  const eventsByDay: Record<string, EventItem[]> = {};
-  (res.data || []).forEach((row) => {
-    const item = overlayFromMock(asEventItem(row as Record<string, unknown>));
-    const key = String((row as { dateKey?: string }).dateKey || '');
-    if (!key) {
-      return;
-    }
-    if (!eventsByDay[key]) {
-      eventsByDay[key] = [];
-    }
-    eventsByDay[key].push(item);
-  });
+    const eventsByDay: Record<string, EventItem[]> = {};
+    (res.data || []).forEach((row) => {
+      const item = asEventItem(row as Record<string, unknown>);
+      const key = String((row as { dateKey?: string }).dateKey || '');
+      if (!key) {
+        return;
+      }
+      if (!eventsByDay[key]) {
+        eventsByDay[key] = [];
+      }
+      eventsByDay[key].push(item);
+    });
 
-  return {
-    dateKeys: Object.keys(eventsByDay),
-    eventsByDay,
-  };
+    return {
+      dateKeys: Object.keys(eventsByDay),
+      eventsByDay,
+    };
+  } catch (error) {
+    console.warn('读日历失败', error);
+    return {
+      dateKeys: [],
+      eventsByDay: {},
+    };
+  }
 }
 
 export async function submitRegistration(payload: {

@@ -3,7 +3,7 @@
  * 赛事详情页逻辑
  * ============================================================================
  *
- * 从赛事卡点进来。路径带 ?id=e-open-1，对应 mock/event-detail.ts。
+ * 从赛事卡点进来。路径带 ?id=，读云库 events（开关关上后）。
  * 版式来自视觉刷新草稿 V5（首页 228:514 等）：occupy 吸顶栏 + 八宫格切同一页状态。
  * 旧稿 447:103 的高波浪头、网球、大海报已经拿掉。八宫格选中走主题强调色。
  *
@@ -24,7 +24,6 @@
  */
 import {
   EVENT_NAV,
-  SIGNUP_SELF,
 } from '../../mock/event-detail';
 import type {
   EventDetail,
@@ -32,7 +31,7 @@ import type {
 } from '../../mock/event-detail';
 import { applyTeamRecruit, loadEventDetail, publishTeamRecruit } from '../../api/events';
 import { isSinglesEvent } from '../../mock/home';
-import { venueIdByEventId } from '../../mock/venue';
+import { resolveVenueId } from '../../mock/venue';
 import { navigateToPage } from '../../utils/navigate';
 import { themeBehavior } from '../../behaviors/theme';
 
@@ -72,7 +71,7 @@ Page({
     recruitDeadline: '2026年8月25日',
     recruitDeadlineValue: '2026-08-25',
     recruitNote: '',
-    emptyAvatars: [SIGNUP_SELF.avatar, '/assets/images/avatars/anime-02.jpg'],
+    emptyAvatars: ['/assets/images/avatars/anime-01.jpg', '/assets/images/avatars/anime-02.jpg'],
     /** 单打场组队 Tab / CTA 用。跟 isSinglesEvent(category) 走，不要看标题。 */
     singles: false,
   },
@@ -160,7 +159,7 @@ Page({
   },
 
   onVenueTap() {
-    navigateToPage(`/pages/venue/index?id=${venueIdByEventId(this.data.event.id)}`);
+    navigateToPage(`/pages/venue/index?id=${resolveVenueId(this.data.event)}`);
   },
 
   onPreviewPhoto(event: WechatMiniprogram.TouchEvent) {

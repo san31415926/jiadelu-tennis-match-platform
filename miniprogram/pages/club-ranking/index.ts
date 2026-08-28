@@ -46,22 +46,33 @@ Page({
 
   async refresh() {
     const { activeMetric, activePeriod, expanded } = this.data;
-    const pool = await listRankedClubs();
-    const clubs = rankGivenClubs(pool, activeMetric, activePeriod);
-    const allRows = toClubRows(clubs, activeMetric, activePeriod);
-    const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
-    const mine = isLoggedIn ? await getMyClub() : undefined;
+    try {
+      const pool = await listRankedClubs();
+      const clubs = rankGivenClubs(pool, activeMetric, activePeriod);
+      const allRows = toClubRows(clubs, activeMetric, activePeriod);
+      const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
+      const mine = isLoggedIn ? await getMyClub() : undefined;
 
-    this.setData({
-      podium: toClubPodium(clubs, activeMetric, activePeriod),
-      rows: expanded ? allRows : allRows.slice(0, COLLAPSED_ROW_COUNT),
-      totalRows: allRows.length,
-      totalCount: clubs.length,
-      myRanking:
-        isLoggedIn && mine
-          ? myClubBoard(clubs, mine.id, activeMetric, activePeriod)
-          : { summary: '', actionText: '', clubId: '' },
-    });
+      this.setData({
+        podium: toClubPodium(clubs, activeMetric, activePeriod),
+        rows: expanded ? allRows : allRows.slice(0, COLLAPSED_ROW_COUNT),
+        totalRows: allRows.length,
+        totalCount: clubs.length,
+        myRanking:
+          isLoggedIn && mine
+            ? myClubBoard(clubs, mine.id, activeMetric, activePeriod)
+            : { summary: '', actionText: '', clubId: '' },
+      });
+    } catch (error) {
+      console.warn('读俱乐部榜失败', error);
+      this.setData({
+        podium: toClubPodium([], activeMetric, activePeriod),
+        rows: [],
+        totalRows: 0,
+        totalCount: 0,
+        myRanking: { summary: '', actionText: '', clubId: '' },
+      });
+    }
   },
 
   onPeriodTap(event: WechatMiniprogram.TouchEvent) {

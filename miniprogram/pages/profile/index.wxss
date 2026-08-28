@@ -793,89 +793,14 @@
 }
 
 /**
- * 微信支付图标按官方标志来：绿圆角方、两只白气泡、绿点眼睛、小尾巴。
- * 用 view 拼，不要绿线空心泡，也不要 data URI SVG。
+ * 微信支付图标来自 Figma 456:413「微信图标 / 96px 主图标」导出。
+ * 支付行槽位是 36×36（355:402），1px = 1rpx。圆角已画在图里，不要再裁一层。
  */
 .wx-mark {
-  position: relative;
   flex-shrink: 0;
+  display: block;
   width: 36rpx;
   height: 36rpx;
-  overflow: hidden;
-  border-radius: 10rpx;
-  background: #07c160;
-}
-
-.wx-mark__big,
-.wx-mark__small {
-  position: absolute;
-  background: #ffffff;
-}
-
-.wx-mark__big {
-  left: 4rpx;
-  top: 6rpx;
-  width: 21rpx;
-  height: 15rpx;
-  border-radius: 8rpx;
-}
-
-.wx-mark__small {
-  right: 3rpx;
-  top: 14rpx;
-  z-index: 1;
-  width: 16rpx;
-  height: 12rpx;
-  border-radius: 6rpx;
-}
-
-.wx-mark__tail {
-  position: absolute;
-  width: 6rpx;
-  height: 6rpx;
-  background: #ffffff;
-}
-
-.wx-mark__tail--l {
-  left: 2rpx;
-  bottom: -2rpx;
-  border-radius: 1rpx;
-  transform: rotate(48deg);
-}
-
-.wx-mark__tail--s {
-  right: 1rpx;
-  bottom: -2rpx;
-  border-radius: 1rpx;
-  transform: rotate(-18deg);
-}
-
-.wx-mark__eye {
-  position: absolute;
-  width: 3rpx;
-  height: 3rpx;
-  border-radius: 50%;
-  background: #07c160;
-}
-
-.wx-mark__eye--l1 {
-  left: 5rpx;
-  top: 4rpx;
-}
-
-.wx-mark__eye--l2 {
-  left: 11rpx;
-  top: 4rpx;
-}
-
-.wx-mark__eye--s1 {
-  left: 4rpx;
-  top: 3rpx;
-}
-
-.wx-mark__eye--s2 {
-  left: 9rpx;
-  top: 3rpx;
 }
 
 .sheet__panel--mint .sheet__done {

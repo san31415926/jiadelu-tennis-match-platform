@@ -108,7 +108,7 @@
     <view class="row row--last" bindtap="onEditClub">
       <text class="row__label">所属俱乐部</text>
       <view class="row__right">
-        <text class="row__value">{{form.club}}</text>
+        <text class="row__value">{{form.club || '未加入'}}</text>
         <text class="row__arrow">›</text>
       </view>
     </view>

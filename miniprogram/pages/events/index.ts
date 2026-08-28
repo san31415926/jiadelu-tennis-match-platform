@@ -1,4 +1,4 @@
-import { listEventsByFilter } from '../../api/events';
+import { listEventsByFilter, listHomeBanners, listHotEvents } from '../../api/events';
 import {
   AREA_BY_CITY,
   CATEGORY_LEFT,
@@ -6,10 +6,8 @@ import {
   COURT_TYPE_ROWS,
   EVENT_FILTERS,
   GRADE_BAND_ROWS,
-  HOME_BANNERS,
   HOME_CITIES,
   HOME_FEATURES,
-  HOME_HOT_EVENTS,
   LEVEL_LABELS,
   SLOT_ROWS,
   UNLIMITED,
@@ -18,8 +16,8 @@ import {
   matchMoreFilters,
   moreFiltersActive,
 } from '../../mock/home';
-import type { EventItem, EventListFilterKey, MoreFilterState } from '../../mock/home';
-import { venueIdByEventId } from '../../mock/venue';
+import type { EventItem, EventListFilterKey, HomeBanner, HomeHotEvent, MoreFilterState } from '../../mock/home';
+import { resolveVenueId } from '../../mock/venue';
 import {
   WEEKDAY_NAMES,
   buildMonthCells,
@@ -39,7 +37,7 @@ import { themeBehavior } from '../../behaviors/theme';
  *
  * 【这个文件负责什么】
  * 把数据交给页面渲染、响应点击、切换两层筛选、开关左侧栏。
- * 所有文案和数据都在 mock/home.ts，样式在 index.wxss。
+ * 赛事列表和热门卡走 api/events（云库）；轮播图、筛选项、侧栏入口仍是本页配置。
  *
  * 【两层筛选 + 搜索】
  * 上面四个状态 Tab（我的报名 / 报名中 / 进行中 / 已结束）决定取哪一份列表。
@@ -204,8 +202,8 @@ Page({
     statusBarHeight: 0,
     navBarHeight: 44,
     menuInsetRight: 96,
-    banners: HOME_BANNERS,
-    hotEvents: HOME_HOT_EVENTS,
+    banners: [] as HomeBanner[],
+    hotEvents: [] as HomeHotEvent[],
     features: HOME_FEATURES,
     filters: EVENT_FILTERS,
     activeFilter: DEFAULT_FILTER,
@@ -245,8 +243,12 @@ Page({
     this.setData(headerMetrics());
     const boot = getApp<IAppOption>().globalData.cloudBoot;
     if (boot) {
-      boot.then(() => this.applyFilter(DEFAULT_FILTER));
+      boot.then(() => {
+        this.refreshChrome();
+        this.applyFilter(DEFAULT_FILTER);
+      });
     } else {
+      this.refreshChrome();
       this.applyFilter(DEFAULT_FILTER);
     }
   },
@@ -267,6 +269,15 @@ Page({
     if (this.data.activeFilter === LOGIN_REQUIRED_FILTER) {
       this.applyFilter(LOGIN_REQUIRED_FILTER);
     }
+  },
+
+  refreshChrome() {
+    Promise.all([listHomeBanners(), listHotEvents()])
+      .then(([banners, hotEvents]) => this.setData({ banners, hotEvents }))
+      .catch((error) => {
+        console.warn('读首页轮播和热门失败', error);
+        this.setData({ banners: [], hotEvents: [] });
+      });
   },
 
   onHide() {
@@ -338,9 +349,9 @@ Page({
 
     listEventsByFilter(filter, 'personal')
       .then(applyPool)
-      .catch(() => {
+      .catch((error) => {
+        console.warn('读首页赛事失败', error);
         applyPool([]);
-        wx.showToast({ title: '赛事加载失败', icon: 'none' });
       });
   },
 
@@ -349,7 +360,7 @@ Page({
   },
 
   onBannerTap(event: WechatMiniprogram.TouchEvent) {
-    const banner = HOME_BANNERS[Number(event.currentTarget.dataset.index)];
+    const banner = this.data.banners[Number(event.currentTarget.dataset.index)];
     if (banner) {
       navigateToPage(banner.target);
     }
@@ -620,8 +631,8 @@ Page({
     navigateToEventDetail(event.detail.id);
   },
 
-  /** 点卡片底部场馆行，进对应店铺页（默认禅城店） */
-  onVenueTap(event: WechatMiniprogram.CustomEvent<{ id?: string }>) {
-    navigateToPage(`/pages/venue/index?id=${venueIdByEventId(event.detail.id)}`);
+  /** 点卡片底部场馆行，进对应店铺页 */
+  onVenueTap(event: WechatMiniprogram.CustomEvent<{ id?: string; venue?: string; venueId?: string }>) {
+    navigateToPage(`/pages/venue/index?id=${resolveVenueId(event.detail)}`);
   },
 });

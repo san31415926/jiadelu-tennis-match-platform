@@ -21,7 +21,7 @@
   <view class="topbar-spacer" style="height: calc({{statusBarHeight}}px + 88rpx)"></view>
 
   <!-- 轮播 320rpx。V5 直边，标题叠在图上，不要白浪 -->
-  <view class="hero">
+  <view class="hero" wx:if="{{banners.length}}">
     <swiper
       class="hero__swiper"
       circular
@@ -51,7 +51,7 @@
   </view>
 
   <view class="sheet">
-    <view class="hot">
+    <view class="hot" wx:if="{{hotEvents.length}}">
       <view class="hot__head">
         <view class="hot-mark">
           <view class="hot-mark__dot hot-mark__dot--tl"></view>

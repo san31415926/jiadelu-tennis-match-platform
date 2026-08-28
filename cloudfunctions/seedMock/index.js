@@ -84,6 +84,9 @@ exports.main = async (event) => {
   if (payload.records) {
     result.records = await seedCollection('match_records', payload.records, upsertCatalog);
   }
+  if (payload.posters) {
+    result.posters = await seedCollection('posters', payload.posters, upsertCatalog);
+  }
 
   if (Object.keys(result).length === 0) {
     return { ok: false, error: '没有要灌入的数据' };

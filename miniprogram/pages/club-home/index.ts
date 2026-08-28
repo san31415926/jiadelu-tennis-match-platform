@@ -4,7 +4,7 @@
  * ============================================================================
  *
  * 从俱乐部列表点某一行进来。路径带 ?id=club-4。
- * id 对不上就显示第一家，避免空白页。
+ * id 对不上就 toast，不要落到示例第一家。
  *
  * 两个来源共用这一页，不要复制第二套页面：
  *   默认（俱乐部列表）     草稿 444:36：三列 总战力 / 成员 / 战力榜
@@ -12,6 +12,7 @@
  *                         头部换成会所插画
  *
  * 申请加入走 clubAction 云函数，写入 club_members。
+ * 成员人数按名单实数，已加入的自己会排进列表，不要再用种子里的 24。
  * 未登录看任何一家都是「申请加入」。
  */
 import { clubHomeStats, joinClub, loadClubHome } from '../../api/catalog';
@@ -50,15 +51,27 @@ Page({
   },
 
   async hydrate(id: string) {
-    const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
-    const home = await loadClubHome(id);
-    const club = withViewerJoinState(home.club, isLoggedIn);
-    this.setData({
-      club,
-      members: home.members,
-      shownLabel: home.shownLabel,
-      stats: clubHomeStats(club, home.ranked, this.data.fromSuperCup),
-    });
+    if (!id) {
+      wx.showToast({ title: '俱乐部不存在', icon: 'none' });
+      return;
+    }
+    try {
+      const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
+      const home = await loadClubHome(id);
+      const club = withViewerJoinState(home.club, isLoggedIn);
+      this.setData({
+        club,
+        members: home.members,
+        shownLabel: home.shownLabel,
+        stats: clubHomeStats(club, home.ranked, this.data.fromSuperCup),
+      });
+    } catch (error) {
+      console.warn('读俱乐部主页失败', error);
+      wx.showToast({
+        title: error instanceof Error ? error.message : '俱乐部加载失败',
+        icon: 'none',
+      });
+    }
   },
 
   async onJoin() {

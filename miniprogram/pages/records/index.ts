@@ -6,11 +6,11 @@
  * 「我的」菜单点参赛记录进来。已对照草稿 Figma「参赛记录 / V5」(419:359)：
  * occupy 吸顶栏、生涯汇总卡、全部/胜/负芯片。筛选选中和胜场标走主题强调色。
  *
- * 有个人记录就显示自己的；还没有就显示演示数据（seed 灌的 demo）。
+ * 只显示当前登录用户自己的记录。没有就空列表，不要拿演示赛凑数。
  * 组队 / 约战 / H2H 本期不做。
  */
 import { listMatchRecords, recordsOfFilter } from '../../api/catalog';
-import { RECORD_FILTERS, RECORDS_SUMMARY } from '../../mock/records';
+import { RECORD_FILTERS, buildRecordsSummary } from '../../mock/records';
 import type { MatchRecord, RecordFilter, RecordsSummary } from '../../mock/records';
 import { navigateToEventDetail } from '../../utils/navigate';
 import { themeBehavior } from '../../behaviors/theme';
@@ -18,7 +18,7 @@ import { themeBehavior } from '../../behaviors/theme';
 Page({
   behaviors: [themeBehavior],
   data: {
-    summary: RECORDS_SUMMARY as RecordsSummary,
+    summary: buildRecordsSummary([]) as RecordsSummary,
     filters: RECORD_FILTERS,
     activeFilter: '全部' as RecordFilter,
     allRecords: [] as MatchRecord[],

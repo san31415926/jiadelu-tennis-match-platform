@@ -7,14 +7,15 @@
  * 头像是圆形封面图，不再套 gold-avatar 的 large 档。
  *
  * 【哪些能改、哪些不能改】
- * 能改：头像、昵称、手机、姓名、性别、惯用手、城市、俱乐部、
+ * 能改：头像、昵称、手机、姓名、性别、惯用手、城市、
  *       常打项目、球龄、个性标签、个人简介
  * 不能改：评分、等级、积分、身价、胜场（设计写了「比赛自动生成，不可手改」）
  * UID 点了是复制，不是编辑。
  * 个性标签：10 个备选胶囊可点，也可在下面空框里自己写。点选 + 手写加起来最多 5 个。
  * 备选文案在 mock/profile-edit.ts 的 PRESET_TAGS。保存仍写成一个字符串进 users.tags。
  * 球龄、个性标签都不要 placeholder，空着就是空着。
- * 俱乐部仍跳转到俱乐部页。保存走底部「保存资料」。
+ * 所属俱乐部不在本页加入：俱乐部中心加过就会自动带过来。点这一行是去已加入的主页，
+ * 还没加入才去俱乐部中心。保存资料不要带 club，免得把已加入的冲成空。
  *
  * 保存走 api/auth.ts 的 saveProfile，写入 users 集合。
  * 头像选完只是临时文件，点「保存资料」才压缩成 base64 交给云函数上传；
@@ -34,6 +35,7 @@ import {
   appendDraftTag,
 } from '../../mock/profile-edit';
 import { readSession, saveProfile, toEditForm, writeSession, guestProfile } from '../../api/auth';
+import { getMyClub, syncMyClubSession } from '../../api/catalog';
 import { openMyClub } from '../../utils/navigate';
 import { themeBehavior } from '../../behaviors/theme';
 
@@ -60,12 +62,39 @@ Page({
   },
 
   onLoad() {
+    this.fillFromSession();
+  },
+
+  onShow() {
+    void this.syncClubRow();
+  },
+
+  fillFromSession() {
     const session = readSession();
     const form = session ? toEditForm(session) : this.data.form;
     this.setData({
       form,
       ...tagState(parseTags(form.tags)),
     });
+  },
+
+  async syncClubRow() {
+    await syncMyClubSession();
+    const session = readSession();
+    if (!session) {
+      return;
+    }
+    let club = session.club || '';
+    if (!club && session.clubId) {
+      const mine = await getMyClub();
+      if (mine) {
+        club = mine.name;
+        writeSession({ ...session, club: mine.name, clubId: mine.id });
+      }
+    }
+    if (club !== this.data.form.club) {
+      this.setData({ 'form.club': club });
+    }
   },
 
   onPickAvatar() {
@@ -173,7 +202,6 @@ Page({
       gender: form.gender,
       hand: form.hand,
       city: form.city.trim(),
-      club: form.club,
       play: form.play,
       years: form.years.trim(),
       tags: joinTags(drafted.selected),

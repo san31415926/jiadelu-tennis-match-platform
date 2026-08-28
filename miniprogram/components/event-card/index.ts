@@ -47,7 +47,12 @@ Component({
     },
 
     onVenueTap() {
-      this.triggerEvent('venuetap', { id: this.currentId() });
+      const event = this.data.event as { id?: string; venue?: string; venueId?: string } | null;
+      this.triggerEvent('venuetap', {
+        id: this.currentId(),
+        venue: event && event.venue,
+        venueId: event && event.venueId,
+      });
     },
   },
 });

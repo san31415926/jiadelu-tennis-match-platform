@@ -1,8 +1,9 @@
 /**
  * 保存当前用户能改的资料。
  *
- * 能改：头像、昵称、手机、姓名、性别、惯用手、城市、俱乐部、
+ * 能改：头像、昵称、手机、姓名、性别、惯用手、城市、
  *       常打项目、球龄、个性标签、个人简介、封面、主题。
+ * 俱乐部只由 clubAction 写入，这里不要带 club，避免资料页空值把已加入的冲掉。
  * 不能改：评分、等级、积分、身价、胜场（设计写了比赛自动生成）。
  *
  * 头像不要让小程序直传云存储：部分网络（Clash 半开）会在 TLS 握手被掐。
@@ -27,7 +28,6 @@ const ALLOWED = [
   'gender',
   'hand',
   'city',
-  'club',
   'play',
   'years',
   'tags',
@@ -71,7 +71,7 @@ function completeLabel(doc) {
     hasText(doc.phone),
     hasText(doc.realName),
     hasText(doc.city),
-    hasText(doc.club),
+    hasText(doc.club) || hasText(doc.clubId),
     hasText(doc.years),
     hasText(doc.tags),
     hasText(doc.bio),

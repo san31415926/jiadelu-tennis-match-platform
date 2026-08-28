@@ -10,6 +10,7 @@
  * updateProfile 里同名函数要一起改，两边规则才一致。
  *
  * 不计分：性别 / 惯用手 / 常打项目（一进来就有默认值，算上会虚高）。
+ * 俱乐部按 club_members / users.clubId 算，不要只看资料页有没有手填。
  * 头像还是包内那张默认图、昵称还是「微信用户」，都算没填。
  */
 
@@ -26,6 +27,7 @@ type ProfileBits = {
   realName?: string;
   city?: string;
   club?: string;
+  clubId?: string;
   years?: string;
   tags?: string;
   bio?: string;
@@ -41,7 +43,7 @@ const CHECKS: Array<(profile: ProfileBits) => boolean> = [
   (p) => hasText(p.phone),
   (p) => hasText(p.realName),
   (p) => hasText(p.city),
-  (p) => hasText(p.club),
+  (p) => hasText(p.club) || hasText(p.clubId),
   (p) => hasText(p.years),
   (p) => hasText(p.tags),
   (p) => hasText(p.bio),

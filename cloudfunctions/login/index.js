@@ -42,7 +42,7 @@ function completeLabel(doc) {
     hasText(doc.phone),
     hasText(doc.realName),
     hasText(doc.city),
-    hasText(doc.club),
+    hasText(doc.club) || hasText(doc.clubId),
     hasText(doc.years),
     hasText(doc.tags),
     hasText(doc.bio),

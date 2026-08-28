@@ -13,7 +13,7 @@
  * EventItem 接口本身。
  *
  * 【常见改动】
- * 想改杯赛 / 荣誉入口 → 改 SUPER_CUP_FEATURES（path 决定点进去去哪）
+ * 想改杯赛 / 荣誉入口 → 改 SUPER_CUP_FEATURES（荣誉走 path；杯赛按关键词筛本页列表）
  * 想改头图 / 叠字     → 图用 banners 目录（直边、不要白浪）；文案改 SUPER_CUP_BANNERS
  * 想改赛事内容         → 改 SUPER_CUP_EVENTS，键名必须和 EVENT_FILTERS 一致
  * Cover Flow 的排列    → 改 SUPER_CUP_EVENT_TYPE_KEYS / SUPER_CUP_HONOR_KEYS
@@ -86,7 +86,7 @@ export const SUPER_CUP_BANNERS: SuperCupBanner[] = [
 
 /**
  * 八个入口仍保留完整列表，Cover Flow 和绿按钮按 key 来取。
- * 点卡片走这里的 path（海报 / 榜单 / 俱乐部列表），不要在页面里另写一套路径。
+ * 杯赛入口筛本页云库列表；荣誉 / 俱乐部仍走这里的 path。
  */
 export const SUPER_CUP_FEATURES: SuperCupFeature[] = [
   {
@@ -165,6 +165,23 @@ export const SUPER_CUP_HONORS = featuresByKeys(SUPER_CUP_HONOR_KEYS);
 export const SUPER_CUP_CLUB_CENTER = SUPER_CUP_FEATURES.find(
   (item) => item.key === 'club-badge',
 ) as SuperCupFeature;
+
+/** 点赛事类型 Cover Flow 时，用标题/等级里的关键词筛云库俱乐部赛。 */
+export const SUPER_CUP_SERIES_HINT: Record<string, string[]> = {
+  'super-cup-event': ['超级杯'],
+  'rookie-cup-event': ['新秀'],
+  'women-club-event': ['女'],
+  'evergreen-cup-event': ['常青'],
+};
+
+export function matchSuperCupSeries(item: EventItem, key: string): boolean {
+  const hints = SUPER_CUP_SERIES_HINT[key];
+  if (!hints || hints.length === 0) {
+    return true;
+  }
+  const hay = `${item.title} ${item.grade} ${item.slotCaption} ${item.category}`;
+  return hints.some((hint) => hay.indexOf(hint) >= 0);
+}
 
 const COURT_PHOTO = '/assets/images/court-photo.jpg';
 

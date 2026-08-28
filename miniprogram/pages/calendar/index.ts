@@ -7,7 +7,7 @@ import {
   toDateKey,
 } from '../../utils/calendar';
 import type { CalendarCell } from '../../utils/calendar';
-import { venueIdByEventId } from '../../mock/venue';
+import { resolveVenueId } from '../../mock/venue';
 import { navigateToEventDetail, navigateToPage } from '../../utils/navigate';
 import { themeBehavior } from '../../behaviors/theme';
 
@@ -69,7 +69,8 @@ Page({
           eventsByDay,
         });
       })
-      .catch(() => {
+      .catch((error) => {
+        console.warn('读日历失败', error);
         this.setData({
           year,
           month,
@@ -80,7 +81,6 @@ Page({
           events: [],
           eventsByDay: {},
         });
-        wx.showToast({ title: '日历加载失败', icon: 'none' });
       });
   },
 
@@ -127,7 +127,7 @@ Page({
     }
   },
 
-  onVenueTap(event: WechatMiniprogram.CustomEvent<{ id?: string }>) {
-    navigateToPage(`/pages/venue/index?id=${venueIdByEventId(event.detail.id)}`);
+  onVenueTap(event: WechatMiniprogram.CustomEvent<{ id?: string; venue?: string; venueId?: string }>) {
+    navigateToPage(`/pages/venue/index?id=${resolveVenueId(event.detail)}`);
   },
 });

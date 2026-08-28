@@ -151,10 +151,12 @@ export function rankGivenPlayers(
   players: RankedPlayer[],
   scope: string,
   metric: string,
+  city = CURRENT_CITY,
 ): RankedPlayer[] {
+  const cityName = String(city || CURRENT_CITY).trim() || CURRENT_CITY;
   const pool =
     scope === '城市榜'
-      ? players.filter((player) => player.city === CURRENT_CITY)
+      ? players.filter((player) => player.city === cityName)
       : players;
   return [...pool].sort((a, b) => valueOf(b, metric) - valueOf(a, metric));
 }
@@ -201,17 +203,33 @@ export function toRows(players: RankedPlayer[], metric: string): RankingRow[] {
 }
 
 /**
- * 底部那张固定的「我的排名」卡片。
- *
- * 功能清单要求未上榜时显示提示文案，所以这里默认是未上榜状态。
- * 接云开发后应改为读当前用户的真实排名。
- *
- * 文字里的 • 前后各有两个空格，是设计稿的排版效果，别删。
+ * 底部「我的排名」。按当前登录用户在这份已排序名单里的位置现算，
+ * 不要写死第 128。没登录或没上榜就提示去参赛。
  */
-export const MY_RANKING = {
-  summary: '我的排名  第128  •  积分 0  •  暂未上榜',
-  actionText: '去参赛',
-};
+export function myRankingOf(
+  ranked: RankedPlayer[],
+  metric: string,
+  me?: { nickname?: string; id?: string } | null,
+) {
+  const nickname = String((me && me.nickname) || '').trim();
+  const id = String((me && me.id) || '').trim();
+  if (!nickname && !id) {
+    return { summary: '登录后查看我的排名', actionText: '去参赛' };
+  }
+  const index = ranked.findIndex(
+    (player) => (nickname && player.nickname === nickname) || (id && player.id === id),
+  );
+  if (index < 0) {
+    return { summary: '我的排名  暂未上榜  •  去参赛积累积分', actionText: '去参赛' };
+  }
+  const player = ranked[index];
+  return {
+    summary: `我的排名  第${index + 1}  •  ${metric} ${formatMetric(valueOf(player, metric), metric)}`,
+    actionText: '去查看',
+  };
+}
+
+export const MY_RANKING = myRankingOf([], '积分');
 
 /**
  * 收起状态下列表显示几行。

@@ -23,7 +23,8 @@
  * 【常见改动】
  * 想改场次/胜负     → 改 RECORDS，并同步 RECORDS_SUMMARY
  * 想改筛选项名字   → 改 RECORD_FILTERS，同时改 RecordResult（'胜'/'负'）
- * 想改最近那场文案 → 改 RECORDS_SUMMARY.recent（「我的」生涯卡也读这个）
+ * 想改最近那场文案 → 改 RECORDS_SUMMARY.recent
+ * 「我的」生涯卡走 listMatchRecords 现算，不要再写死 users.recordSummary
  */
 
 export type RecordResult = '胜' | '负';
@@ -212,5 +213,22 @@ export function buildRecordsSummary(records: MatchRecord[]): RecordsSummary {
     wins,
     losses,
     recent: records[0] ? `最近：${records[0].title}` : '暂无参赛记录',
+  };
+}
+
+/** 「我的」生涯卡：和记录页同一批列表现算，空就是暂无。 */
+export function toCareerRecordCard(records: MatchRecord[]): {
+  recordSummary: string;
+  lastEvent: string;
+  wins: string;
+} {
+  const summary = buildRecordsSummary(records);
+  if (!records.length) {
+    return { recordSummary: '暂无参赛记录', lastEvent: '', wins: '0' };
+  }
+  return {
+    recordSummary: `${summary.matches} 场比赛   ${summary.wins} 胜  ${summary.losses} 负`,
+    lastEvent: records[0].title,
+    wins: String(summary.wins),
   };
 }

@@ -107,28 +107,31 @@ function photosFrom(sections: GallerySection[], start: number, count: number): s
 }
 
 export function venueAlbumFrom(venue: VenueInfo, sections: GallerySection[]): VenueAlbum {
-  const rating = sections.find((section) => section.id === 'rating-70');
-  const superCup = sections.find((section) => section.id === 'super-cup-1');
+  const photos = sections.flatMap((section) => section.photos || []);
+  const events = sections
+    .filter((section) => (section.photos || []).length > 0)
+    .slice(0, 4)
+    .map((section) => ({
+      id: section.id,
+      title: (section.titleParts || []).map((part) => part.text).join(''),
+      date: section.subtitle || '',
+      photos: section.photos.slice(0, 3),
+      albumId: section.id,
+    }));
   return {
     cover: venue.hero.cover,
-    coverUrls: [venue.hero.cover],
-    featured: photosFrom(sections, 0, 6),
-    events: [
-      {
-        id: 'album-rating',
-        title: '7.0混双评级赛',
-        date: '08/24',
-        photos: rating?.photos ?? photosFrom(sections, 2, 3),
-        albumId: rating?.id,
-      },
-      {
-        id: 'album-night',
-        title: '夜间混双公开赛',
-        date: '08/19',
-        photos: superCup?.photos ?? photosFrom(sections, 5, 3),
-        albumId: superCup?.id,
-      },
-    ],
+    coverUrls: venue.hero.cover ? [venue.hero.cover] : photos.slice(0, 1),
+    featured: photos.slice(0, 6),
+    events,
+  };
+}
+
+export function emptyVenueAlbum(venue?: VenueInfo): VenueAlbum {
+  return {
+    cover: (venue && venue.hero.cover) || '',
+    coverUrls: [],
+    featured: [],
+    events: [],
   };
 }
 
@@ -202,13 +205,22 @@ function collectEvents(): EventItem[] {
   return out;
 }
 
-/** 点赛事卡场馆行时，用赛事 id 反查该跳哪家店 */
+export function resolveVenueId(payload?: { venueId?: string; venue?: string }): string {
+  if (payload && payload.venueId) {
+    return payload.venueId;
+  }
+  if (payload && payload.venue) {
+    return venueIdByName(payload.venue);
+  }
+  return DEFAULT_VENUE.id;
+}
+
+/** 点赛事卡场馆行时，用赛事上的 venueId / 场馆名，不要再反查示例赛事表 */
 export function venueIdByEventId(eventId?: string): string {
   if (!eventId) {
     return DEFAULT_VENUE.id;
   }
-  const hit = collectEvents().find((item) => item.id === eventId);
-  return hit ? venueIdByName(hit.venue) : DEFAULT_VENUE.id;
+  return DEFAULT_VENUE.id;
 }
 
 /**

@@ -1,10 +1,11 @@
 /**
  * 加入或创建俱乐部。
  *
- * action=join：写入 club_members，更新 users.club / clubId，俱乐部人数 +1。
+ * action=join：写入 club_members，更新 users.club / clubId，人数按实数回写。
  * action=create：新建一家俱乐部，自己当队长。
+ * action=mine：读当前用户归属；成员记录缺失时补写，users.club 被冲掉时按 club_members 补回。
  *
- * 一个人同时只能在一家。换俱乐部会退出旧的，旧俱乐部人数 -1。
+ * 一个人同时只能在一家。换俱乐部会退出旧的，两家人数都按实数重算。
  * 不要从前端传 openid，身份用 cloud.getWXContext()。
  */
 const cloud = require('wx-server-sdk');
@@ -12,7 +13,6 @@ const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
 const db = cloud.database();
-const _ = db.command;
 const USERS = db.collection('users');
 const CLUBS = db.collection('clubs');
 const MEMBERS = db.collection('club_members');
@@ -56,19 +56,52 @@ async function readMyMember(openid) {
   }
 }
 
-async function leaveOldClub(oldClubId) {
-  if (!oldClubId) {
-    return;
+function completeLabel(doc) {
+  const nickname = String(doc.nickname || '').trim();
+  const avatar = String(doc.avatar || '');
+  const hasText = (value) => String(value || '').trim().length > 0;
+  const checks = [
+    avatar && avatar !== '/assets/images/avatars/anime-01.jpg',
+    nickname && nickname !== '微信用户' && nickname !== '登录',
+    hasText(doc.phone),
+    hasText(doc.realName),
+    hasText(doc.city),
+    hasText(doc.club) || hasText(doc.clubId),
+    hasText(doc.years),
+    hasText(doc.tags),
+    hasText(doc.bio),
+    hasText(doc.cover),
+  ];
+  const filled = checks.filter(Boolean).length;
+  return `${Math.round((filled / checks.length) * 100)}%`;
+}
+
+/** 人数按 club_members 实数回写，不要在种子 24 上 +1。 */
+async function recountMembers(clubId) {
+  if (!clubId) {
+    return 0;
   }
+  let total = 0;
   try {
-    await CLUBS.doc(oldClubId).update({
+    const counted = await MEMBERS.where({ clubId }).count();
+    total = (counted && counted.total) || 0;
+  } catch (error) {
+    return 0;
+  }
+  const club = await readClub(clubId);
+  const power = (club && club.power) || 0;
+  const founded = (club && club.founded) || foundedToday();
+  try {
+    await CLUBS.doc(clubId).update({
       data: {
-        members: _.inc(-1),
+        members: total,
+        meta: `成员 ${total} 人 · 战力 ${power} · 成立 ${founded}`,
       },
     });
   } catch (error) {
-    // 旧俱乐部分子可能已不存在
+    // 俱乐部分子可能已不存在
   }
+  return total;
 }
 
 async function writeMembership(openid, user, club, captain) {
@@ -86,10 +119,12 @@ async function writeMembership(openid, user, club, captain) {
       _openid: openid,
     },
   });
+  const next = Object.assign({}, user, { club: club.name, clubId: club.id });
   await USERS.doc(user._id).update({
     data: {
       club: club.name,
       clubId: club.id,
+      profileComplete: completeLabel(next),
       updatedAt: Date.now(),
     },
   });
@@ -110,11 +145,28 @@ exports.main = async (event) => {
   if (action === 'mine') {
     const existing = await readMyMember(OPENID);
     const user = await readUser(OPENID);
-    return {
-      ok: true,
-      clubId: (existing && existing.clubId) || (user && user.clubId) || '',
-      clubName: (user && user.club) || '',
-    };
+    const clubId = (existing && existing.clubId) || (user && user.clubId) || '';
+    let clubName = (user && user.club) || '';
+    const club = clubId ? await readClub(clubId) : null;
+    if (clubId && !clubName) {
+      clubName = (club && club.name) || '';
+    }
+    if (user && clubId && club && !existing) {
+      await writeMembership(OPENID, user, club, false);
+      await recountMembers(clubId);
+    }
+    if (user && clubId && (user.club !== clubName || user.clubId !== clubId)) {
+      const next = Object.assign({}, user, { club: clubName, clubId });
+      await USERS.doc(user._id).update({
+        data: {
+          club: clubName,
+          clubId,
+          profileComplete: completeLabel(next),
+          updatedAt: Date.now(),
+        },
+      });
+    }
+    return { ok: true, clubId, clubName };
   }
 
   const user = await readUser(OPENID);
@@ -135,16 +187,13 @@ exports.main = async (event) => {
       return { ok: false, error: '找不到这家俱乐部' };
     }
     if (oldClubId === clubId) {
+      await recountMembers(clubId);
       return { ok: true, already: true, clubId, clubName: club.name };
     }
 
-    await leaveOldClub(oldClubId);
     await writeMembership(OPENID, user, club, false);
-    await CLUBS.doc(clubId).update({
-      data: {
-        members: _.inc(1),
-      },
-    });
+    await recountMembers(oldClubId);
+    await recountMembers(clubId);
     return { ok: true, already: false, clubId, clubName: club.name };
   }
 
@@ -174,8 +223,9 @@ exports.main = async (event) => {
       rankPower: power,
     };
     await CLUBS.doc(clubId).set({ data: club });
-    await leaveOldClub(oldClubId);
     await writeMembership(OPENID, user, club, true);
+    await recountMembers(oldClubId);
+    await recountMembers(clubId);
     return { ok: true, already: false, clubId, clubName: name };
   }
 

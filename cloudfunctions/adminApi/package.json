@@ -1,0 +1,9 @@
+{
+  "name": "adminApi",
+  "version": "1.0.0",
+  "description": "运营后台读写云库。网页端调这个函数，小程序读同一批集合。",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -54,6 +54,9 @@ const TASKS = [
   ['gold-avatar-ring.png', 'images/gold-avatar-ring.png', 422, 422],
   ['camera-badge.png', 'icons/profile/camera-badge.png', 128, 128],
 
+  // 微信支付小图标（node 456:413 / 458:415），支付行显示 36×36
+  ['wechat-pay-96.png', 'icons/pay/wechat.png', 80, 80],
+
   // 榜单页装饰与领奖台（node 15:18）
   ['rk-confetti.png', 'images/ranking/confetti.png', 330, null],
   ['rk-podium-first.png', 'images/ranking/podium-first.png', 528, null],

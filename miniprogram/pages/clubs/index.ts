@@ -1,6 +1,6 @@
 import { createClub, joinClub, listClubs } from '../../api/catalog';
 import { readSession } from '../../api/auth';
-import { CLUB_FILTERS, CLUB_SUMMARY } from '../../mock/club';
+import { CLUB_FILTERS } from '../../mock/club';
 import type { ClubItem } from '../../mock/club';
 import { navigateToPage } from '../../utils/navigate';
 import { themeBehavior } from '../../behaviors/theme';
@@ -19,7 +19,7 @@ import { themeBehavior } from '../../behaviors/theme';
 Page({
   behaviors: [themeBehavior],
   data: {
-    summary: CLUB_SUMMARY,
+    summary: '找到你的球队',
     filters: CLUB_FILTERS,
     activeFilter: '全部',
     keyword: '',
@@ -36,11 +36,22 @@ Page({
   },
 
   async refreshList() {
-    const clubs = await listClubs(
-      this.data.activeFilter || '全部',
-      this.data.keyword || '',
-    );
-    this.setData({ clubs });
+    try {
+      const clubs = await listClubs(
+        this.data.activeFilter || '全部',
+        this.data.keyword || '',
+      );
+      this.setData({
+        clubs,
+        summary: `找到你的球队 · 共 ${clubs.length} 家俱乐部`,
+      });
+    } catch (error) {
+      console.warn('读俱乐部列表失败', error);
+      this.setData({
+        clubs: [],
+        summary: '找到你的球队 · 共 0 家俱乐部',
+      });
+    }
   },
 
   /** 筛选与关键词叠加生效 */

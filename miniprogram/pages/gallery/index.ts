@@ -1,5 +1,5 @@
-import { galleriesOfFilter, listGalleries } from '../../api/catalog';
-import { GALLERY_FILTERS, GALLERY_SUMMARY } from '../../mock/gallery';
+import { galleriesOfFilter, gallerySummaryOf, listGalleries } from '../../api/catalog';
+import { GALLERY_FILTERS } from '../../mock/gallery';
 import type { GallerySection } from '../../mock/gallery';
 import { navigateToPage } from '../../utils/navigate';
 import { themeBehavior } from '../../behaviors/theme';
@@ -16,7 +16,7 @@ import { themeBehavior } from '../../behaviors/theme';
 Page({
   behaviors: [themeBehavior],
   data: {
-    summary: GALLERY_SUMMARY,
+    summary: '还没有赛事照片',
     filters: GALLERY_FILTERS,
     activeFilter: '全部',
     allSections: [] as GallerySection[],
@@ -27,6 +27,7 @@ Page({
     await getApp<IAppOption>().globalData.cloudBoot;
     const allSections = await listGalleries();
     this.setData({
+      summary: gallerySummaryOf(allSections),
       allSections,
       sections: galleriesOfFilter(allSections, '全部'),
     });

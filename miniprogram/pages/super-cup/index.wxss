@@ -274,6 +274,11 @@
   opacity: 1;
 }
 
+.cover-card.is-picked {
+  border-color: var(--accent);
+  opacity: 1;
+}
+
 .cover-card--pressed {
   opacity: 0.85;
 }

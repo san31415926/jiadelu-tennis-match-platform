@@ -3,23 +3,31 @@
  * 积分兑换页逻辑
  * ============================================================================
  *
- * 点首页宫格「积分兑换」进来。结构就是旧版那一套：黄条提示 + 一张海报。
- * 点海报会用微信自带预览打开，方便把兑换表看大、长按存图。
- *
- * 想改提示文案或换海报 → mock/rewards.ts
- * 吸顶栏 occupy 打开，variant 用 plain（页底色，不走顶栏实色）。
+ * 点首页宫格「积分兑换」进来。黄条 + 海报从云库 posters.rewards 读。
  */
-import { REWARDS_NOTICE, REWARDS_POSTER } from '../../mock/rewards';
+import { loadPosterPage } from '../../api/catalog';
 import { themeBehavior } from '../../behaviors/theme';
 
 Page({
   behaviors: [themeBehavior],
   data: {
-    notice: REWARDS_NOTICE,
-    poster: REWARDS_POSTER,
+    notice: '',
+    poster: '',
+  },
+
+  async onLoad() {
+    await getApp<IAppOption>().globalData.cloudBoot;
+    const page = await loadPosterPage('rewards');
+    this.setData({
+      notice: page.notice,
+      poster: page.poster,
+    });
   },
 
   onPreviewPoster() {
+    if (!this.data.poster) {
+      return;
+    }
     wx.previewImage({
       current: this.data.poster,
       urls: [this.data.poster],

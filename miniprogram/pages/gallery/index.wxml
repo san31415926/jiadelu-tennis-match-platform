@@ -53,4 +53,5 @@
     <view class="section__count">{{item.count}}</view>
     <view class="section__divider" wx:if="{{item.layout === 'photo'}}"></view>
   </view>
+  <view class="feed__empty" wx:if="{{sections.length === 0}}">该分类下暂无照片</view>
 </view>

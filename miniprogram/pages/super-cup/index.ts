@@ -1,16 +1,18 @@
-import { listEventsByFilter } from '../../api/events';
+import { listEventsByFilter, listSuperCupBanners } from '../../api/events';
 import { EVENT_FILTERS } from '../../mock/home';
 import type { EventItem } from '../../mock/home';
 import {
-  SUPER_CUP_BANNERS,
   SUPER_CUP_CLUB_CENTER,
   SUPER_CUP_EVENT_TYPES,
+  SUPER_CUP_FEATURES,
   SUPER_CUP_FEED_TITLES,
   SUPER_CUP_HONORS,
+  SUPER_CUP_SERIES_HINT,
+  matchSuperCupSeries,
 } from '../../mock/super-cup';
-import type { SuperCupFeature } from '../../mock/super-cup';
+import type { SuperCupBanner, SuperCupFeature } from '../../mock/super-cup';
 import { headerMetrics } from '../../utils/header';
-import { venueIdByEventId } from '../../mock/venue';
+import { resolveVenueId } from '../../mock/venue';
 import { navigateToEventDetail, navigateToPage } from '../../utils/navigate';
 import { syncTabBarSelected } from '../../utils/tabbar';
 import { themeBehavior } from '../../behaviors/theme';
@@ -28,10 +30,6 @@ interface CoverItem extends SuperCupFeature {
   role: CoverRole;
 }
 
-/**
- * 给每张 Cover Flow 卡标上角色，样式才能区分「中间大 / 左侧小 / 右侧小」。
- * 循环 sliders 里，当前项的前一张永远是 prev、后一张永远是 next。
- */
 function withCoverRoles(items: SuperCupFeature[], current: number): CoverItem[] {
   const total = items.length;
   return items.map((item, index) => {
@@ -47,8 +45,10 @@ function withCoverRoles(items: SuperCupFeature[], current: number): CoverItem[] 
   });
 }
 
-function feedTitleOf(filter: string): string {
-  return SUPER_CUP_FEED_TITLES[filter] || '俱乐部赛';
+function feedTitleOf(filter: string, seriesKey: string): string {
+  const base = SUPER_CUP_FEED_TITLES[filter] || '俱乐部赛';
+  const feature = SUPER_CUP_FEATURES.find((item) => item.key === seriesKey);
+  return feature ? `${feature.label} · ${base}` : base;
 }
 
 /**
@@ -58,11 +58,11 @@ function feedTitleOf(filter: string): string {
  *
  * 【这个文件负责什么】
  * 顶栏字标、头图叠字、两组 Cover Flow、俱乐部中心按钮、胶囊筛选、赛事卡。
- * 文案和路径都在 mock/super-cup.ts。顶栏自己画，换色挂 themeBehavior。
+ * 赛事列表和头图走云库俱乐部线；杯赛入口筛同一批赛事。海报 / 榜单 / 俱乐部中心仍走各自页面。
  *
  * 【Cover Flow】
- * 横滑切换当前项（中间放大、两侧缩小）。点卡片走 SUPER_CUP_FEATURES 的 path，
- * 和旧宫格同一套跳转（海报 / 榜单 / 俱乐部）。「查看全部」弹出该组全部入口。
+ * 横滑切换当前项（中间放大、两侧缩小）。点「赛事类型」按标题关键词筛本页列表，
+ * 再点一次取消；荣誉入口仍走海报 / 俱乐部榜。「查看全部」弹出该组全部入口。
  *
  * 【筛选】
  * 仍是 我的报名 / 报名中 / 进行中 / 已结束。「我的报名」的登录判断和首页一致。
@@ -73,7 +73,7 @@ Page({
     statusBarHeight: 0,
     navBarHeight: 44,
     menuInsetRight: 96,
-    banners: SUPER_CUP_BANNERS,
+    banners: [] as SuperCupBanner[],
     currentBanner: 0,
     eventTypes: withCoverRoles(SUPER_CUP_EVENT_TYPES, DEFAULT_EVENT_TYPE_INDEX),
     eventTypeIndex: DEFAULT_EVENT_TYPE_INDEX,
@@ -82,7 +82,8 @@ Page({
     clubCenterPath: SUPER_CUP_CLUB_CENTER.path,
     filters: EVENT_FILTERS,
     activeFilter: DEFAULT_FILTER,
-    feedTitle: feedTitleOf(DEFAULT_FILTER),
+    activeSeries: '',
+    feedTitle: feedTitleOf(DEFAULT_FILTER, ''),
     events: [] as EventItem[],
     emptyHint: '该分类下暂无赛事',
     /** 离开本页时藏掉 fixed 顶栏，避免挡住下一页左上角「返回」 */
@@ -93,8 +94,12 @@ Page({
     this.setData(headerMetrics());
     const boot = getApp<IAppOption>().globalData.cloudBoot;
     if (boot) {
-      boot.then(() => this.applyFilter(DEFAULT_FILTER));
+      boot.then(() => {
+        this.refreshBanners();
+        this.applyFilter(DEFAULT_FILTER);
+      });
     } else {
+      this.refreshBanners();
       this.applyFilter(DEFAULT_FILTER);
     }
   },
@@ -111,15 +116,25 @@ Page({
     this.setData({ pageHidden: true });
   },
 
+  refreshBanners() {
+    listSuperCupBanners()
+      .then((banners) => this.setData({ banners }))
+      .catch((error) => {
+        console.warn('读超级杯轮播失败', error);
+        this.setData({ banners: [] });
+      });
+  },
+
   /** 「我的报名」依赖登录态，未登录时列表为空并提示登录 */
   applyFilter(filter: string) {
     const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
     const needLogin = filter === LOGIN_REQUIRED_FILTER && !isLoggedIn;
+    const seriesKey = this.data.activeSeries;
 
     if (needLogin) {
       this.setData({
         activeFilter: filter,
-        feedTitle: feedTitleOf(filter),
+        feedTitle: feedTitleOf(filter, seriesKey),
         events: [],
         emptyHint: '登录后查看你报名的赛事',
       });
@@ -127,22 +142,23 @@ Page({
     }
 
     listEventsByFilter(filter, 'super-cup')
-      .then((events) => {
+      .then((pool) => {
+        const events = seriesKey ? pool.filter((item) => matchSuperCupSeries(item, seriesKey)) : pool;
         this.setData({
           activeFilter: filter,
-          feedTitle: feedTitleOf(filter),
+          feedTitle: feedTitleOf(filter, seriesKey),
           events,
-          emptyHint: '该分类下暂无赛事',
+          emptyHint: pool.length > 0 && events.length === 0 ? '该杯赛下暂无赛事' : '该分类下暂无赛事',
         });
       })
-      .catch(() => {
+      .catch((error) => {
+        console.warn('读超级杯赛事失败', error);
         this.setData({
           activeFilter: filter,
-          feedTitle: feedTitleOf(filter),
+          feedTitle: feedTitleOf(filter, seriesKey),
           events: [],
           emptyHint: '该分类下暂无赛事',
         });
-        wx.showToast({ title: '赛事加载失败', icon: 'none' });
       });
   },
 
@@ -151,7 +167,7 @@ Page({
   },
 
   onBannerTap(event: WechatMiniprogram.TouchEvent) {
-    const banner = SUPER_CUP_BANNERS[Number(event.currentTarget.dataset.index)];
+    const banner = this.data.banners[Number(event.currentTarget.dataset.index)];
     if (banner) {
       navigateToPage(banner.target);
     }
@@ -174,7 +190,14 @@ Page({
   },
 
   onCoverTap(event: WechatMiniprogram.TouchEvent) {
-    navigateToPage(String(event.currentTarget.dataset.path));
+    const key = String(event.currentTarget.dataset.key || '');
+    const path = String(event.currentTarget.dataset.path || '');
+    if (SUPER_CUP_SERIES_HINT[key]) {
+      const next = this.data.activeSeries === key ? '' : key;
+      this.setData({ activeSeries: next }, () => this.applyFilter(this.data.activeFilter));
+      return;
+    }
+    navigateToPage(path);
   },
 
   /** 「查看全部」列出该组全部入口，点哪项就走哪项的 path */
@@ -191,9 +214,15 @@ Page({
       itemList: items.map((item) => item.label),
       success: (res) => {
         const target = items[res.tapIndex];
-        if (target) {
-          navigateToPage(target.path);
+        if (!target) {
+          return;
         }
+        if (SUPER_CUP_SERIES_HINT[target.key]) {
+          const next = this.data.activeSeries === target.key ? '' : target.key;
+          this.setData({ activeSeries: next }, () => this.applyFilter(this.data.activeFilter));
+          return;
+        }
+        navigateToPage(target.path);
       },
     });
   },
@@ -210,7 +239,7 @@ Page({
     navigateToEventDetail(event.detail.id);
   },
 
-  onVenueTap(event: WechatMiniprogram.CustomEvent<{ id?: string }>) {
-    navigateToPage(`/pages/venue/index?id=${venueIdByEventId(event.detail.id)}`);
+  onVenueTap(event: WechatMiniprogram.CustomEvent<{ id?: string; venue?: string; venueId?: string }>) {
+    navigateToPage(`/pages/venue/index?id=${resolveVenueId(event.detail)}`);
   },
 });

@@ -9,7 +9,7 @@
   <view class="topbar-spacer" style="height: calc({{statusBarHeight}}px + 72rpx)"></view>
 
   <!-- 头图 321rpx。V5 直边叠字，不要底部白浪 -->
-  <view class="hero">
+  <view class="hero" wx:if="{{banners.length}}">
     <swiper
       class="hero__swiper"
       circular
@@ -63,7 +63,8 @@
         <swiper-item wx:for="{{eventTypes}}" wx:key="key">
           <view class="cover-slide cover-slide--{{item.role}}">
             <view
-              class="cover-card {{item.role === 'current' ? 'is-current' : ''}}"
+              class="cover-card {{item.role === 'current' ? 'is-current' : ''}} {{item.key === activeSeries ? 'is-picked' : ''}}"
+              data-key="{{item.key}}"
               data-path="{{item.path}}"
               bindtap="onCoverTap"
               hover-class="cover-card--pressed"
@@ -106,6 +107,7 @@
           <view class="cover-slide cover-slide--{{item.role}}">
             <view
               class="cover-card {{item.role === 'current' ? 'is-current' : ''}}"
+              data-key="{{item.key}}"
               data-path="{{item.path}}"
               bindtap="onCoverTap"
               hover-class="cover-card--pressed"

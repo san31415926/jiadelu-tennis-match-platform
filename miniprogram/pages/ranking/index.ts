@@ -1,14 +1,16 @@
 import { listRankedPlayers } from '../../api/catalog';
+import { readSession } from '../../api/auth';
 import {
   COLLAPSED_ROW_COUNT,
-  MY_RANKING,
+  CURRENT_CITY,
   RANKING_METRICS,
   RANKING_SCOPES,
+  myRankingOf,
   rankGivenPlayers,
   toPodium,
   toRows,
 } from '../../mock/ranking';
-import type { PodiumPlayer, RankingRow } from '../../mock/ranking';
+import type { PodiumPlayer, RankedPlayer, RankingRow } from '../../mock/ranking';
 import { themeBehavior } from '../../behaviors/theme';
 import { switchToEvents } from '../../utils/navigate';
 
@@ -19,18 +21,45 @@ import { switchToEvents } from '../../utils/navigate';
  * 版式来自终稿 15:2。V5 草稿 228:786 几乎同构图，已去掉波浪头，改 occupy 吸顶栏。
  * 筛选选中色走主题强调色，不要再写死青柠。
  *
- * 【三个状态维度会互相影响】
- *   范围（城市榜/全国榜）→ 决定参与排名的人有哪些
- *   指标（积分/身价/战力）→ 决定按什么排序、显示什么数值
- *   展开态（收起/展开）  → 决定列表显示 3 行还是全部
- *
- * 名单从云库 players 读，排序仍用 rankGivenPlayers()。
+ * 名单从云库 players 读，底部「我的排名」按当前登录用户现算。
+ * 城市榜用资料里的城市，没有才退回广州。
  */
+
+function viewerPlayer(): RankedPlayer | null {
+  const session = readSession();
+  if (!session) {
+    return null;
+  }
+  const uid = String(session.uid || '').replace(/^UID\s*/, '');
+  const digits = (value: string) => Number(String(value || '').replace(/[^\d]/g, '')) || 0;
+  return {
+    id: uid,
+    nickname: session.nickname,
+    club: session.club || '个人',
+    badge: session.level && session.level !== '--' ? session.level : '',
+    avatar: session.avatar,
+    city: session.city || CURRENT_CITY,
+    points: digits(session.points),
+    marketValue: digits(session.marketValue),
+    power: Number((session as { power?: number }).power || 0),
+  };
+}
+
+function withViewer(pool: RankedPlayer[]): RankedPlayer[] {
+  const me = viewerPlayer();
+  if (!me) {
+    return pool;
+  }
+  if (pool.some((player) => player.nickname === me.nickname || player.id === me.id)) {
+    return pool;
+  }
+  return pool.concat([me]);
+}
+
 Page({
   behaviors: [themeBehavior],
   data: {
     scopes: RANKING_SCOPES,
-    /** 默认打开全国榜。改成 '城市榜' 就默认显示同城排名 */
     activeScope: '城市榜',
     metrics: RANKING_METRICS,
     activeMetric: '积分',
@@ -39,7 +68,7 @@ Page({
     rows: [] as RankingRow[],
     totalRows: 0,
     totalCount: 0,
-    myRanking: MY_RANKING,
+    myRanking: myRankingOf([], '积分'),
   },
 
   async onLoad() {
@@ -49,8 +78,9 @@ Page({
 
   async refresh() {
     const { activeScope, activeMetric, expanded } = this.data;
-    const pool = await listRankedPlayers();
-    const players = rankGivenPlayers(pool, activeScope, activeMetric);
+    const me = viewerPlayer();
+    const pool = withViewer(await listRankedPlayers());
+    const players = rankGivenPlayers(pool, activeScope, activeMetric, me ? me.city : CURRENT_CITY);
     const allRows = toRows(players, activeMetric);
 
     this.setData({
@@ -58,6 +88,7 @@ Page({
       rows: expanded ? allRows : allRows.slice(0, COLLAPSED_ROW_COUNT),
       totalRows: allRows.length,
       totalCount: players.length,
+      myRanking: myRankingOf(players, activeMetric, me),
     });
   },
 
@@ -81,7 +112,6 @@ Page({
     this.setData({ expanded: !this.data.expanded }, () => this.refresh());
   },
 
-  /** 底部条「去参赛」：未上榜就去报名，切回赛事首页 */
   onMineTap() {
     switchToEvents();
   },

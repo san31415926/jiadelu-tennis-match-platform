@@ -143,6 +143,7 @@
               <image class="career-card__icon" src="/assets/icons/profile/my-club-flag.png" mode="aspectFit" />
               <text class="career-card__name">我的俱乐部</text>
             </view>
+            <view class="career-card__meta" wx:if="{{profile.club}}">{{profile.club}}</view>
             <view class="career-card__meta">俱乐部排名 {{profile.clubRank}}</view>
             <view class="career-card__meta">成员 {{profile.clubMembers}}</view>
           </view>
@@ -395,18 +396,12 @@
           data-key="{{item.key}}"
           bindtap="onSelectPay"
         >
-          <view wx:if="{{item.key === 'wechat'}}" class="wx-mark">
-            <view class="wx-mark__big">
-              <view class="wx-mark__eye wx-mark__eye--l1"></view>
-              <view class="wx-mark__eye wx-mark__eye--l2"></view>
-              <view class="wx-mark__tail wx-mark__tail--l"></view>
-            </view>
-            <view class="wx-mark__small">
-              <view class="wx-mark__eye wx-mark__eye--s1"></view>
-              <view class="wx-mark__eye wx-mark__eye--s2"></view>
-              <view class="wx-mark__tail wx-mark__tail--s"></view>
-            </view>
-          </view>
+          <image
+            wx:if="{{item.key === 'wechat'}}"
+            class="wx-mark"
+            src="/assets/icons/pay/wechat.png"
+            mode="aspectFit"
+          />
           <view wx:else class="member-pay__mark member-pay__mark--{{item.key}}">{{item.mark}}</view>
           <text>{{item.label}}</text>
         </view>

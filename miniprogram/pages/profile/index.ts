@@ -17,6 +17,7 @@ import { navigateToPage, openMyClub } from '../../utils/navigate';
 import { syncTabBarSelected, setTabBarHidden } from '../../utils/tabbar';
 import { getAppTheme, setAppTheme } from '../../utils/theme';
 import { themeBehavior } from '../../behaviors/theme';
+import { listMatchRecords, loadMyClubCard, syncMyClubSession, toCareerRecordCard } from '../../api/catalog';
 
 /**
  * ============================================================================
@@ -32,8 +33,12 @@ import { themeBehavior } from '../../behaviors/theme';
  * 不是只改这一页的霜化罩。封面默认空，头图只显示主题纯色；相册上传后才铺图。
  *
  * 【我的俱乐部】
- * 未登录进俱乐部中心，列表不显示「已加入」。
- * 已登录且 mock 里有 joined 的俱乐部，直接进那家主页；还没入会也去俱乐部中心。
+ * 卡片上的排名和人数不写在 users 里，onShow 按 club_members 现算。
+ * 点进去：已加入直接进那家主页，还没入会去俱乐部中心。
+ *
+ * 【参赛记录】
+ * 生涯卡场次/胜负/最近一场和记录页同一批 match_records 现算。
+ * 没有自己的记录就写「暂无参赛记录」，不要拿演示赛当自己的。
  *
  * 【战力图】
  * 六个轴的分数在 mock 里。用 canvas 2d 画六边形雷达，标签叠在 canvas 外面。
@@ -126,10 +131,55 @@ Page({
     // 登录态没变，只比对 isLoggedIn 会继续显示旧图。每次 onShow 都按 session 刷一遍。
     const isLoggedIn = getApp<IAppOption>().globalData.isLoggedIn;
     this.applyProfile(isLoggedIn, readSession());
+    if (isLoggedIn) {
+      void this.pullCareerCards();
+    }
     const theme = getAppTheme();
     if (this.data.profile.theme !== theme) {
       this.setData({ 'profile.theme': theme });
     }
+  },
+
+  async pullCareerCards() {
+    await this.pullClubIntoProfile();
+    await this.pullRecordsIntoProfile();
+  },
+
+  async pullClubIntoProfile() {
+    await syncMyClubSession();
+    const card = await loadMyClubCard();
+    const session = readSession();
+    if (!session) {
+      return;
+    }
+    if (!card) {
+      // 云函数已确认没加入时 session.clubId 会是空的。读库失败不要把已有俱乐部抹掉。
+      return;
+    }
+    writeSession({
+      ...session,
+      club: card.clubName,
+      clubId: card.clubId,
+      clubRank: card.clubRank,
+      clubMembers: card.clubMembers,
+    });
+    this.applyProfile(true, readSession());
+  },
+
+  async pullRecordsIntoProfile() {
+    const { records } = await listMatchRecords();
+    const session = readSession();
+    if (!session) {
+      return;
+    }
+    const card = toCareerRecordCard(records);
+    writeSession({
+      ...session,
+      recordSummary: card.recordSummary,
+      lastEvent: card.lastEvent,
+      wins: card.wins,
+    });
+    this.applyProfile(true, readSession());
   },
 
   requireLogin(): boolean {

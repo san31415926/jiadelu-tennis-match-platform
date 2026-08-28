@@ -3,7 +3,8 @@
  * 报名页逻辑
  * ============================================================================
  *
- * 从赛事详情「立即报名 / 报名参赛」进来。路径 ?id= 对应 mock/event-detail.ts。
+ * 从赛事详情「立即报名 / 报名参赛」进来。路径 ?id= 对应云库赛事。
+ * 报名人用当前登录资料，搭档空着写「待邀请」，不要再用示例「帆 / 阿月」。
  * 五个画板收成这一页的 data 状态，不要各写一页：
  *   369:359 选方式·单人 / 369:559 组队 / 369:770 无队伍
  *   370:359 报名详情 / 371:371 报名详情·组队
@@ -15,10 +16,9 @@
  * 去支付会写入 registrations，不接微信支付。
  * 吸顶栏 occupy 打开，不要再垫波浪头。
  */
-import { SIGNUP_PARTNER, SIGNUP_SELF } from '../../mock/event-detail';
-import type { EventDetail, SignupPerson } from '../../mock/event-detail';
 import { loadEventDetail, submitRegistration } from '../../api/events';
 import { readSession } from '../../api/auth';
+import type { EventDetail, SignupPerson } from '../../mock/event-detail';
 import { isSinglesEvent } from '../../mock/home';
 import { themeBehavior } from '../../behaviors/theme';
 
@@ -28,16 +28,30 @@ type SignupMode = '单人' | '组队';
 function selfFromSession(): SignupPerson {
   const session = readSession();
   if (!session) {
-    return SIGNUP_SELF;
+    return {
+      name: '请先登录',
+      avatar: '/assets/images/avatars/anime-01.jpg',
+      uid: '--',
+      hand: '--',
+      rating: '--',
+    };
   }
   return {
-    name: session.nickname || SIGNUP_SELF.name,
-    avatar: session.avatar || SIGNUP_SELF.avatar,
-    uid: session.uid.replace(/^UID\s*/, '') || SIGNUP_SELF.uid,
-    hand: session.hand && session.hand !== '--' ? session.hand : SIGNUP_SELF.hand,
-    rating: session.rating && session.rating !== '--' ? session.rating : SIGNUP_SELF.rating,
+    name: session.nickname || '微信用户',
+    avatar: session.avatar || '/assets/images/avatars/anime-01.jpg',
+    uid: session.uid.replace(/^UID\s*/, '') || '--',
+    hand: session.hand && session.hand !== '--' ? session.hand : '--',
+    rating: session.rating && session.rating !== '--' ? session.rating : '--',
   };
 }
+
+const OPEN_PARTNER: SignupPerson = {
+  name: '待邀请',
+  avatar: '/assets/images/avatars/anime-02.jpg',
+  uid: '--',
+  hand: '--',
+  rating: '--',
+};
 
 function feeNumber(fee: string): string {
   const hit = fee.match(/\d+/);
@@ -51,8 +65,14 @@ Page({
     step: 'mode' as SignupStep,
     mode: '单人' as SignupMode,
     hasTeam: true,
-    self: SIGNUP_SELF as SignupPerson,
-    partner: SIGNUP_PARTNER as SignupPerson,
+    self: {
+      name: '请先登录',
+      avatar: '/assets/images/avatars/anime-01.jpg',
+      uid: '--',
+      hand: '--',
+      rating: '--',
+    } as SignupPerson,
+    partner: OPEN_PARTNER as SignupPerson,
     payLabel: '去支付  ¥108',
     /** 双打才显示「选择参赛方式」。单打直接进报名详情。 */
     allowTeam: true,

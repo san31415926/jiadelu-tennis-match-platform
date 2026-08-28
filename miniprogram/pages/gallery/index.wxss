@@ -165,3 +165,10 @@
   height: 1rpx;
   background: #dbded4;
 }
+
+.feed__empty {
+  padding: 80rpx 32rpx 40rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #787e6c;
+}

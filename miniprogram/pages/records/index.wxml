@@ -56,6 +56,6 @@
       </view>
       <view class="row__arrow">›</view>
     </view>
-    <view class="list__empty" wx:if="{{records.length === 0}}">暂无该结果的比赛</view>
+    <view class="list__empty" wx:if="{{records.length === 0}}">{{allRecords.length === 0 ? '暂无参赛记录' : '暂无该结果的比赛'}}</view>
   </view>
 </view>

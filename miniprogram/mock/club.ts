@@ -195,7 +195,7 @@ export function clubsForViewer(clubs: ClubItem[], isLoggedIn: boolean): ClubItem
   return clubs.map((club) => withViewerJoinState(club, isLoggedIn));
 }
 
-/** 俱乐部主页成员行。主页只展示前几条，总人数仍用 ClubItem.members */
+/** 俱乐部主页成员行。人数按实际名单，不再用写死的 24 去凑「6 / 24」。 */
 export interface ClubMember {
   id: string;
   nickname: string;
@@ -234,9 +234,8 @@ function memberOf(
 }
 
 /**
- * 每个俱乐部主页上展示的成员（草稿只画了 6 行）。
- * 总人数仍以 CLUB_LIST 的 members 为准，所以会出现「6 / 26 人」。
- * 改名单就改这里；头像循环复用榜单那四张示例图。
+ * 每个俱乐部主页上的成员名单。人数以这里为准，不要再另写一个更大的 members。
+ * 改名单就改这里；头像循环复用榜单那几张示例图。
  */
 export const CLUB_MEMBERS: Record<string, ClubMember[]> = {
   'club-1': [
@@ -289,23 +288,25 @@ export const CLUB_MEMBERS: Record<string, ClubMember[]> = {
   ],
 };
 
-/** 主页列表最多展示这么多行，和草稿 6 行对齐 */
-const HOME_MEMBER_PREVIEW = 6;
-
 /**
  * 按 id 取俱乐部主页数据。id 对不上就退回第一家，避免空白页。
- * 接云开发后：俱乐部档案 + 成员列表分成两次查询即可。
+ * 人数按名单实数，已加入的当前用户由 catalog 补进列表。
  */
 export function getClubHome(id: string): {
   club: ClubItem;
   members: ClubMember[];
   shownLabel: string;
 } {
-  const club = CLUB_LIST.find((item) => item.id === id) ?? CLUB_LIST[0];
-  const members = (CLUB_MEMBERS[club.id] ?? []).slice(0, HOME_MEMBER_PREVIEW);
+  const found = CLUB_LIST.find((item) => item.id === id) ?? CLUB_LIST[0];
+  const members = (CLUB_MEMBERS[found.id] ?? []).slice();
+  const club = {
+    ...found,
+    members: members.length,
+    meta: metaOf(members.length, found.power, found.founded),
+  };
   return {
     club,
     members,
-    shownLabel: `${members.length} / ${club.members} 人`,
+    shownLabel: `${members.length} 人`,
   };
 }

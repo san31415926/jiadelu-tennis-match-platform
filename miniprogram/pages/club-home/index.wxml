@@ -17,6 +17,10 @@
     </view>
   </view>
 
+  <view class="league-note">
+    联赛权益：有效选手年费可转会、累计身价。加入第一家俱乐部不需要年费。年费不是免单站报名费。
+  </view>
+
   <view class="stats {{fromSuperCup ? 'stats--quad' : ''}}">
     <block wx:for="{{stats}}" wx:key="label">
       <view class="stats__divider" wx:if="{{index > 0}}"></view>

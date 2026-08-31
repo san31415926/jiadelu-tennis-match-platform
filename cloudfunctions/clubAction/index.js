@@ -6,6 +6,8 @@
  * action=mine：读当前用户归属；成员记录缺失时补写，users.club 被冲掉时按 club_members 补回。
  *
  * 一个人同时只能在一家。换俱乐部会退出旧的，两家人数都按实数重算。
+ * 第一次加入俱乐部免费用户可以；转会（已有一家再加入另一家）和创建俱乐部
+ * 要有效年度选手会员。身价/分红按会员身份放行，不要把年费说成免报名费。
  * 不要从前端传 openid，身份用 cloud.getWXContext()。
  */
 const cloud = require('wx-server-sdk');
@@ -31,6 +33,22 @@ function foundedToday() {
   const m = `${now.getMonth() + 1}`.padStart(2, '0');
   const d = `${now.getDate()}`.padStart(2, '0');
   return `${y}-${m}-${d}`;
+}
+
+function todayKey() {
+  return foundedToday();
+}
+
+function isPlayerMember(doc) {
+  if (doc && doc.memberPaused) {
+    return false;
+  }
+  const until = String((doc && doc.memberUntil) || '').slice(0, 10);
+  return !!until && until >= todayKey();
+}
+
+function fail(error) {
+  return { ok: false, error };
 }
 
 async function readUser(openid) {
@@ -133,7 +151,7 @@ async function writeMembership(openid, user, club, captain) {
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
   if (!OPENID) {
-    return { ok: false, error: '拿不到微信身份，请先登录' };
+    return fail('拿不到微信身份，请先登录');
   }
 
   const action = event && event.action;
@@ -171,7 +189,7 @@ exports.main = async (event) => {
 
   const user = await readUser(OPENID);
   if (!user) {
-    return { ok: false, error: '还没有用户，请先登录' };
+    return fail('还没有用户，请先登录');
   }
 
   const existing = await readMyMember(OPENID);
@@ -180,15 +198,18 @@ exports.main = async (event) => {
   if (action === 'join') {
     const clubId = event && event.clubId;
     if (!clubId) {
-      return { ok: false, error: '缺少俱乐部 id' };
+      return fail('缺少俱乐部 id');
     }
     const club = await readClub(clubId);
     if (!club) {
-      return { ok: false, error: '找不到这家俱乐部' };
+      return fail('找不到这家俱乐部');
     }
     if (oldClubId === clubId) {
       await recountMembers(clubId);
       return { ok: true, already: true, clubId, clubName: club.name };
+    }
+    if (oldClubId && !isPlayerMember(user)) {
+      return fail('转会需要有效的年度选手会员。加入第一家俱乐部不需要年费');
     }
 
     await writeMembership(OPENID, user, club, false);
@@ -200,7 +221,10 @@ exports.main = async (event) => {
   if (action === 'create') {
     const name = String((event && event.name) || '').trim();
     if (!name) {
-      return { ok: false, error: '请填写俱乐部名称' };
+      return fail('请填写俱乐部名称');
+    }
+    if (!isPlayerMember(user)) {
+      return fail('创建俱乐部需要有效的年度选手会员（联赛准入）');
     }
     const city = String((event && event.city) || user.city || '广州').trim() || '广州';
     const clubId = `club-${Date.now()}`;
@@ -229,5 +253,5 @@ exports.main = async (event) => {
     return { ok: true, already: false, clubId, clubName: name };
   }
 
-  return { ok: false, error: '未知操作' };
+  return fail('未知操作');
 };

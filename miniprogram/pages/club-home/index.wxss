@@ -70,6 +70,20 @@
   color: var(--accent-text);
 }
 
+/**
+ * 联赛权益说明。设计稿俱乐部主页没有这一条，是选手会员第四阶段加上的产品文案，
+ * 不要做成第二套页面。改字只动 wxml 里那一句。
+ */
+.league-note {
+  margin: 20rpx 32rpx 0;
+  padding: 16rpx 20rpx;
+  font-size: 22rpx;
+  line-height: 1.45;
+  color: #5c6166;
+  background: #f4f5f4;
+  border-radius: 16rpx;
+}
+
 .stats {
   display: flex;
   align-items: center;

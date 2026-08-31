@@ -1,12 +1,17 @@
 /**
- * 报名读写。不调微信支付，status 固定 pending。
+ * 报名读写。不调微信支付，status 默认 pending。
  *
- * action: 'list'  —— 列出当前用户的报名，并带上对应赛事。
- * 不传 action     —— 写入一条报名；同一人同一场已报过就返回 duplicated。
+ * action: 'list'     —— 列出当前用户的报名，并带上对应赛事。
+ * action: 'withdraw' —— 退赛必须走这里，不要在后台直接删报名。
+ * 不传 action        —— 写入一条报名；同一人同一场未退赛则 duplicated。
  *
- * 报名是云函数写入的。集合若是「仅创建者可读写」，客户端 where {openid}
- * 读不到这些文档，首页「我的报名」会是空的，但再点报名会提示已经报过。
- * 所以列表必须走云函数，不要在小程序端直接查 registrations。
+ * 【巡回赛级别】读 events.tourSeries，不要去动 events.series（那是品牌文案）。
+ * open = 公开体验赛，免费用户可报。
+ * L-15 / L-25 / masters = 要年度选手会员（users.memberUntil 未过期）。
+ * 年费不是免单站报名费。支付未开通时，运营在后台填会员有效至即可放行。
+ *
+ * 【退赛】免费退赛截止前不算迟退。截止后算迟退，每年 3 次豁免，超出后
+ * signupPriority 降为 low（再报名会进候补）。比赛开始后不能退。
  */
 const cloud = require('wx-server-sdk');
 
@@ -15,6 +20,40 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const REGS = db.collection('registrations');
 const EVENTS = db.collection('events');
+const USERS = db.collection('users');
+
+const LATE_WITHDRAW_EXEMPT = 3;
+
+function todayKey() {
+  const date = new Date();
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+function isPlayerMember(doc) {
+  if (doc && doc.memberPaused) {
+    return false;
+  }
+  const until = String((doc && doc.memberUntil) || '').slice(0, 10);
+  return !!until && until >= todayKey();
+}
+
+function tourSeriesOf(match) {
+  const text = String((match && match.tourSeries) || 'open');
+  if (text === 'L-15' || text === 'L-25' || text === 'masters') {
+    return text;
+  }
+  return 'open';
+}
+
+function tourNeedsMember(tour) {
+  return tour === 'L-15' || tour === 'L-25' || tour === 'masters';
+}
+
+function fail(error) {
+  return { ok: false, error };
+}
 
 async function loadEvent(eventId) {
   try {
@@ -33,6 +72,21 @@ async function loadEvent(eventId) {
   return { ...row, id: row.id || eventId };
 }
 
+async function readUser(openid) {
+  const found = await USERS.where({ _openid: openid }).limit(1).get();
+  return found.data && found.data[0];
+}
+
+async function findReg(openid, eventId) {
+  const existed = await REGS.where({
+    _openid: openid,
+    eventId,
+  })
+    .limit(1)
+    .get();
+  return existed.data && existed.data[0];
+}
+
 async function listMine(openid) {
   const regs = await REGS.where({ _openid: openid }).limit(20).get();
   const rows = regs.data || [];
@@ -49,7 +103,12 @@ async function listMine(openid) {
       events.push(event);
     }
   }
-  return { ok: true, events, count: rows.length };
+  return {
+    ok: true,
+    events,
+    registrations: rows,
+    count: rows.length,
+  };
 }
 
 async function createOne(openid, event) {
@@ -58,44 +117,140 @@ async function createOne(openid, event) {
   const partnerUid = (event && event.partnerUid) || '';
 
   if (!eventId) {
-    return { ok: false, error: '缺少赛事 id' };
+    return fail('缺少赛事 id');
   }
 
-  const existed = await REGS.where({
+  const match = await loadEvent(eventId);
+  if (!match) {
+    return fail('找不到这场赛事');
+  }
+  if (match.status && match.status !== '报名中') {
+    return fail('这场已经截止报名');
+  }
+
+  const deadline = String(match.signupDeadline || '').slice(0, 10);
+  if (deadline && todayKey() > deadline) {
+    return fail('报名已截止');
+  }
+
+  const user = await readUser(openid);
+  if (!user) {
+    return fail('还没有用户，请先登录');
+  }
+
+  const tour = tourSeriesOf(match);
+  if (tourNeedsMember(tour)) {
+    if (!isPlayerMember(user)) {
+      return fail('报 L-15 / L-25 需开通年度选手会员。年费不是免单站报名费，请到「我的」开通，或让运营填写会员有效至');
+    }
+    if (!String(user.realName || '').trim() || !String(user.phone || '').trim()) {
+      return fail('报积分赛请先在资料里填写真实姓名和手机号');
+    }
+  }
+
+  const existed = await findReg(openid, eventId);
+  if (existed && existed.status !== 'withdrawn') {
+    return { ok: true, duplicated: true, id: existed._id, status: existed.status };
+  }
+
+  const status = user.signupPriority === 'low' ? 'waitlist' : 'pending';
+  const now = Date.now();
+  const payload = {
     _openid: openid,
     eventId,
-  })
-    .limit(1)
-    .get();
+    mode,
+    partnerUid,
+    status,
+    tourSeries: tour,
+    createdAt: now,
+    updatedAt: now,
+  };
 
-  if (existed.data && existed.data[0]) {
-    return { ok: true, duplicated: true, id: existed.data[0]._id };
+  if (existed && existed.status === 'withdrawn') {
+    await REGS.doc(existed._id).update({ data: payload });
+    return { ok: true, duplicated: false, id: existed._id, status };
   }
 
-  const now = Date.now();
-  const added = await REGS.add({
+  const added = await REGS.add({ data: payload });
+  return { ok: true, duplicated: false, id: added._id, status };
+}
+
+async function withdrawOne(openid, event) {
+  const eventId = event && event.eventId;
+  if (!eventId) {
+    return fail('缺少赛事 id');
+  }
+
+  const row = await findReg(openid, eventId);
+  if (!row || row.status === 'withdrawn') {
+    return fail('你还没有报名这场');
+  }
+
+  const match = await loadEvent(eventId);
+  if (match && (match.status === '进行中' || match.status === '已结束')) {
+    return fail('比赛已开始，不能退赛');
+  }
+
+  const freeUntil = String(
+    (match && (match.withdrawDeadline || match.signupDeadline)) || '',
+  ).slice(0, 10);
+  const late = !!freeUntil && todayKey() > freeUntil;
+
+  const user = await readUser(openid);
+  let remainingExempt = LATE_WITHDRAW_EXEMPT;
+  let signupPriority = 'normal';
+  let usedExemption = false;
+
+  if (late && user) {
+    const year = new Date().getFullYear();
+    let count = Number(user.lateWithdrawCount || 0);
+    const countYear = Number(user.lateWithdrawYear || 0);
+    if (countYear !== year) {
+      count = 0;
+    }
+    count += 1;
+    usedExemption = count <= LATE_WITHDRAW_EXEMPT;
+    remainingExempt = Math.max(0, LATE_WITHDRAW_EXEMPT - count);
+    signupPriority = count > LATE_WITHDRAW_EXEMPT ? 'low' : 'normal';
+    await USERS.doc(user._id).update({
+      data: {
+        lateWithdrawCount: count,
+        lateWithdrawYear: year,
+        signupPriority,
+        updatedAt: Date.now(),
+      },
+    });
+  }
+
+  await REGS.doc(row._id).update({
     data: {
-      _openid: openid,
-      eventId,
-      mode,
-      partnerUid,
-      status: 'pending',
-      createdAt: now,
-      updatedAt: now,
+      status: 'withdrawn',
+      late,
+      withdrawnAt: Date.now(),
+      updatedAt: Date.now(),
     },
   });
 
-  return { ok: true, duplicated: false, id: added._id };
+  return {
+    ok: true,
+    late,
+    usedExemption,
+    remainingExempt,
+    signupPriority,
+  };
 }
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
   if (!OPENID) {
-    return { ok: false, error: '拿不到微信身份，请先登录' };
+    return fail('拿不到微信身份，请先登录');
   }
 
   if (event && event.action === 'list') {
     return listMine(OPENID);
+  }
+  if (event && event.action === 'withdraw') {
+    return withdrawOne(OPENID, event);
   }
   return createOne(OPENID, event);
 };

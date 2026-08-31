@@ -14,6 +14,8 @@
  * 只预览名单。单打一人一行，双打两人一组（signupPreview.format）。
  * 不要「查看按积分报名」，球员卡也不要积分组标签。
  * 「立即报名 / 报名参赛」才跳 /pages/signup/index?id=。
+ * 已经报名的人底部改成「申请退赛」，退赛走 createRegistration 的 withdraw，
+ * 不要让运营在后台直接删报名（迟退次数要记在用户档案里）。
  *
  * 【组队不是约球】
  * 单打：空状态「单打无需组队」，底部不显示发布组队。
@@ -29,7 +31,7 @@ import type {
   EventDetail,
   EventDetailTab,
 } from '../../mock/event-detail';
-import { applyTeamRecruit, loadEventDetail, publishTeamRecruit } from '../../api/events';
+import { applyTeamRecruit, loadEventDetail, listMyRegistrations, publishTeamRecruit, withdrawRegistration } from '../../api/events';
 import { isSinglesEvent } from '../../mock/home';
 import { resolveVenueId } from '../../mock/venue';
 import { navigateToPage } from '../../utils/navigate';
@@ -74,6 +76,7 @@ Page({
     emptyAvatars: ['/assets/images/avatars/anime-01.jpg', '/assets/images/avatars/anime-02.jpg'],
     /** 单打场组队 Tab / CTA 用。跟 isSinglesEvent(category) 走，不要看标题。 */
     singles: false,
+    myRegStatus: '',
   },
 
   onLoad(query: Record<string, string | undefined>) {
@@ -88,7 +91,7 @@ Page({
           displayTitle: event.grade ? `${event.grade}${event.title}` : event.title,
           recruitNeed: isSinglesEvent(event) ? '女搭档' : '男搭档',
         });
-        this.applyTab(tab, event);
+        return this.refreshMyReg(event.id).then(() => this.applyTab(tab, event));
       })
       .catch(() => {
         wx.showToast({ title: '赛事详情加载失败', icon: 'none' });
@@ -103,8 +106,15 @@ Page({
     let ctaLime = true;
     let ctaHintGray = false;
     if (tab === 'signup') {
-      ctaLabel = '报名参赛';
-      ctaHint = event.status === '报名中' ? '报名需先登录成为赛事球员' : '';
+      if (this.data.myRegStatus && this.data.myRegStatus !== 'withdrawn') {
+        ctaLabel = '申请退赛';
+        ctaHint = this.data.myRegStatus === 'waitlist'
+          ? '候补中。退赛须走小程序，不要让后台直接删'
+          : '退赛须走小程序。免费截止后算迟退，每年 3 次豁免';
+      } else {
+        ctaLabel = '报名参赛';
+        ctaHint = event.status === '报名中' ? '报名需先登录成为赛事球员' : '';
+      }
     } else if (tab === 'team') {
       if (isSinglesEvent(event)) {
         showCta = false;
@@ -120,6 +130,9 @@ Page({
     } else if (tab === 'bracket' || tab === 'schedule' || tab === 'results') {
       showCta = false;
       ctaHint = '';
+    } else if (this.data.myRegStatus && this.data.myRegStatus !== 'withdrawn') {
+      ctaLabel = '申请退赛';
+      ctaHint = '退赛须走小程序。免费截止后算迟退，每年 3 次豁免';
     } else if (event.status !== '报名中') {
       ctaHint = '';
     }
@@ -139,6 +152,21 @@ Page({
       return;
     }
     this.applyTab(key);
+  },
+
+  async refreshMyReg(eventId?: string) {
+    const id = eventId || this.data.event.id;
+    if (!id || !getApp<IAppOption>().globalData.isLoggedIn) {
+      this.setData({ myRegStatus: '' });
+      return;
+    }
+    try {
+      const rows = await listMyRegistrations();
+      const mine = rows.find((row) => row.eventId === id);
+      this.setData({ myRegStatus: mine && mine.status !== 'withdrawn' ? mine.status : '' });
+    } catch (error) {
+      this.setData({ myRegStatus: '' });
+    }
   },
 
   onNewsTap() {
@@ -268,6 +296,10 @@ Page({
       this.onOpenGallery();
       return;
     }
+    if (this.data.ctaLabel === '申请退赛') {
+      this.onWithdraw();
+      return;
+    }
     if (tab === 'signup' || action === '立即报名' || action.indexOf('报名') >= 0) {
       navigateToPage(`/pages/signup/index?id=${this.data.event.id}`);
       return;
@@ -281,5 +313,34 @@ Page({
       return;
     }
     navigateToPage(`/pages/signup/index?id=${this.data.event.id}`);
+  },
+
+  onWithdraw() {
+    wx.showModal({
+      title: '申请退赛',
+      content: '免费退赛截止后算迟退。每年 3 次豁免，超出后报名会进候补。退赛必须走这里。',
+      confirmText: '确认退赛',
+      success: (res) => {
+        if (!res.confirm) {
+          return;
+        }
+        withdrawRegistration(this.data.event.id)
+          .then((result) => {
+            const extra = result.late
+              ? result.usedExemption
+                ? `已记迟退，本年度还剩 ${result.remainingExempt} 次豁免`
+                : '迟退次数已满，之后报名将进入候补'
+              : '已退出本场';
+            wx.showToast({ title: extra, icon: 'none', duration: 2500 });
+            return this.refreshMyReg().then(() => this.applyTab(this.data.activeTab));
+          })
+          .catch((error: { message?: string }) => {
+            wx.showToast({
+              title: (error && error.message) || '退赛失败',
+              icon: 'none',
+            });
+          });
+      },
+    });
   },
 });

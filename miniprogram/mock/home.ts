@@ -126,6 +126,16 @@ export interface EventItem {
   recommended?: boolean;
   /** 卡片底部那一行场馆入口（logo + 名称 + ›） */
   venueLink?: boolean;
+  /**
+   * 巡回赛级别。不要和详情页 series（品牌文案）混用。
+   * open = 公开体验赛，免费可报；L-15 / L-25 / masters 要年度选手会员。
+   * 后台「赛事」里改 tourSeries。不填就当 open，避免老数据全部拦掉。
+   */
+  tourSeries?: 'open' | 'L-15' | 'L-25' | 'masters';
+  /** 报名截止日期 YYYY-MM-DD。空 = 只看赛事 status */
+  signupDeadline?: string;
+  /** 免费退赛截止 YYYY-MM-DD。空且没报名截止 = 开赛前都算自愿退 */
+  withdrawDeadline?: string;
 }
 
 /** 属性标签的现成配色。新增标签优先复用，不要随手写一组新颜色 */

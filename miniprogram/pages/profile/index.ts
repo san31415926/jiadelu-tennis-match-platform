@@ -8,7 +8,7 @@ import {
 } from '../../api/auth';
 import type { CloudProfile } from '../../api/auth';
 import { parseTags, joinTags, buildTagView, appendDraftTag, MAX_PROFILE_TAGS } from '../../mock/profile-edit';
-import { TERMS_TITLE, PRIVACY_TITLE, TERMS_TEXT, PRIVACY_TEXT } from '../../mock/legal';
+import { TERMS_TITLE, PRIVACY_TITLE, TERMS_TEXT, PRIVACY_TEXT, MEMBER_TITLE, MEMBER_TEXT } from '../../mock/legal';
 import { PAY_METHODS, PLANS } from '../../mock/membership';
 import { PROFILE_THEMES } from '../../mock/profile';
 import type { ProfileSummary } from '../../mock/profile';
@@ -49,8 +49,9 @@ import { listMatchRecords, loadMyClubCard, syncMyClubSession, toCareerRecordCard
  * 选完图会按当前头图窗口的宽高比打开通用裁剪器，框里就是头图会铺到的那一块。
  * 取消不改封面；完成才写入 profile.cover，并走相册轻糊。
  *
- * 【开通会员】
+ * 【开通选手会员】
  * 同一页底部抽屉（Figma 355:361），不要 navigateTo 会员页。点蒙层关掉。
+ * 只留 198 元/年一档，换掉原来的包月包季。支付未接：运营填 memberUntil。
  * 抽屉打开时卸掉雷达 canvas。
  *
  * 【登录】
@@ -104,8 +105,10 @@ Page({
     memberPays: PAY_METHODS,
     activePlan: 'year',
     activePay: 'wechat',
-    payLabel: '立即支付 ¥199',
-    saveHint: '立省 100 元',
+    payLabel: '立即支付 ¥198',
+    saveHint: '',
+    memberActive: false,
+    memberUntil: '',
   },
 
   async onLoad() {
@@ -207,12 +210,18 @@ Page({
     if (isLoggedIn && loggedInProfile) {
       writeSession({ ...loggedInProfile, ...next });
     }
+    const memberUntil = isLoggedIn && loggedInProfile
+      ? String(loggedInProfile.memberUntil || '').slice(0, 10)
+      : '';
+    const memberActive = !!(isLoggedIn && loggedInProfile && loggedInProfile.memberActive);
     const shown = (isLoggedIn && readSession()) || next;
     const tags = isLoggedIn && shown ? parseTags(shown.tags) : [];
     this.setData({
       isLoggedIn,
       profile: shown,
       tags,
+      memberActive,
+      memberUntil,
       ...buildTagView(tags),
     }, () => this.drawRadar());
   },
@@ -480,10 +489,18 @@ Page({
   },
 
   onMemberCheckout() {
-    const plan = PLANS.find((item) => item.key === this.data.activePlan);
     wx.showToast({
-      title: plan ? `${plan.name}购买待接入支付` : '购买待接入支付',
+      title: '支付未开通，请让运营在后台填写会员有效至',
       icon: 'none',
+      duration: 2500,
+    });
+  },
+
+  onShowMemberAgree() {
+    wx.showModal({
+      title: MEMBER_TITLE,
+      content: MEMBER_TEXT,
+      showCancel: false,
     });
   },
 

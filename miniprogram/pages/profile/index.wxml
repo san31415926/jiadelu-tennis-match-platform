@@ -76,10 +76,10 @@
         mode="aspectFit"
       />
       <view class="vip__copy">
-        <view class="vip__title">开通会员</view>
-        <view class="vip__sub">享 10+ 项会员权益</view>
+        <view class="vip__title">{{memberActive ? '选手会员已开通' : '开通选手会员'}}</view>
+        <view class="vip__sub">{{memberActive ? '有效至 ' + memberUntil + ' · 年费不等于单站报名费' : '198元/年 · 报 L-15 / L-25'}}</view>
       </view>
-      <view class="vip__cta">立即开通</view>
+      <view class="vip__cta">{{memberActive ? '查看权益' : '立即开通'}}</view>
     </view>
   </view>
 
@@ -363,8 +363,8 @@
     <view class="sheet__dim" bindtap="onCloseMemberSheet"></view>
     <view class="sheet__panel sheet__panel--mint" catchtouchmove="onPreventMove">
       <view class="sheet__handle"></view>
-      <view class="sheet__title">开通会员</view>
-      <view class="sheet__sub">一种会员，按时长选择套餐</view>
+      <view class="sheet__title">开通选手会员</view>
+      <view class="sheet__sub">198 元/年，解锁巡回赛报名。年费不是免单站费。</view>
       <scroll-view class="member-plans" scroll-x show-scrollbar="{{false}}">
         <view
           wx:for="{{memberPlans}}"
@@ -384,7 +384,7 @@
         </view>
       </scroll-view>
       <view class="member-hint">
-        <text>到期 299 元/年自动续费，可随时取消</text>
+        <text>微信支付尚未开通。运营把「会员有效至」写成日期即可放行</text>
         <view class="member-hint__q">?</view>
       </view>
       <view class="sheet__label">支付方式</view>
@@ -414,7 +414,7 @@
         <text>{{payLabel}}</text>
         <text class="member-save" wx:if="{{saveHint}}">{{saveHint}}</text>
       </view>
-      <view class="member-agree">开通会员代表同意《会员服务协议》和《自动续费服务规则》</view>
+      <view class="member-agree" bindtap="onShowMemberAgree">开通代表同意《选手会员协议》。年费 ≠ 单站报名费，不含 ATP/ITF 官方积分</view>
     </view>
   </view>
 

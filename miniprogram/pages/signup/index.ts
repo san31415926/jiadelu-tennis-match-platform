@@ -18,7 +18,7 @@
  */
 import { loadEventDetail, submitRegistration } from '../../api/events';
 import { readSession } from '../../api/auth';
-import { formatPlayerId } from '../../utils/player-id';
+import { formatPlayerId, isPlayerMember, tourNeedsMember, tourSeriesOf } from '../../utils/player-id';
 import type { EventDetail, SignupPerson } from '../../mock/event-detail';
 import { isSinglesEvent } from '../../mock/home';
 import { themeBehavior } from '../../behaviors/theme';
@@ -132,6 +132,19 @@ Page({
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
+    const session = readSession();
+    const tour = tourSeriesOf(this.data.event.tourSeries);
+    if (tourNeedsMember(tour) && !isPlayerMember(session && session.memberUntil, session && session.memberPaused)) {
+      wx.showToast({
+        title: '报积分赛需开通选手会员（年费≠报名费）',
+        icon: 'none',
+      });
+      return;
+    }
+    if (tourNeedsMember(tour) && (!session || !session.realName || !session.phone)) {
+      wx.showToast({ title: '请先填写真实姓名和手机号', icon: 'none' });
+      return;
+    }
     submitRegistration({
       eventId: this.data.event.id,
       mode: this.data.mode,
@@ -139,7 +152,11 @@ Page({
     })
       .then((res) => {
         wx.showToast({
-          title: res.duplicated ? '已经报名过这场' : '报名已提交（支付待开通）',
+          title: res.duplicated
+            ? '已经报名过这场'
+            : res.status === 'waitlist'
+              ? '已进入候补（迟退次数已满）'
+              : '报名已提交（支付待开通）',
           icon: 'none',
         });
       })

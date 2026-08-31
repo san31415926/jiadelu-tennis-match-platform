@@ -11,7 +11,8 @@
  * 首页和超级杯用 line 区分：personal / super-cup。
  * 「我的报名」不是一种 status，是当前用户在 registrations 里的记录。
  * 报名由云函数写入，客户端直接查库经常是空的，所以列表走
- * createRegistration({ action: 'list' })。
+ * createRegistration({ action: 'list' })。退赛走同一云函数 action=withdraw。
+ * 巡回赛级别读 events.tourSeries，不要和详情页 series 品牌文案混用。
  *
  * 启动时 seedMock 只在集合为空时灌一次，不要每次用 mock 覆盖已有赛事。
  * 列表 / 热门 / 详情读云库原文，读失败就空着，不要再回落示例表。
@@ -424,16 +425,61 @@ export async function submitRegistration(payload: {
   eventId: string;
   mode: '单人' | '组队';
   partnerUid?: string;
-}): Promise<{ duplicated: boolean }> {
+}): Promise<{ duplicated: boolean; status?: string }> {
   if (useMockEvents()) {
-    return { duplicated: false };
+    return { duplicated: false, status: 'pending' };
   }
-  const res = await callCloud<{ duplicated?: boolean }>('createRegistration', {
+  const res = await callCloud<{ duplicated?: boolean; status?: string }>('createRegistration', {
     eventId: payload.eventId,
     mode: payload.mode,
     partnerUid: payload.partnerUid || '',
   });
+  return { duplicated: !!res.duplicated, status: res.status || 'pending' };
+}
   return { duplicated: !!res.duplicated };
+}
+
+export async function listMyRegistrations(): Promise<
+  { id: string; eventId: string; status: string }[]
+> {
+  if (useMockEvents()) {
+    return [];
+  }
+  const res = await callCloud<{
+    registrations?: { _id?: string; eventId?: string; status?: string }[];
+  }>('createRegistration', { action: 'list' });
+  return (res.registrations || []).map((row) => ({
+    id: String(row._id || ''),
+    eventId: String(row.eventId || ''),
+    status: String(row.status || 'pending'),
+  }));
+}
+
+/**
+ * 退赛必须走云函数，不要让运营在后台直接删报名。
+ * 免费退赛截止后算迟退，每年 3 次豁免。
+ */
+export async function withdrawRegistration(eventId: string): Promise<{
+  late: boolean;
+  usedExemption: boolean;
+  remainingExempt: number;
+}> {
+  if (useMockEvents()) {
+    return { late: false, usedExemption: false, remainingExempt: 3 };
+  }
+  const res = await callCloud<{
+    late?: boolean;
+    usedExemption?: boolean;
+    remainingExempt?: number;
+  }>('createRegistration', {
+    action: 'withdraw',
+    eventId,
+  });
+  return {
+    late: !!res.late,
+    usedExemption: !!res.usedExemption,
+    remainingExempt: Number(res.remainingExempt || 0),
+  };
 }
 
 /** 发布组队招募，写入这场 events.teamRecruits */

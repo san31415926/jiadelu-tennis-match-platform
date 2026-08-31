@@ -59,7 +59,7 @@ export const PROFILE_THEMES: ProfileTheme[] = [
 export const GUEST_PROFILE: ProfileSummary = {
   nickname: '登录',
   avatar: '/assets/images/avatars/anime-01.jpg',
-  uid: 'UID --',
+  uid: 'L-ID --',
   bio: '登录后编辑介绍',
   cover: '',
   theme: 'mint',
@@ -88,7 +88,7 @@ export const GUEST_PROFILE: ProfileSummary = {
 export const MOCK_PROFILE: ProfileSummary = {
   nickname: '帆',
   avatar: '/assets/images/avatars/anime-01.jpg',
-  uid: 'UID 10008652',
+  uid: 'L-10008652',
   bio: '',
   cover: '',
   theme: 'mint',

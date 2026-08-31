@@ -9,7 +9,7 @@
  * 能改：头像、昵称、手机、姓名、性别、惯用手、城市、俱乐部、
  *       常打项目、球龄、个性标签、个人简介
  * 不能改：评分、等级、积分、身价、胜场（设计写了「比赛自动生成，不可手改」）
- * UID 点了是复制，不是编辑。
+ * UID 点了是复制，不是编辑。展示为 L-ID。
  *
  * 想改示例值 → 改 MOCK_PROFILE_EDIT
  * 想改选项文案 → 改 GENDER_OPTIONS / HAND_OPTIONS / PLAY_OPTIONS
@@ -118,7 +118,7 @@ export const MOCK_PROFILE_EDIT: ProfileEditForm = {
   avatar: '/assets/images/avatars/anime-01.jpg',
   nickname: '帆',
   phone: '138****2618',
-  uid: '10008652',
+  uid: 'L-10008652',
   realName: '陈帆',
   gender: '男',
   hand: '右手',

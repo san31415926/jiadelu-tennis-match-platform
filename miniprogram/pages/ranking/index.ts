@@ -13,6 +13,7 @@ import {
 import type { PodiumPlayer, RankedPlayer, RankingRow } from '../../mock/ranking';
 import { themeBehavior } from '../../behaviors/theme';
 import { switchToEvents } from '../../utils/navigate';
+import { rawUid } from '../../utils/player-id';
 
 /**
  * ============================================================================
@@ -30,7 +31,7 @@ function viewerPlayer(): RankedPlayer | null {
   if (!session) {
     return null;
   }
-  const uid = String(session.uid || '').replace(/^UID\s*/, '');
+  const uid = rawUid(String(session.uid || ''));
   const digits = (value: string) => Number(String(value || '').replace(/[^\d]/g, '')) || 0;
   return {
     id: uid,

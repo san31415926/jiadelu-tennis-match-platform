@@ -41,7 +41,7 @@
       />
     </view>
     <view class="row row--last" bindtap="onCopyUid">
-      <text class="row__label">UID</text>
+      <text class="row__label">L-ID</text>
       <view class="row__right">
         <text class="row__value">{{form.uid}}</text>
         <text class="row__arrow">›</text>

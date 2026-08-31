@@ -21,14 +21,14 @@
           <image class="who__av" src="{{self.avatar}}" mode="aspectFill" />
           <view class="who__body">
             <view class="who__name">{{self.name}}</view>
-            <view class="who__meta">UID {{self.uid}}  ·  {{self.hand}}</view>
+            <view class="who__meta">L-ID {{self.uid}}  ·  {{self.hand}}</view>
           </view>
         </view>
         <view class="who__row" wx:if="{{mode === '组队' && hasTeam}}">
           <image class="who__av" src="{{partner.avatar}}" mode="aspectFill" />
           <view class="who__body">
             <view class="who__name">{{partner.name}}</view>
-            <view class="who__meta">UID {{partner.uid}}  ·  {{partner.hand}}</view>
+            <view class="who__meta">L-ID {{partner.uid}}  ·  {{partner.hand}}</view>
           </view>
           <view class="who__clear" bindtap="onClearTeam">暂无队伍</view>
         </view>
@@ -64,14 +64,14 @@
         <image class="who__av who__av--sm" src="{{self.avatar}}" mode="aspectFill" />
         <view class="who__body">
           <view class="who__name">{{self.name}}</view>
-          <view class="who__meta">UID {{self.uid}}  ·  {{self.hand}}</view>
+          <view class="who__meta">L-ID {{self.uid}}  ·  {{self.hand}}</view>
         </view>
       </view>
       <view class="who who--in" wx:if="{{mode === '组队'}}">
         <image class="who__av who__av--sm" src="{{partner.avatar}}" mode="aspectFill" />
         <view class="who__body">
           <view class="who__name">{{partner.name}}</view>
-          <view class="who__meta">UID {{partner.uid}}  ·  {{partner.hand}}</view>
+          <view class="who__meta">L-ID {{partner.uid}}  ·  {{partner.hand}}</view>
         </view>
       </view>
     </view>

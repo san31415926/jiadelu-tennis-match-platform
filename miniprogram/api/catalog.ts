@@ -16,6 +16,7 @@
 import { USE_MOCK } from '../config/env';
 import { callCloud, cloudDb } from './cloud';
 import { readSession, writeSession } from './auth';
+import { rawUid } from '../utils/player-id';
 
 import {
   CLUB_LIST,
@@ -229,7 +230,7 @@ function ensureSelfInMembers(members: ClubMember[], joined: boolean): ClubMember
     return list;
   }
   const nickname = String(session.nickname || '').trim();
-  const uid = String(session.uid || '').replace(/^UID\s*/, '');
+  const uid = rawUid(String(session.uid || ''));
   if (!list.some((item) => isSelfMember(item, nickname, uid))) {
     const power = Number((session as { power?: number }).power || 0);
     list.unshift({

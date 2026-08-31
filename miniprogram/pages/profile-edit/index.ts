@@ -10,7 +10,7 @@
  * 能改：头像、昵称、手机、姓名、性别、惯用手、城市、
  *       常打项目、球龄、个性标签、个人简介
  * 不能改：评分、等级、积分、身价、胜场（设计写了「比赛自动生成，不可手改」）
- * UID 点了是复制，不是编辑。
+ * UID 点了是复制，不是编辑。展示为 L-ID。
  * 个性标签：10 个备选胶囊可点，也可在下面空框里自己写。点选 + 手写加起来最多 5 个。
  * 备选文案在 mock/profile-edit.ts 的 PRESET_TAGS。保存仍写成一个字符串进 users.tags。
  * 球龄、个性标签都不要 placeholder，空着就是空着。
@@ -130,7 +130,7 @@ Page({
   onCopyUid() {
     wx.setClipboardData({
       data: this.data.form.uid.replace(/\s/g, ''),
-      success: () => wx.showToast({ title: 'UID 已复制', icon: 'none' }),
+      success: () => wx.showToast({ title: 'L-ID 已复制', icon: 'none' }),
     });
   },
 

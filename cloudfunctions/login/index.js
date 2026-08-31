@@ -52,12 +52,39 @@ function completeLabel(doc) {
   return `${Math.round((filled / checks.length) * 100)}%`;
 }
 
+function formatPlayerId(uid) {
+  const raw = String(uid || '')
+    .replace(/^UID\s*/i, '')
+    .replace(/^L-/i, '')
+    .trim();
+  if (!raw || raw === '--') {
+    return 'L-ID --';
+  }
+  return `L-${raw}`;
+}
+
+function todayKey() {
+  const date = new Date();
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+function isPlayerMember(doc) {
+  if (doc && doc.memberPaused) {
+    return false;
+  }
+  const until = String((doc && doc.memberUntil) || '').slice(0, 10);
+  return !!until && until >= todayKey();
+}
+
 function toProfile(doc) {
   const uid = doc.uid || '';
   return {
     nickname: doc.nickname || '微信用户',
     avatar: doc.avatar || '/assets/images/avatars/anime-01.jpg',
-    uid: uid.indexOf('UID') === 0 ? uid : `UID ${uid}`,
+    uid: formatPlayerId(uid),
+    playerId: doc.playerId || formatPlayerId(uid),
     bio: doc.bio || '',
     cover: doc.cover || '',
     theme: doc.theme || 'mint',
@@ -83,6 +110,11 @@ function toProfile(doc) {
     rating: doc.rating || '--',
     level: doc.level || '--',
     power: doc.power || 0,
+    memberUntil: String(doc.memberUntil || '').slice(0, 10),
+    memberActive: isPlayerMember(doc),
+    memberPaused: !!doc.memberPaused,
+    lateWithdrawCount: Number(doc.lateWithdrawCount || 0),
+    signupPriority: doc.signupPriority === 'low' ? 'low' : 'normal',
   };
 }
 
@@ -120,6 +152,12 @@ function blankUser(openid) {
     rating: '--',
     level: 'Lv.1',
     power: 0,
+    memberUntil: '',
+    memberPaused: false,
+    lateWithdrawCount: 0,
+    lateWithdrawYear: 0,
+    signupPriority: 'normal',
+    playerId: `L-${uid}`,
     createdAt: now,
     updatedAt: now,
   };
@@ -152,11 +190,18 @@ exports.main = async (event) => {
   const create = event && event.create !== false;
 
   if (existing) {
+    const patch = {};
     if (phone && phone !== existing.phone) {
-      await USERS.doc(existing._id).update({
-        data: { phone, updatedAt: Date.now() },
-      });
+      patch.phone = phone;
       existing.phone = phone;
+    }
+    if (!existing.playerId && existing.uid) {
+      patch.playerId = formatPlayerId(existing.uid);
+      existing.playerId = patch.playerId;
+    }
+    if (Object.keys(patch).length > 0) {
+      patch.updatedAt = Date.now();
+      await USERS.doc(existing._id).update({ data: patch });
     }
     return { ok: true, exists: true, profile: toProfile(existing) };
   }

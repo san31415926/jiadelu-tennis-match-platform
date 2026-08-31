@@ -31,6 +31,7 @@ import {
   packAvatarForCloud,
 } from './cloud';
 import { withProfileComplete } from '../utils/profile-complete';
+import { formatPlayerId } from '../utils/player-id';
 
 /** 退出后写 '1'。启动 restoreSession 看到它就保持游客，直到再点登录。 */
 const LOGGED_OUT_KEY = 'auth.loggedOut';
@@ -48,6 +49,10 @@ export interface CloudProfile extends ProfileSummary {
   tags: string;
   rating: string;
   level: string;
+  memberUntil?: string;
+  memberActive?: boolean;
+  memberPaused?: boolean;
+  lateWithdrawCount?: number;
 }
 
 function withEditFields(base: ProfileSummary, extra?: Partial<CloudProfile>): CloudProfile {
@@ -120,7 +125,7 @@ export function mockLoggedInProfile(): CloudProfile {
 }
 
 export function toEditForm(profile: CloudProfile): ProfileEditForm {
-  const uid = profile.uid.replace(/^UID\s*/, '');
+  const uid = formatPlayerId(profile.uid);
   return {
     avatar: profile.avatar,
     nickname: profile.nickname,

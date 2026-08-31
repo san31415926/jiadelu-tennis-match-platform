@@ -18,6 +18,7 @@
  */
 import { loadEventDetail, submitRegistration } from '../../api/events';
 import { readSession } from '../../api/auth';
+import { formatPlayerId } from '../../utils/player-id';
 import type { EventDetail, SignupPerson } from '../../mock/event-detail';
 import { isSinglesEvent } from '../../mock/home';
 import { themeBehavior } from '../../behaviors/theme';
@@ -39,7 +40,7 @@ function selfFromSession(): SignupPerson {
   return {
     name: session.nickname || '微信用户',
     avatar: session.avatar || '/assets/images/avatars/anime-01.jpg',
-    uid: session.uid.replace(/^UID\s*/, '') || '--',
+    uid: formatPlayerId(session.uid),
     hand: session.hand && session.hand !== '--' ? session.hand : '--',
     rating: session.rating && session.rating !== '--' ? session.rating : '--',
   };

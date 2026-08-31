@@ -8,6 +8,8 @@ interface UserProfile {
   nickname: string;
   avatar: string;
   uid: string;
+  memberUntil?: string;
+  memberActive?: boolean;
   bio: string;
   cover: string;
   theme: string;

@@ -7,6 +7,7 @@
  * action=login  运营账号登录，返回 token
  * action=me / codes / menus  登录后的用户信息
  * action=list / save / remove  读写云库，必须带 token
+ * action=upload / fileUrl / fileUrls  海报等图片上传到云存储，并换临时预览链
  *
  * 公网 HTTP 打开后，网页用 https 调这里。先配环境变量 ADMIN_PASSWORD，
  * 再开通公网访问，否则谁拿到地址都能改库。
@@ -136,6 +137,74 @@ function parseDateKey(time, year) {
   const month = hit[1].length < 2 ? `0${hit[1]}` : hit[1];
   const day = hit[2].length < 2 ? `0${hit[2]}` : hit[2];
   return `${y}-${month}-${day}`;
+}
+
+function decodeBase64Image(raw) {
+  const text = String(raw || '');
+  return text.replace(/^data:image\/[a-zA-Z0-9+]+;base64,/, '');
+}
+
+async function uploadImage(payload) {
+  const body = decodeBase64Image(payload && payload.fileBase64);
+  if (!body) {
+    return { ok: false, error: '没有图片' };
+  }
+  if (body.length > 900000) {
+    return { ok: false, error: '图片太大，请换一张更小的' };
+  }
+  const folder = String((payload && payload.folder) || 'admin-images').replace(
+    /[^a-zA-Z0-9/_-]/g,
+    '',
+  );
+  const cloudPath = `${folder || 'admin-images'}/${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2, 8)}.jpg`;
+  const uploaded = await cloud.uploadFile({
+    cloudPath,
+    fileContent: Buffer.from(body, 'base64'),
+  });
+  const fileID = uploaded && uploaded.fileID;
+  if (!fileID) {
+    return { ok: false, error: '图片没有传上去' };
+  }
+  let tempUrl = '';
+  try {
+    const temps = await cloud.getTempFileURL({ fileList: [fileID] });
+    const first = temps && temps.fileList && temps.fileList[0];
+    tempUrl = (first && first.tempFileURL) || '';
+  } catch (error) {
+    tempUrl = '';
+  }
+  return { ok: true, fileID, tempUrl };
+}
+
+async function fileUrl(payload) {
+  const fileID = String((payload && payload.fileID) || '');
+  if (!fileID) {
+    return { ok: false, error: '没有文件' };
+  }
+  const temps = await cloud.getTempFileURL({ fileList: [fileID] });
+  const first = temps && temps.fileList && temps.fileList[0];
+  const tempUrl = (first && first.tempFileURL) || '';
+  if (!tempUrl) {
+    return { ok: false, error: '暂时无法预览这张图' };
+  }
+  return { ok: true, fileID, tempUrl };
+}
+
+async function fileUrls(payload) {
+  const list = Array.isArray(payload && payload.fileList)
+    ? payload.fileList.map((item) => String(item || '')).filter(Boolean)
+    : [];
+  if (list.length === 0) {
+    return { ok: true, urls: [] };
+  }
+  const temps = await cloud.getTempFileURL({ fileList: list });
+  const urls = ((temps && temps.fileList) || []).map((item) => ({
+    fileID: item.fileID,
+    tempUrl: item.tempFileURL || '',
+  }));
+  return { ok: true, urls };
 }
 
 function stripDoc(row) {
@@ -498,6 +567,16 @@ async function handle(payload, event) {
     }
   } else if (action === 'me' || action === 'codes' || action === 'menus') {
     return { ok: false, error: '请用网页登录' };
+  }
+
+  if (action === 'upload') {
+    return uploadImage(payload);
+  }
+  if (action === 'fileUrl') {
+    return fileUrl(payload);
+  }
+  if (action === 'fileUrls') {
+    return fileUrls(payload);
   }
 
   const collection = payload.collection;

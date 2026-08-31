@@ -8,6 +8,8 @@
  * 【巡回赛级别】读 events.tourSeries，不要去动 events.series（那是品牌文案）。
  * open = 公开体验赛，免费用户可报。
  * L-15 / L-25 / masters = 要年度选手会员（users.memberUntil 未过期）。
+ * L-25 巡回赛排名在 qualifyingCutoff 之外进预选（超签）。
+ * masters 只录取 rankPoints 52 周榜前 mastersTopN。
  * 年费不是免单站报名费。支付未开通时，运营在后台填会员有效至即可放行。
  *
  * 【退赛】免费退赛截止前不算迟退。截止后算迟退，每年 3 次豁免，超出后
@@ -18,9 +20,11 @@ const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
 const db = cloud.database();
+const _ = db.command;
 const REGS = db.collection('registrations');
 const EVENTS = db.collection('events');
 const USERS = db.collection('users');
+const RECORDS = db.collection('match_records');
 
 const LATE_WITHDRAW_EXEMPT = 3;
 
@@ -49,6 +53,58 @@ function tourSeriesOf(match) {
 
 function tourNeedsMember(tour) {
   return tour === 'L-15' || tour === 'L-25' || tour === 'masters';
+}
+
+const RANK_WINDOW_DAYS = 52 * 7;
+
+function inRankWindow(dateKey) {
+  const key = String(dateKey || '').slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) {
+    return false;
+  }
+  const played = Date.parse(`${key}T00:00:00`);
+  if (!played) {
+    return false;
+  }
+  return Date.now() - played <= RANK_WINDOW_DAYS * 24 * 3600 * 1000;
+}
+
+async function tourPointsOf(openid, stored) {
+  const fromUser = Number(stored || 0);
+  try {
+    const recs = await RECORDS.where({ _openid: openid }).limit(50).get();
+    const rows = (recs && recs.data) || [];
+    let sum = 0;
+    let has = false;
+    rows.forEach((row) => {
+      const pts = Number(row.rankPoints || 0);
+      if (!pts || row.demo) {
+        return;
+      }
+      if (row.dateKey && !inRankWindow(row.dateKey)) {
+        return;
+      }
+      has = true;
+      sum += pts;
+    });
+    if (has) {
+      return sum;
+    }
+  } catch (error) {
+    // 没有参赛记录集合时退回 users.rankPoints
+  }
+  return fromUser;
+}
+
+async function officialRankOf(openid, user) {
+  const mine = await tourPointsOf(openid, user && user.rankPoints);
+  if (mine <= 0) {
+    return 0;
+  }
+  const counted = await USERS.where({
+    rankPoints: _.gt(mine),
+  }).count();
+  return ((counted && counted.total) || 0) + 1;
 }
 
 function fail(error) {
@@ -148,6 +204,20 @@ async function createOne(openid, event) {
     }
   }
 
+  let draw = 'main';
+  if (tour === 'L-25') {
+    const rank = await officialRankOf(openid, user);
+    const cutoff = Number(match.qualifyingCutoff || 16);
+    draw = rank > 0 && rank <= cutoff ? 'main' : 'qualifying';
+  }
+  if (tour === 'masters') {
+    const rank = await officialRankOf(openid, user);
+    const topN = Number(match.mastersTopN || 8);
+    if (!rank || rank > topN) {
+      return fail(`年终大师赛只录取巡回赛排名前 ${topN}。你当前排名不足，先打 L-15 / L-25 攒 52 周积分`);
+    }
+  }
+
   const existed = await findReg(openid, eventId);
   if (existed && existed.status !== 'withdrawn') {
     return { ok: true, duplicated: true, id: existed._id, status: existed.status };
@@ -162,17 +232,18 @@ async function createOne(openid, event) {
     partnerUid,
     status,
     tourSeries: tour,
+    draw,
     createdAt: now,
     updatedAt: now,
   };
 
   if (existed && existed.status === 'withdrawn') {
     await REGS.doc(existed._id).update({ data: payload });
-    return { ok: true, duplicated: false, id: existed._id, status };
+    return { ok: true, duplicated: false, id: existed._id, status, draw };
   }
 
   const added = await REGS.add({ data: payload });
-  return { ok: true, duplicated: false, id: added._id, status };
+  return { ok: true, duplicated: false, id: added._id, status, draw };
 }
 
 async function withdrawOne(openid, event) {

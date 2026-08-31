@@ -53,6 +53,7 @@ export interface CloudProfile extends ProfileSummary {
   memberActive?: boolean;
   memberPaused?: boolean;
   lateWithdrawCount?: number;
+  rankPoints?: number;
 }
 
 function withEditFields(base: ProfileSummary, extra?: Partial<CloudProfile>): CloudProfile {

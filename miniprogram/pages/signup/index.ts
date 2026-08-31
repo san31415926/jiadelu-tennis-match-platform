@@ -154,9 +154,11 @@ Page({
         wx.showToast({
           title: res.duplicated
             ? '已经报名过这场'
-            : res.status === 'waitlist'
-              ? '已进入候补（迟退次数已满）'
-              : '报名已提交（支付待开通）',
+            : res.draw === 'qualifying'
+              ? '已进入预选（L-25 正签需巡回赛排名靠前）'
+              : res.status === 'waitlist'
+                ? '已进入候补（迟退次数已满）'
+                : '报名已提交（支付待开通）',
           icon: 'none',
         });
       })

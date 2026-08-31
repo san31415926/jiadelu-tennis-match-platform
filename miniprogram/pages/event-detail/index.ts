@@ -113,7 +113,13 @@ Page({
           : '退赛须走小程序。免费截止后算迟退，每年 3 次豁免';
       } else {
         ctaLabel = '报名参赛';
-        ctaHint = event.status === '报名中' ? '报名需先登录成为赛事球员' : '';
+        ctaHint = event.status === '报名中'
+          ? (event.tourSeries === 'L-25'
+            ? 'L-25 排名靠后将进入预选。年费不是免单站报名费'
+            : event.tourSeries === 'masters'
+              ? '大师赛仅录取巡回赛排名前列'
+              : '报名需先登录成为赛事球员')
+          : '';
       }
     } else if (tab === 'team') {
       if (isSinglesEvent(event)) {

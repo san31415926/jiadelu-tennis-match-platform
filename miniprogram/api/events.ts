@@ -425,18 +425,16 @@ export async function submitRegistration(payload: {
   eventId: string;
   mode: '单人' | '组队';
   partnerUid?: string;
-}): Promise<{ duplicated: boolean; status?: string }> {
+}): Promise<{ duplicated: boolean; status?: string; draw?: string }> {
   if (useMockEvents()) {
     return { duplicated: false, status: 'pending' };
   }
-  const res = await callCloud<{ duplicated?: boolean; status?: string }>('createRegistration', {
+  const res = await callCloud<{ duplicated?: boolean; status?: string; draw?: string }>('createRegistration', {
     eventId: payload.eventId,
     mode: payload.mode,
     partnerUid: payload.partnerUid || '',
   });
-  return { duplicated: !!res.duplicated, status: res.status || 'pending' };
-}
-  return { duplicated: !!res.duplicated };
+  return { duplicated: !!res.duplicated, status: res.status || 'pending', draw: res.draw || '' };
 }
 
 export async function listMyRegistrations(): Promise<

@@ -136,6 +136,10 @@ export interface EventItem {
   signupDeadline?: string;
   /** 免费退赛截止 YYYY-MM-DD。空且没报名截止 = 开赛前都算自愿退 */
   withdrawDeadline?: string;
+  /** L-25：巡回赛排名晚于这个名次就进预选。默认 16 */
+  qualifyingCutoff?: number;
+  /** 年终大师赛录取人数。默认 8 */
+  mastersTopN?: number;
 }
 
 /** 属性标签的现成配色。新增标签优先复用，不要随手写一组新颜色 */

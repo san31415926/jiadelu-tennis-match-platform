@@ -12,11 +12,13 @@
  * 主页「成员」人数按 club_members 实数，不读种子里写死的 24。
  * 「我的」生涯卡的俱乐部排名、人数、参赛场次都不写 users，进页时按云库现算。
  * 参赛记录只认当前用户自己的 match_records，没有就空，不要回落演示赛。
+ * 球员榜「积分」优先用 match_records.rankPoints 的 52 周滚动合计，
+ * 没有巡回赛积分时才退回 players.points。这不是 ATP/ITF 官方分。
  */
 import { USE_MOCK } from '../config/env';
 import { callCloud, cloudDb } from './cloud';
 import { readSession, writeSession } from './auth';
-import { rawUid } from '../utils/player-id';
+import { dateKeyInRankWindow, rawUid } from '../utils/player-id';
 
 import {
   CLUB_LIST,
@@ -597,7 +599,34 @@ export async function listRankedPlayers(): Promise<RankedPlayer[]> {
   }
   try {
     const rows = await queryCollection('players', 50);
-    return rows.map((row) => asPlayer(row));
+    const players = rows.map((row) => asPlayer(row));
+    const records = await queryCollection('match_records', 100);
+    const sums: Record<string, number> = {};
+    records.forEach((row) => {
+      if (row.demo) {
+        return;
+      }
+      const pts = Number(row.rankPoints || 0);
+      if (!pts) {
+        return;
+      }
+      const key = String(row.dateKey || '').slice(0, 10);
+      if (key && !dateKeyInRankWindow(key)) {
+        return;
+      }
+      const pid = String(row.playerId || row._openid || row.id || '');
+      if (!pid) {
+        return;
+      }
+      sums[pid] = (sums[pid] || 0) + pts;
+    });
+    if (!Object.keys(sums).length) {
+      return players;
+    }
+    return players.map((player) => {
+      const extra = sums[player.id];
+      return extra ? { ...player, points: extra } : player;
+    });
   } catch (error) {
     console.warn('读球员榜失败', error);
     return [];
